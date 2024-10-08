@@ -30,17 +30,18 @@ android {
         sourceCompatibility = JavaVersion.VERSION_1_8
         targetCompatibility = JavaVersion.VERSION_1_8
     }
+    composeOptions {
+        kotlinCompilerExtensionVersion = "1.5.2"
+    }
     kotlinOptions {
         jvmTarget = "1.8"
     }
     buildFeatures {
         compose = true
     }
-
 }
 
 dependencies {
-
     implementation(libs.androidx.core.ktx)
     implementation(libs.androidx.appcompat)
     implementation(libs.material)
@@ -53,6 +54,9 @@ dependencies {
     val composeBom = platform("androidx.compose:compose-bom:2024.09.03")
     implementation(composeBom)
     androidTestImplementation(composeBom)
+
+    // Add the Compose Compiler dependency
+    implementation("androidx.compose.compiler:compiler:1.5.1") // Use the appropriate version
 
     // Choose one of the following:
     // Material Design 3
@@ -90,5 +94,4 @@ dependencies {
     implementation("androidx.compose.runtime:runtime-livedata")
     // Optional - Integration with RxJava
     implementation("androidx.compose.runtime:runtime-rxjava2")
-
 }
