@@ -10,13 +10,15 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.ComposeCompilerApi
 import androidx.compose.ui.tooling.preview.Preview
 import com.example.compose.AppTheme
+import com.example.sehatin.view.screen.onboarding.OnBoardingScreen
 
 class MainActivity : AppCompatActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContent {
             AppTheme {
-                SehatinApp()
+//                SehatinApp()
+                OnBoardingScreen()
             }
         }
     }

@@ -1,3 +1,16 @@
 <resources>
     <string name="app_name">Sehatin</string>
+
+
+
+<!--    On Boarding String-->
+    <string name="on_boarding_tittle_1">Welcom to SehatIn</string>
+    <string name="on_boarding_tittle_2">Personalized Diet Plans</string>
+    <string name="on_boarding_tittle_3">Workout Routines</string>
+    <string name="on_boarding_tittle_4">AI for Consultation</string>
+
+    <string name="on_boarding_desc_1">Ready to start your healthy journey?</string>
+    <string name="on_boarding_desc_2">Tailor your meals according to your goals</string>
+    <string name="on_boarding_desc_3">Discover workout routines designed just for you</string>
+    <string name="on_boarding_desc_4">Get personalized guidance and tips</string>
 </resources>
