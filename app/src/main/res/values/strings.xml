@@ -13,4 +13,9 @@
     <string name="on_boarding_desc_2">Tailor your meals according to your goals</string>
     <string name="on_boarding_desc_3">Discover workout routines designed just for you</string>
     <string name="on_boarding_desc_4">Get personalized guidance and tips</string>
+
+    <string name="on_boarding_next_page">Next</string>
+    <string name="sign_up">Sign up</string>
+    <string name="already_have_acc">Already have an account?</string>
+    <string name="sign_in">Sign in</string>
 </resources>

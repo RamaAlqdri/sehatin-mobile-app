@@ -12,10 +12,13 @@ import androidx.compose.foundation.layout.*
 import androidx.compose.ui.unit.dp
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
+import androidx.compose.foundation.pager.HorizontalPager
+import androidx.compose.foundation.pager.PagerState
 import androidx.compose.foundation.pager.rememberPagerState
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Surface
+import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.res.painterResource
@@ -25,6 +28,7 @@ import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.sp
 import com.example.sehatin.R
 import com.example.sehatin.view.components.CustomButton
+import kotlinx.coroutines.launch
 
 @Composable
 fun OnBoardingScreen(
@@ -36,10 +40,7 @@ fun OnBoardingScreen(
         R.drawable.on_boarding_2,
         R.drawable.on_boarding_3,
         R.drawable.on_boarding_4,
-//        R.drawable.ob_2,
-//        R.drawable.ob_3,
     )
-    val cloudVector = R.drawable.cloud
 
 
     val titles = listOf(
@@ -60,6 +61,119 @@ fun OnBoardingScreen(
         horizontalAlignment = Alignment.CenterHorizontally,
 
         ) {
+        HorizontalPager(
+            state = pagerState,
+            modifier = Modifier
+        ) { page ->
+            TopContainer(
+                vectorResId = vectorImages[page],
+                title = titles[page],
+                description = descriptions[page]
+            )
+
+        }
+        HorizontalPagerIndicator(
+            pagerState = pagerState,
+            pageCount = vectorImages.size,
+            modifier = Modifier
+                .padding(top = 40.dp)
+                .align(Alignment.CenterHorizontally),
+            activeColor = MaterialTheme.colorScheme.primary,
+            inactiveColor = MaterialTheme.colorScheme.onBackground.copy(alpha = 0.3f)
+        )
+        ButtonSection(pagerState = pagerState)
+
+    }
+}
+
+@Composable
+fun ButtonSection(
+    pagerState: PagerState
+) {
+    val coroutineScope = rememberCoroutineScope()
+
+    fun navigateToNextPage() {
+        coroutineScope.launch {
+            pagerState.animateScrollToPage(
+                page = pagerState.currentPage + 1
+            )
+        }
+    }
+
+    fun navigateToPreviousPage() {
+        coroutineScope.launch {
+            if (pagerState.currentPage > 0) {
+                pagerState.animateScrollToPage(
+                    page = pagerState.currentPage - 1
+                )
+            }
+        }
+    }
+    Column(
+        verticalArrangement = Arrangement.SpaceBetween,
+        modifier = Modifier
+            .padding(0.dp, 20.dp)
+            .fillMaxHeight(1f)
+//                .background(color = Color.Blue)
+    ) {
+
+        Column(
+            verticalArrangement = Arrangement.SpaceBetween,
+            horizontalAlignment = Alignment.CenterHorizontally,
+            modifier = Modifier
+                .height(100.dp)
+                .padding(top = 25.dp)
+        ) {
+
+            CustomButton(
+                text =
+                if (pagerState.currentPage == pagerState.pageCount - 1) {
+                    stringResource(id = R.string.sign_up)
+                } else {
+                    stringResource(id = R.string.on_boarding_next_page)
+                },
+                isOutlined = true,
+                modifier = Modifier,
+                onClick = {
+                    if (pagerState.currentPage == pagerState.pageCount - 1) {
+                        // Logika jika currentPage - 1 memenuhi kondisi
+                    } else {
+                        navigateToNextPage() // Aksi yang dilakukan jika kondisi tidak terpenuhi
+                    }
+                }
+            )
+            if (pagerState.currentPage == pagerState.pageCount - 1) {
+                Row {
+                    Text(text = stringResource(id = R.string.already_have_acc),
+                        fontSize = 13.sp,
+                        fontWeight = FontWeight.Medium,
+                        color = MaterialTheme.colorScheme.onBackground,
+                        letterSpacing = -0.15.sp
+                        )
+                    Text(
+                        text = " " + stringResource(id = R.string.sign_in),
+                        fontSize = 12.sp,
+                        fontWeight = FontWeight.Bold,
+                        color = MaterialTheme.colorScheme.onBackground,
+                        letterSpacing = -0.15.sp
+                    )
+
+                }
+            }
+        }
+    }
+}
+
+
+@Composable
+fun TopContainer(
+    vectorResId: Int,
+    title: String,
+    description: String
+) {
+    val cloudVector = R.drawable.cloud
+    Column(horizontalAlignment = Alignment.CenterHorizontally) {
+
         Box(
             modifier = Modifier
         ) {
@@ -69,37 +183,37 @@ fun OnBoardingScreen(
                 painter = painterResource(id = cloudVector),
                 contentDescription = null,
                 modifier = Modifier
-                    .size(150.dp)
-                    .offset(x = -50.dp, y = 100.dp)
+                    .size(110.dp)
+                    .offset(x = 5.dp, y = 120.dp)
             )
             Image(
                 painter = painterResource(id = cloudVector),
                 contentDescription = null,
                 modifier = Modifier
                     .size(100.dp)
-                    .offset(x = 170.dp, y = 40.dp)
+                    .offset(x = 180.dp, y = 40.dp)
             )
             Image(
                 painter = painterResource(id = cloudVector),
                 contentDescription = null,
                 modifier = Modifier
-                    .size(180.dp)
-                    .offset(x = 270.dp, y = 170.dp)
+                    .size(140.dp)
+                    .offset(x = 250.dp, y = 170.dp)
             )
             Surface(
                 modifier = Modifier
                     .size(10.dp)
                     .offset(x = 100.dp, y = 100.dp),
-                shape = CircleShape, // menentukan bentuk lingkaran
-                color = MaterialTheme.colorScheme.background // warna latar lingkaran
+                shape = CircleShape,
+                color = MaterialTheme.colorScheme.background
             ) {
             }
             Surface(
                 modifier = Modifier
                     .size(10.dp)
                     .offset(x = 250.dp, y = 150.dp),
-                shape = CircleShape, // menentukan bentuk lingkaran
-                color = MaterialTheme.colorScheme.background // warna latar lingkaran
+                shape = CircleShape,
+                color = MaterialTheme.colorScheme.background
             ) {
             }
             Surface(
@@ -111,30 +225,32 @@ fun OnBoardingScreen(
             ) {
             }
             Image(
-                painter = painterResource(id = vectorImages[0]),
+                painter = painterResource(id = vectorResId),
                 contentDescription = null,
                 modifier = Modifier
-                    .size(325.dp)
+                    .size(
+                        if (vectorResId == R.drawable.on_boarding_2) 270.dp else 320.dp
+                    )
                     .align(Alignment.BottomCenter)
+                    .padding(
+                        bottom = if (vectorResId == R.drawable.on_boarding_2) 40.dp else
+                            20.dp
+                    )
             )
-
-
         }
-
-        // Bagian bawah dengan latar belakang putih
         Column(
             horizontalAlignment = Alignment.CenterHorizontally, modifier = Modifier
 //                .background(color = Color.Red)
         ) {
             Text(
-                text = "Welcome to SehatIn",
+                text = title,
                 fontSize = 24.sp,
                 fontWeight = FontWeight.SemiBold,
                 color = MaterialTheme.colorScheme.onBackground
             )
             Spacer(modifier = Modifier.height(8.dp))
             Text(
-                text = "Ready to start your healthy journey?",
+                text = description,
                 fontSize = 17.sp,
                 fontWeight = FontWeight.Medium,
                 color = MaterialTheme.colorScheme.secondary,
@@ -145,41 +261,8 @@ fun OnBoardingScreen(
             )
 
         }
-        Column(
-            verticalArrangement = Arrangement.SpaceBetween,
-            modifier = Modifier
-                .padding(0.dp, 20.dp)
-                .fillMaxHeight(1f)
-//                .background(color = Color.Blue)
-        ) {
-            Box(
-                modifier = Modifier
-                    .padding(8.dp)
-                    .size(8.dp)
-                    .background(color = Color.Black, shape = CircleShape)
-            )
-            Column(
-                verticalArrangement = Arrangement.SpaceAround,
-                modifier = Modifier
-                    .height(100.dp)
-//                    .background(color = Color.Green)
-            ) {
-
-                CustomButton(
-                    text = "Next",
-                    isOutlined = true,
-                    modifier = Modifier,
-                    onClick = {
-//                        navController.popBackStack()
-//                        navController.navigate(Graph.REGISTER)
-                    },
-//            modifier = Modifier.align(Alignment.BottomCenter)
-                )
-            }
-        }
     }
 }
-
 
 @Composable
 fun BackgroundWithCurve() {
@@ -225,8 +308,8 @@ fun HorizontalPagerIndicator(
             val color = if (i == pagerState.currentPage) activeColor else inactiveColor
             Box(
                 modifier = Modifier
-                    .padding(8.dp)
-                    .size(8.dp)
+                    .padding(4.dp)
+                    .size(9.dp)
                     .background(color, shape = CircleShape)
             )
         }
