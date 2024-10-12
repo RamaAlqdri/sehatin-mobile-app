@@ -4,7 +4,8 @@ import androidx.compose.ui.graphics.Color
 
 
 val onBoardingBGcolor = Color(0xFFB3DF93)
-val primaryLight = Color(0xFF476730)
+val primaryLight = Color(0xFF70A44C)
+//val primaryLight = Color(0xFF476730)
 val onPrimaryLight = Color(0xFFFFFFFF)
 val primaryContainerLight = Color(0xFFC7EEA9)
 val onPrimaryContainerLight = Color(0xFF0A2000)

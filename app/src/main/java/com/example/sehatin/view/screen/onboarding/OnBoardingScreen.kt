@@ -11,16 +11,20 @@ import androidx.compose.ui.graphics.Path
 import androidx.compose.foundation.layout.*
 import androidx.compose.ui.unit.dp
 import androidx.compose.foundation.Image
+import androidx.compose.foundation.background
+import androidx.compose.foundation.pager.rememberPagerState
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Surface
 import androidx.compose.ui.Alignment
+import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.sp
 import com.example.sehatin.R
+import com.example.sehatin.view.components.CustomButton
 
 @Composable
 fun OnBoardingScreen(
@@ -29,6 +33,9 @@ fun OnBoardingScreen(
 ) {
     val vectorImages = listOf(
         R.drawable.on_boarding_1,
+        R.drawable.on_boarding_2,
+        R.drawable.on_boarding_3,
+        R.drawable.on_boarding_4,
 //        R.drawable.ob_2,
 //        R.drawable.ob_3,
     )
@@ -47,19 +54,14 @@ fun OnBoardingScreen(
         stringResource(R.string.on_boarding_desc_3),
         stringResource(R.string.on_boarding_desc_4),
     )
+    val pagerState = rememberPagerState(pageCount = { vectorImages.size })
     Column(
         modifier = Modifier.fillMaxSize(),
         horizontalAlignment = Alignment.CenterHorizontally,
-//        verticalArrangement = Arrangement.SpaceBetween
-    ) {
 
-        // Bagian atas dengan latar belakang hijau dan lengkungan ke latar putih
+        ) {
         Box(
             modifier = Modifier
-
-//                .weight(1f)
-//                .background(MaterialTheme.colorScheme.background)
-//                .background(color = Color.Blue)
         ) {
             BackgroundWithCurve()
 
@@ -139,8 +141,41 @@ fun OnBoardingScreen(
                 textAlign = TextAlign.Center,
                 modifier = Modifier
                     .width(241.dp)
+                    .height(55.dp)
             )
 
+        }
+        Column(
+            verticalArrangement = Arrangement.SpaceBetween,
+            modifier = Modifier
+                .padding(0.dp, 20.dp)
+                .fillMaxHeight(1f)
+//                .background(color = Color.Blue)
+        ) {
+            Box(
+                modifier = Modifier
+                    .padding(8.dp)
+                    .size(8.dp)
+                    .background(color = Color.Black, shape = CircleShape)
+            )
+            Column(
+                verticalArrangement = Arrangement.SpaceAround,
+                modifier = Modifier
+                    .height(100.dp)
+//                    .background(color = Color.Green)
+            ) {
+
+                CustomButton(
+                    text = "Next",
+                    isOutlined = true,
+                    modifier = Modifier,
+                    onClick = {
+//                        navController.popBackStack()
+//                        navController.navigate(Graph.REGISTER)
+                    },
+//            modifier = Modifier.align(Alignment.BottomCenter)
+                )
+            }
         }
     }
 }
@@ -170,5 +205,30 @@ fun BackgroundWithCurve() {
 
         // Gambar latar belakang hijau dengan lengkungan
         drawPath(path = path, color = onBoardingBGcolor) // Hijau
+    }
+}
+
+@Composable
+fun HorizontalPagerIndicator(
+    pagerState: PagerState,
+    pageCount: Int,
+    modifier: Modifier = Modifier,
+    activeColor: Color = Color.Black,
+    inactiveColor: Color = Color.Gray
+) {
+    Row(
+        horizontalArrangement = Arrangement.Center,
+        verticalAlignment = Alignment.CenterVertically,
+        modifier = modifier
+    ) {
+        for (i in 0 until pageCount) {
+            val color = if (i == pagerState.currentPage) activeColor else inactiveColor
+            Box(
+                modifier = Modifier
+                    .padding(8.dp)
+                    .size(8.dp)
+                    .background(color, shape = CircleShape)
+            )
+        }
     }
 }

@@ -106,4 +106,5 @@ dependencies {
 //    kapt("androidx.hilt:hilt-compiler:1.0.0")
     implementation(libs.androidx.hilt.navigation.compose)
     implementation(libs.androidx.ui.text.google.fonts)
+    implementation(libs.androidx.viewpager2)
 }
