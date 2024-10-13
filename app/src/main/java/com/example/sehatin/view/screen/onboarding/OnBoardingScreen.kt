@@ -27,6 +27,7 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.sp
 import com.example.sehatin.R
+import com.example.sehatin.view.components.BackgroundCurve
 import com.example.sehatin.view.components.CustomButton
 import kotlinx.coroutines.launch
 
@@ -177,7 +178,7 @@ fun TopContainer(
         Box(
             modifier = Modifier
         ) {
-            BackgroundWithCurve()
+            BackgroundCurve()
 
             Image(
                 painter = painterResource(id = cloudVector),
@@ -264,32 +265,6 @@ fun TopContainer(
     }
 }
 
-@Composable
-fun BackgroundWithCurve() {
-    // Menggunakan Canvas untuk menggambar lengkungan
-    Canvas(
-        modifier = Modifier
-            .fillMaxWidth()
-            .fillMaxHeight(0.60f)
-    ) {
-        // Buat Path untuk lengkungan
-        val path = Path().apply {
-            moveTo(0f, size.height * 0.75f) // Mulai di titik 75% dari atas
-            quadraticTo(
-                size.width / 2, // Kontrol titik di tengah
-                size.height, // Posisi vertikal di bagian bawah
-                size.width, // Posisi horizontal di bagian akhir (kanan)
-                size.height * 0.75f // Titik akhir dari lengkungan
-            )
-            lineTo(size.width, 0f) // Garis ke pojok kanan atas
-            lineTo(0f, 0f) // Garis ke pojok kiri atas
-            close() // Tutup path
-        }
-
-        // Gambar latar belakang hijau dengan lengkungan
-        drawPath(path = path, color = onBoardingBGcolor) // Hijau
-    }
-}
 
 @Composable
 fun HorizontalPagerIndicator(

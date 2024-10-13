@@ -10,6 +10,7 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.ComposeCompilerApi
 import androidx.compose.ui.tooling.preview.Preview
 import com.example.compose.AppTheme
+import com.example.sehatin.view.screen.authentication.login.LoginScreen
 import com.example.sehatin.view.screen.onboarding.OnBoardingScreen
 
 class MainActivity : AppCompatActivity() {
@@ -18,7 +19,8 @@ class MainActivity : AppCompatActivity() {
         setContent {
             AppTheme {
 //                SehatinApp()
-                OnBoardingScreen()
+                LoginScreen()
+//                OnBoardingScreen()
             }
         }
     }
