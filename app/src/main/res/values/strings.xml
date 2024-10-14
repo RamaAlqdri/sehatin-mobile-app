@@ -19,4 +19,7 @@
     <string name="already_have_acc">Already have an account?</string>
     <string name="dont_have_acc">`Don\'t have an account?`</string>
     <string name="sign_in">Sign In</string>
+    <string name="create_acc">Create Your Account</string>
+    <string name="otp_tittle">Verify Your Account</string>
+    <string name="otp_desc">We’ve sent a 6-digit code to your email. Please enter it below to verify your account.</string>
 </resources>

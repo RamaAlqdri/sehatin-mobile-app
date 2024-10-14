@@ -1,4 +1,4 @@
-package com.example.sehatin.view.screen.authentication.login
+package com.example.sehatin.view.screen.authentication.register
 
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
@@ -12,6 +12,8 @@ import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.offset
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
+import androidx.compose.foundation.layout.width
+import androidx.compose.foundation.layout.wrapContentHeight
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.material.Divider
 import androidx.compose.material3.MaterialTheme
@@ -22,6 +24,7 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.painter.Painter
+import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
@@ -34,12 +37,10 @@ import com.example.sehatin.view.components.CustomButton
 import com.example.sehatin.view.components.CustomTextField
 
 
-fun setPassword(value: String) {
 
-}
 
 @Composable
-fun LoginScreen(modifier: Modifier = Modifier) {
+fun RegisterScreen(modifier: Modifier = Modifier) {
     val cloudVector = R.drawable.cloud
     val vectorIcon = R.drawable.login_1
     Column(
@@ -48,14 +49,19 @@ fun LoginScreen(modifier: Modifier = Modifier) {
 //            .background(color = Color.Black)
             .fillMaxSize()
     ) {
-        Column(horizontalAlignment = Alignment.CenterHorizontally) {
+        Column(horizontalAlignment = Alignment.CenterHorizontally,
+            modifier = Modifier
+//                .background(color = Color.Red)
+                .wrapContentHeight()
+        ) {
 
             Box(
                 modifier = Modifier
+
             ) {
                 BackgroundCurve(
-                    containerHeight = 0.40f,
-                    curveHeightRatio = 0.75f
+                    containerHeight = 0.35f,
+                    curveHeightRatio = 0.65f
                 )
 
                 Image(
@@ -107,9 +113,11 @@ fun LoginScreen(modifier: Modifier = Modifier) {
                     painter = painterResource(id = vectorIcon),
                     contentDescription = null,
                     modifier = Modifier
-                        .size(300.dp)
+                        .size(300.dp,190.dp)
+//                        .background(color = Color.Black)
                         .align(Alignment.BottomCenter)
-                        .padding(top = 60.dp)
+
+                        .padding(bottom = 10.dp)
                 )
             }
 
@@ -128,7 +136,7 @@ fun LoginScreen(modifier: Modifier = Modifier) {
                     .fillMaxWidth(0.75f)
             ) {
                 Text(
-                    text = stringResource(id = R.string.sign_in),
+                    text = stringResource(id = R.string.create_acc),
                     modifier = Modifier.padding(bottom = 22.dp),
                     fontSize = 24.sp,
                     fontWeight = FontWeight.SemiBold,
@@ -150,20 +158,21 @@ fun LoginScreen(modifier: Modifier = Modifier) {
                     isPassword = true,
                     errorMessage = "Password"
                 )
-                Text(
-                    text = "Forgot Password ?",
-                    modifier = Modifier
-                        .padding(bottom = 10.dp)
-                        .fillMaxWidth(),
-                    fontSize = 12.sp,
-                    fontWeight = FontWeight.Medium,
-                    color = MaterialTheme.colorScheme.onBackground,
-                    textAlign = TextAlign.End
+                CustomTextField(
+                    value = "",
+                    placeholder = "Confirm Password",
+                    onChange = ::setPassword,
+                    isError = false,
+                    isPassword = true,
+                    errorMessage = "Password"
                 )
+
                 CustomButton(
-                    text = "Sign In",
+                    text = stringResource(id = R.string.sign_up),
 //                isOutlined = true,
-                    modifier = Modifier.fillMaxWidth(),
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .padding(top = 10.dp),
                     onClick = {
                     })
                 Box(
@@ -209,14 +218,14 @@ fun LoginScreen(modifier: Modifier = Modifier) {
                 horizontalArrangement = Arrangement.Center
             ) {
                 Text(
-                    text = stringResource(id = R.string.dont_have_acc),
+                    text = stringResource(id = R.string.already_have_acc),
                     fontSize = 12.sp,
                     fontWeight = FontWeight.Medium,
                     color = MaterialTheme.colorScheme.onBackground,
                     letterSpacing = -0.15.sp
                 )
                 Text(
-                    text = " " + stringResource(id = R.string.sign_up),
+                    text = " " + stringResource(id = R.string.sign_in),
                     fontSize = 12.sp,
                     fontWeight = FontWeight.Bold,
                     color = MaterialTheme.colorScheme.onBackground,
