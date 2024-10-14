@@ -122,8 +122,8 @@ fun ButtonSection(
             verticalArrangement = Arrangement.SpaceBetween,
             horizontalAlignment = Alignment.CenterHorizontally,
             modifier = Modifier
-                .height(100.dp)
-                .padding(top = 25.dp)
+                .height(90.dp)
+                .padding(top = 15.dp)
         ) {
 
             CustomButton(
@@ -133,6 +133,7 @@ fun ButtonSection(
                 } else {
                     stringResource(id = R.string.on_boarding_next_page)
                 },
+                textColor = MaterialTheme.colorScheme.primary,
                 isOutlined = true,
                 modifier = Modifier,
                 onClick = {
@@ -144,9 +145,10 @@ fun ButtonSection(
                 }
             )
             if (pagerState.currentPage == pagerState.pageCount - 1) {
-                Row {
+                Row (modifier = Modifier
+                    .padding(top = 10.dp)){
                     Text(text = stringResource(id = R.string.already_have_acc),
-                        fontSize = 13.sp,
+                        fontSize = 12.sp,
                         fontWeight = FontWeight.Medium,
                         color = MaterialTheme.colorScheme.onBackground,
                         letterSpacing = -0.15.sp
@@ -255,10 +257,11 @@ fun TopContainer(
                 fontSize = 17.sp,
                 fontWeight = FontWeight.Medium,
                 color = MaterialTheme.colorScheme.secondary,
+                lineHeight = 25.sp,
                 textAlign = TextAlign.Center,
                 modifier = Modifier
                     .width(241.dp)
-                    .height(55.dp)
+                    .height(69.dp)
             )
 
         }

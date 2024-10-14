@@ -35,7 +35,7 @@ import com.example.compose.primaryLight
 fun CustomButton(
     modifier: Modifier = Modifier, // Modifier default tanpa ukuran
     defaultWidth: Dp = 163.dp, // Ukuran default yang dapat diubah
-    defaultHeight: Dp = 40.dp,
+    defaultHeight: Dp = 42.dp,
     text: String = "",
     isOutlined: Boolean = false,
     backgroundColor: Color = MaterialTheme.colorScheme.primary,
@@ -78,9 +78,10 @@ fun CustomButton(
                 }
                 Text(
                     text = text,
-                    color = outlinedColor,
+                    color = textColor,
                     fontSize = fontSize,
-                    fontWeight = fontWeight
+                    fontWeight = fontWeight,
+                    letterSpacing = 0.5.sp
                 )
             }
         }
@@ -113,7 +114,8 @@ fun CustomButton(
                     text = text,
                     color = textColor,
                     fontSize = fontSize,
-                    fontWeight = fontWeight
+                    fontWeight = fontWeight,
+                    letterSpacing = 0.5.sp
                 )
             }
         }
