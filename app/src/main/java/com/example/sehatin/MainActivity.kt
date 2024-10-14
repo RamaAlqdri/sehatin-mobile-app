@@ -10,6 +10,8 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.ComposeCompilerApi
 import androidx.compose.ui.tooling.preview.Preview
 import com.example.compose.AppTheme
+import com.example.sehatin.view.screen.authentication.forgot.ChangePassword
+import com.example.sehatin.view.screen.authentication.forgot.ForgotPassword
 import com.example.sehatin.view.screen.authentication.login.LoginScreen
 import com.example.sehatin.view.screen.authentication.register.OtpScreen
 import com.example.sehatin.view.screen.authentication.register.RegisterScreen
@@ -24,7 +26,8 @@ class MainActivity : AppCompatActivity() {
 //                LoginScreen()
 //                OnBoardingScreen()
 //                RegisterScreen()
-                OtpScreen()
+//                OtpScreen()
+                ChangePassword()
             }
         }
     }
