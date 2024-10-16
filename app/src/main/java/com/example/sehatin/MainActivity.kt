@@ -15,6 +15,7 @@ import com.example.sehatin.view.screen.authentication.forgot.ForgotPassword
 import com.example.sehatin.view.screen.authentication.login.LoginScreen
 import com.example.sehatin.view.screen.authentication.register.OtpScreen
 import com.example.sehatin.view.screen.authentication.register.RegisterScreen
+import com.example.sehatin.view.screen.authentication.register.personalize.InputName
 import com.example.sehatin.view.screen.onboarding.OnBoardingScreen
 
 class MainActivity : AppCompatActivity() {
@@ -27,7 +28,8 @@ class MainActivity : AppCompatActivity() {
 //                OnBoardingScreen()
 //                RegisterScreen()
 //                OtpScreen()
-                ChangePassword()
+//                ChangePassword()
+                InputName()
             }
         }
     }
