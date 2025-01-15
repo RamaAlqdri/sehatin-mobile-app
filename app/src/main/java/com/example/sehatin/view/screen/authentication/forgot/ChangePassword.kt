@@ -129,7 +129,7 @@ fun ChangePassword(modifier: Modifier = Modifier) {
                     .fillMaxWidth(0.75f)
             ) {
                 Text(
-                    text = "Change Your Password",
+                    text = "Ubah Kata Sandi Anda",
                     modifier = Modifier.padding(bottom = 3.dp),
                     fontSize = 24.sp,
                     fontWeight = FontWeight.SemiBold,
@@ -137,7 +137,7 @@ fun ChangePassword(modifier: Modifier = Modifier) {
                 )
 //                Spacer(modifier = Modifier.height(8.dp))
                 Text(
-                    text = "Enter your new password below.",
+                    text = "Masukkan kata sandi baru anda",
                     fontSize = 12.sp,
                     fontWeight = FontWeight.Medium,
                     color = MaterialTheme.colorScheme.secondary,
@@ -153,7 +153,7 @@ fun ChangePassword(modifier: Modifier = Modifier) {
                 CustomTextField(
 
                     value = "",
-                    placeholder = "New Password",
+                    placeholder = "Kata Sandi Baru",
                     onChange = ::setPassword,
                     isError = false,
                     isPassword = true,
@@ -162,7 +162,7 @@ fun ChangePassword(modifier: Modifier = Modifier) {
                 CustomTextField(
 
                     value = "",
-                    placeholder = "Confirm Password",
+                    placeholder = "Konfirmasi Kata Sandi",
                     onChange = ::setPassword,
                     isError = false,
                     isPassword = true,
@@ -194,7 +194,7 @@ fun ChangePassword(modifier: Modifier = Modifier) {
 
 
                 CustomButton(
-                    text = "Change",
+                    text = "Ubah",
 //                isOutlined = true,
                     modifier = Modifier
                         .fillMaxWidth()

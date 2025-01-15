@@ -175,14 +175,14 @@ fun OtpScreen(modifier: Modifier = Modifier) {
                     horizontalArrangement = Arrangement.End
                 ) {
                     Text(
-                        text = "Didn't receive the code?",
+                        text = "Tidak menerima kode?",
                         fontSize = 12.sp,
                         fontWeight = FontWeight.Medium,
                         color = MaterialTheme.colorScheme.onBackground,
                         letterSpacing = -0.15.sp
                     )
                     Text(
-                        text = " " + "Resend OTP",
+                        text = " " + "Kirim Ulang",
                         fontSize = 12.sp,
                         fontWeight = FontWeight.Bold,
                         color = MaterialTheme.colorScheme.onBackground,
@@ -193,7 +193,7 @@ fun OtpScreen(modifier: Modifier = Modifier) {
 
 
                 CustomButton(
-                    text = "Verify",
+                    text = "Verifikasi",
 //                isOutlined = true,
                     modifier = Modifier
                         .fillMaxWidth()

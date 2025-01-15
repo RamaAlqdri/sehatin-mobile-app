@@ -36,8 +36,8 @@ fun InputGender(modifier: Modifier = Modifier) {
         R.drawable.ic_female
     )
     val options = listOf(
-        Option(0, "Male"),
-        Option(1, "Female")
+        Option(0, "Laki-laki"),
+        Option(1, "Perempuan")
     )
     var selectedOption by remember { mutableStateOf(options[0]) }
     Column(
@@ -60,21 +60,21 @@ fun InputGender(modifier: Modifier = Modifier) {
             Column (
                 verticalArrangement = Arrangement.spacedBy(16.dp)
             ){
-                Text(text = "3/8",
+                Text(text = "3/7",
                     textAlign = TextAlign.Center,
                     fontSize = 20.sp,
                     fontWeight = FontWeight.SemiBold,
                     color = MaterialTheme.colorScheme.primary,
                     modifier = Modifier
                         .fillMaxWidth())
-                Text(text = "What’s your gender?",
+                Text(text = "Apa jenis kelamin Anda?",
                     textAlign = TextAlign.Center,
                     fontSize = 20.sp,
                     fontWeight = FontWeight.SemiBold,
                     color = MaterialTheme.colorScheme.onBackground,
                     modifier = Modifier
                         .fillMaxWidth())
-                Text(text = "Gender helps us personalize recommendations based on biological factors",
+                Text(text = "Jenis kelamin membantu kami mempersonalisasi rekomendasi berdasarkan faktor biologis",
                     textAlign = TextAlign.Center,
                     fontSize = 16.sp,
                     fontWeight = FontWeight.Normal,
@@ -103,7 +103,7 @@ fun InputGender(modifier: Modifier = Modifier) {
             }
         }
         CustomButton (
-            text = "Next",
+            text = "Selanjutnya",
             modifier = Modifier
                 .padding(bottom =65.dp)
 

@@ -54,21 +54,21 @@ fun InputAge(modifier: Modifier = Modifier) {
             Column (
                 verticalArrangement = Arrangement.spacedBy(16.dp)
             ){
-                Text(text = "2/8",
+                Text(text = "2/7",
                     textAlign = TextAlign.Center,
                     fontSize = 20.sp,
                     fontWeight = FontWeight.SemiBold,
                     color = MaterialTheme.colorScheme.primary,
                     modifier = Modifier
                         .fillMaxWidth())
-                Text(text = "How old are you?",
+                Text(text = "Berapa usia Anda?",
                     textAlign = TextAlign.Center,
                     fontSize = 20.sp,
                     fontWeight = FontWeight.SemiBold,
                     color = MaterialTheme.colorScheme.onBackground,
                     modifier = Modifier
                         .fillMaxWidth())
-                Text(text = "Your age helps us calculate the best diet and workout plans for you.",
+                Text(text = "Usia Anda membantu kami menghitung rencana diet dan latihan terbaik untuk Anda.",
                     textAlign = TextAlign.Center,
                     fontSize = 16.sp,
                     fontWeight = FontWeight.Normal,
@@ -87,7 +87,7 @@ fun InputAge(modifier: Modifier = Modifier) {
 
                 AgeDisplay(selectedDate = selectedDate)
                 CustomDatePicker(
-                    label = "Select a Date",
+                    label = "Tanggal lahir Anda",
                     selectedDate = selectedDate,
                     onDateSelected = {
                         selectedDate = it
@@ -99,7 +99,7 @@ fun InputAge(modifier: Modifier = Modifier) {
             }
         }
         CustomButton (
-            text = "Next",
+            text = "Selanjutnya",
             modifier = Modifier
                 .padding(bottom =65.dp)
 

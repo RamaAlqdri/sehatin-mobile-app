@@ -152,7 +152,7 @@ fun RegisterScreen(modifier: Modifier = Modifier) {
                 )
                 CustomTextField(
                     value = "",
-                    placeholder = "Password",
+                    placeholder = "Kata Sandi",
                     onChange = ::setPassword,
                     isError = false,
                     isPassword = true,
@@ -160,7 +160,7 @@ fun RegisterScreen(modifier: Modifier = Modifier) {
                 )
                 CustomTextField(
                     value = "",
-                    placeholder = "Confirm Password",
+                    placeholder = "Konfirmasi Kata Sandi",
                     onChange = ::setPassword,
                     isError = false,
                     isPassword = true,
@@ -189,7 +189,7 @@ fun RegisterScreen(modifier: Modifier = Modifier) {
                             .padding(vertical = 10.dp)
                     )
                     Text(
-                        text = "or",
+                        text = "atau",
                         textAlign = TextAlign.Center,
                         fontSize = 12.sp,
                         color = MaterialTheme.colorScheme.primary,
@@ -200,7 +200,7 @@ fun RegisterScreen(modifier: Modifier = Modifier) {
                     )
                 }
                 CustomButton(
-                    text = "Continue with Google",
+                    text = "Lanjutkan dengan Google",
                     isOutlined = true,
                     borderWidth = 1.5.dp,
                     textColor = MaterialTheme.colorScheme.onBackground,

@@ -32,6 +32,9 @@ class MainActivity : AppCompatActivity() {
 //                RegisterScreen()
 //                OtpScreen()
 //                ChangePassword()
+//                InputAge()
+//                    InputName()
+//                InputGender()
                 InputHeight()
             }
         }

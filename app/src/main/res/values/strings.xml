@@ -4,22 +4,20 @@
 
 
 <!--    On Boarding String-->
-    <string name="on_boarding_tittle_1">Welcome to SehatIn</string>
-    <string name="on_boarding_tittle_2">Personalized Diet Plans</string>
-    <string name="on_boarding_tittle_3">Workout Routines</string>
-    <string name="on_boarding_tittle_4">AI for Consultation</string>
+    <string name="on_boarding_tittle_1">Selamat Datang di SehatIn</string>
+    <string name="on_boarding_tittle_2">Rencana Diet Terpersonalisasi</string>
+    <string name="on_boarding_tittle_3">Konsultasi AI</string>
 
-    <string name="on_boarding_desc_1">Ready to start your healthy journey?</string>
-    <string name="on_boarding_desc_2">Tailor your meals according to your goals</string>
-    <string name="on_boarding_desc_3">Discover workout routines designed just for you</string>
-    <string name="on_boarding_desc_4">Get personalized guidance and tips</string>
+    <string name="on_boarding_desc_1">Siap memulai perjalanan hidup sehat anda?</string>
+    <string name="on_boarding_desc_2">Sesuaikan makanan anda berdasarkan tujuan diet anda</string>
+    <string name="on_boarding_desc_3">Dapatkan panduan dan tips yang dipersonalisasi.</string>
 
-    <string name="on_boarding_next_page">Next</string>
-    <string name="sign_up">Sign Up</string>
-    <string name="already_have_acc">Already have an account?</string>
-    <string name="dont_have_acc">`Don\'t have an account?`</string>
-    <string name="sign_in">Sign In</string>
-    <string name="create_acc">Create Your Account</string>
-    <string name="otp_tittle">Verify Your Account</string>
-    <string name="otp_desc">We’ve sent a 6-digit code to your email. Please enter it below to verify your account.</string>
+    <string name="on_boarding_next_page">Selanjutnya</string>
+    <string name="sign_up">Daftar</string>
+    <string name="already_have_acc">Sudah punya akun?</string>
+    <string name="dont_have_acc">Belum punya akun?</string>
+    <string name="sign_in">Masuk</string>
+    <string name="create_acc">Buat Akun Anda</string>
+    <string name="otp_tittle">Verifikasi Akun Anda</string>
+    <string name="otp_desc">Masukkan kode 6 digit yang kami kirimkan ke email anda untuk memverifikasi akun Anda</string>
 </resources>

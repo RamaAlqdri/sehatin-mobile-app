@@ -8,6 +8,7 @@ import androidx.compose.foundation.layout.fillMaxHeight
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.width
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
@@ -49,27 +50,27 @@ fun InputHeight(modifier: Modifier = Modifier) {
 //                .background(color = Color.Blue)
 //                .fillMaxHeight(0.35f)
                 .padding(top = 120.dp)
-                .fillMaxWidth(0.75f)
+                .fillMaxWidth(0.90f)
 
         ) {
             Column (
                 verticalArrangement = Arrangement.spacedBy(16.dp)
             ){
-                Text(text = "4/8",
+                Text(text = "4/7",
                     textAlign = TextAlign.Center,
                     fontSize = 20.sp,
                     fontWeight = FontWeight.SemiBold,
                     color = MaterialTheme.colorScheme.primary,
                     modifier = Modifier
                         .fillMaxWidth())
-                Text(text = "What’s your height?",
+                Text(text = "Berapa tinggi badan Anda?",
                     textAlign = TextAlign.Center,
                     fontSize = 20.sp,
                     fontWeight = FontWeight.SemiBold,
                     color = MaterialTheme.colorScheme.onBackground,
                     modifier = Modifier
                         .fillMaxWidth())
-                Text(text = "We need your height to calculate your body composition and ideal weight",
+                Text(text = "Kami membutuhkan tinggi badan Anda untuk menghitung komposisi tubuh dan berat badan ideal Anda",
                     textAlign = TextAlign.Center,
                     fontSize = 16.sp,
                     fontWeight = FontWeight.Normal,

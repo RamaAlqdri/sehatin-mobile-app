@@ -14,7 +14,7 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.shape.RoundedCornerShape
-import androidx.compose.material.Text
+import androidx.compose.material3.Text
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.remember
@@ -43,7 +43,7 @@ fun CustomButton(
     textColor: Color = MaterialTheme.colorScheme.onPrimary,
     shape: RoundedCornerShape = RoundedCornerShape(16.dp),
     fontSize: TextUnit = 14.sp,
-    fontWeight: FontWeight = FontWeight.Medium,
+    fontWeight: FontWeight = FontWeight.SemiBold,
     icon: Painter? = null, // Parameter untuk ikon atau gambar
     iconSpacing: Dp = 8.dp, // Jarak antara ikon dan teks
     borderWidth: Dp = 2.dp,
@@ -62,7 +62,7 @@ fun CustomButton(
                 .clickable(onClick = onClick,
                     indication = null,
                     interactionSource = remember { MutableInteractionSource() })
-                .padding(vertical = 12.dp, horizontal = 24.dp)
+                .padding(vertical = 0.dp, horizontal = 24.dp)
         ) {
             Row(
                 verticalAlignment = Alignment.CenterVertically,
@@ -72,7 +72,7 @@ fun CustomButton(
                     Image(
                         painter = icon,
                         contentDescription = null,
-                        modifier = Modifier.size(24.dp)
+                        modifier = Modifier.size(20.dp)
                     )
                     Spacer(modifier = Modifier.width(iconSpacing))
                 }
@@ -96,7 +96,7 @@ fun CustomButton(
                 .clickable(onClick = onClick,
                     indication = null,
                     interactionSource = remember { MutableInteractionSource() })
-                .padding(vertical = 12.dp, horizontal = 24.dp)
+                .padding(vertical = 0.dp, horizontal = 24.dp)
         ) {
             Row(
                 verticalAlignment = Alignment.CenterVertically,

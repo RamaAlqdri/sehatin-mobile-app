@@ -144,14 +144,14 @@ fun LoginScreen(modifier: Modifier = Modifier) {
                 )
                 CustomTextField(
                     value = "",
-                    placeholder = "Password",
+                    placeholder = "Kata Sandi",
                     onChange = ::setPassword,
                     isError = false,
                     isPassword = true,
                     errorMessage = "Password"
                 )
                 Text(
-                    text = "Forgot Password ?",
+                    text = "Lupa kata sandi?",
                     modifier = Modifier
                         .padding(bottom = 10.dp)
                         .fillMaxWidth(),
@@ -161,7 +161,7 @@ fun LoginScreen(modifier: Modifier = Modifier) {
                     textAlign = TextAlign.End
                 )
                 CustomButton(
-                    text = "Sign In",
+                    text = "Masuk",
 //                isOutlined = true,
                     modifier = Modifier.fillMaxWidth(),
                     onClick = {
@@ -180,7 +180,7 @@ fun LoginScreen(modifier: Modifier = Modifier) {
                             .padding(vertical = 10.dp)
                     )
                     Text(
-                        text = "or",
+                        text = "atau",
                         textAlign = TextAlign.Center,
                         fontSize = 12.sp,
                         color = MaterialTheme.colorScheme.primary,
@@ -191,7 +191,7 @@ fun LoginScreen(modifier: Modifier = Modifier) {
                     )
                 }
                 CustomButton(
-                    text = "Continue with Google",
+                    text = "Lanjutkan dengan Google",
                     isOutlined = true,
                     borderWidth = 1.5.dp,
                     textColor = MaterialTheme.colorScheme.onBackground,

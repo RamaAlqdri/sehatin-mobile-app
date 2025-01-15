@@ -47,21 +47,21 @@ fun InputName(modifier: Modifier = Modifier) {
             Column (
                 verticalArrangement = Arrangement.spacedBy(16.dp)
             ){
-                Text(text = "1/8",
+                Text(text = "1/7",
                     textAlign = TextAlign.Center,
                     fontSize = 20.sp,
                     fontWeight = FontWeight.SemiBold,
                     color = MaterialTheme.colorScheme.primary,
                     modifier = Modifier
                         .fillMaxWidth())
-                Text(text = "What's your name?",
+                Text(text = "Siapa nama Anda?",
                     textAlign = TextAlign.Center,
                     fontSize = 20.sp,
                     fontWeight = FontWeight.SemiBold,
                     color = MaterialTheme.colorScheme.onBackground,
                     modifier = Modifier
                         .fillMaxWidth())
-                Text(text = "We'd like to address you by name for a more personal experience",
+                Text(text = "Kami ingin menyapa Anda dengan nama untuk pengalaman yang lebih personal",
                     textAlign = TextAlign.Center,
                     fontSize = 16.sp,
                     fontWeight = FontWeight.Normal,
@@ -76,7 +76,7 @@ fun InputName(modifier: Modifier = Modifier) {
             ){
 
                 CustomTextField(value = "",
-                    placeholder = "Enter your name",
+                    placeholder = "Nama Anda",
                     onChange = ::setPassword,
                     isError = false,
 //                isPassword = true,
@@ -86,7 +86,7 @@ fun InputName(modifier: Modifier = Modifier) {
             }
         }
         CustomButton (
-            text = "Next",
+            text = "Selanjutnya",
             modifier = Modifier
                 .padding(bottom =65.dp)
 

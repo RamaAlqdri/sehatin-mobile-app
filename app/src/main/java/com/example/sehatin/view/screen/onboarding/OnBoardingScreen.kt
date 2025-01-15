@@ -39,7 +39,6 @@ fun OnBoardingScreen(
     val vectorImages = listOf(
         R.drawable.on_boarding_1,
         R.drawable.on_boarding_2,
-        R.drawable.on_boarding_3,
         R.drawable.on_boarding_4,
     )
 
@@ -48,13 +47,11 @@ fun OnBoardingScreen(
         stringResource(R.string.on_boarding_tittle_1),
         stringResource(R.string.on_boarding_tittle_2),
         stringResource(R.string.on_boarding_tittle_3),
-        stringResource(R.string.on_boarding_tittle_4),
     )
     val descriptions = listOf(
         stringResource(R.string.on_boarding_desc_1),
         stringResource(R.string.on_boarding_desc_2),
         stringResource(R.string.on_boarding_desc_3),
-        stringResource(R.string.on_boarding_desc_4),
     )
     val pagerState = rememberPagerState(pageCount = { vectorImages.size })
     Column(
@@ -83,7 +80,6 @@ fun OnBoardingScreen(
             inactiveColor = MaterialTheme.colorScheme.onBackground.copy(alpha = 0.3f)
         )
         ButtonSection(pagerState = pagerState)
-
     }
 }
 
@@ -127,6 +123,7 @@ fun ButtonSection(
         ) {
 
             CustomButton(
+
                 text =
                 if (pagerState.currentPage == pagerState.pageCount - 1) {
                     stringResource(id = R.string.sign_up)
@@ -247,8 +244,8 @@ fun TopContainer(
         ) {
             Text(
                 text = title,
-                fontSize = 24.sp,
-                fontWeight = FontWeight.SemiBold,
+                fontSize = 20.sp,
+                fontWeight = FontWeight.Bold,
                 color = MaterialTheme.colorScheme.onBackground
             )
             Spacer(modifier = Modifier.height(8.dp))
@@ -260,7 +257,7 @@ fun TopContainer(
                 lineHeight = 25.sp,
                 textAlign = TextAlign.Center,
                 modifier = Modifier
-                    .width(241.dp)
+                    .width(270.dp)
                     .height(69.dp)
             )
 
