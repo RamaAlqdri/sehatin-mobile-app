@@ -23,7 +23,7 @@ import com.example.sehatin.view.components.CustomButton
 
 
 @Composable
-fun InputHeight(modifier: Modifier = Modifier) {
+fun InputWeight(modifier: Modifier = Modifier) {
     var selectedDate by rememberSaveable { mutableStateOf("") }
     var isError by rememberSaveable { mutableStateOf(false) }
     Column(
@@ -46,21 +46,21 @@ fun InputHeight(modifier: Modifier = Modifier) {
             Column (
                 verticalArrangement = Arrangement.spacedBy(16.dp)
             ){
-                Text(text = "4/7",
+                Text(text = "5/7",
                     textAlign = TextAlign.Center,
                     fontSize = 20.sp,
                     fontWeight = FontWeight.SemiBold,
                     color = MaterialTheme.colorScheme.primary,
                     modifier = Modifier
                         .fillMaxWidth())
-                Text(text = "Berapa tinggi badan Anda?",
+                Text(text = "Berapa berat badan Anda?",
                     textAlign = TextAlign.Center,
                     fontSize = 20.sp,
                     fontWeight = FontWeight.SemiBold,
                     color = MaterialTheme.colorScheme.onBackground,
                     modifier = Modifier
                         .fillMaxWidth())
-                Text(text = "Kami membutuhkan tinggi badan Anda untuk menghitung komposisi tubuh dan berat badan ideal Anda",
+                Text(text = "Ini membantu kami menghitung BMI Anda dan merekomendasikan diet dan latihan yang dipersonalisasi",
                     textAlign = TextAlign.Center,
                     fontSize = 16.sp,
                     fontWeight = FontWeight.Normal,
@@ -73,10 +73,16 @@ fun InputHeight(modifier: Modifier = Modifier) {
                 verticalArrangement = Arrangement.spacedBy(18.dp),
                 modifier = Modifier
                     .padding(top = 50.dp)
-
             ){
 
-                CustomScrollInput()
+                CustomScrollInput(
+                    firstUnitMax = 220,
+                    secondUnitMax = 440,
+                    unitOptions = listOf(
+                        Option(0,"kg"),
+                        Option(1,"lbs")
+                    )
+                )
 
             }
         }

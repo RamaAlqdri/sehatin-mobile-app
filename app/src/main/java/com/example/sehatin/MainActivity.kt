@@ -19,6 +19,7 @@ import com.example.sehatin.view.screen.authentication.register.personalize.Input
 import com.example.sehatin.view.screen.authentication.register.personalize.InputGender
 import com.example.sehatin.view.screen.authentication.register.personalize.InputHeight
 import com.example.sehatin.view.screen.authentication.register.personalize.InputName
+import com.example.sehatin.view.screen.authentication.register.personalize.InputWeight
 import com.example.sehatin.view.screen.onboarding.OnBoardingScreen
 
 class MainActivity : AppCompatActivity() {
@@ -35,7 +36,8 @@ class MainActivity : AppCompatActivity() {
 //                InputAge()
 //                    InputName()
 //                InputGender()
-                InputHeight()
+//                InputHeight()
+                InputWeight()
             }
         }
     }

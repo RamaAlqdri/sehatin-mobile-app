@@ -29,6 +29,7 @@ import com.example.sehatin.view.components.CustomGenderRadioButton
 
 
 data class Option(val index: Int, val label: String)
+
 @Composable
 fun InputGender(modifier: Modifier = Modifier) {
     val vectorImages = listOf(
@@ -57,38 +58,44 @@ fun InputGender(modifier: Modifier = Modifier) {
                 .fillMaxWidth(0.75f)
 
         ) {
-            Column (
+            Column(
                 verticalArrangement = Arrangement.spacedBy(16.dp)
-            ){
-                Text(text = "3/7",
+            ) {
+                Text(
+                    text = "3/7",
                     textAlign = TextAlign.Center,
                     fontSize = 20.sp,
                     fontWeight = FontWeight.SemiBold,
                     color = MaterialTheme.colorScheme.primary,
                     modifier = Modifier
-                        .fillMaxWidth())
-                Text(text = "Apa jenis kelamin Anda?",
+                        .fillMaxWidth()
+                )
+                Text(
+                    text = "Apa jenis kelamin Anda?",
                     textAlign = TextAlign.Center,
                     fontSize = 20.sp,
                     fontWeight = FontWeight.SemiBold,
                     color = MaterialTheme.colorScheme.onBackground,
                     modifier = Modifier
-                        .fillMaxWidth())
-                Text(text = "Jenis kelamin membantu kami mempersonalisasi rekomendasi berdasarkan faktor biologis",
+                        .fillMaxWidth()
+                )
+                Text(
+                    text = "Jenis kelamin membantu kami mempersonalisasi rekomendasi berdasarkan faktor biologis",
                     textAlign = TextAlign.Center,
                     fontSize = 16.sp,
                     fontWeight = FontWeight.Normal,
                     color = MaterialTheme.colorScheme.secondary,
                     modifier = Modifier
-                        .fillMaxWidth())
+                        .fillMaxWidth()
+                )
 
             }
-            Row (
+            Row(
                 horizontalArrangement = Arrangement.spacedBy(18.dp),
                 modifier = Modifier
                     .padding(top = 50.dp)
 
-            ){
+            ) {
 
 
                 options.forEach { option ->
@@ -102,10 +109,10 @@ fun InputGender(modifier: Modifier = Modifier) {
                 }
             }
         }
-        CustomButton (
+        CustomButton(
             text = "Selanjutnya",
             modifier = Modifier
-                .padding(bottom =65.dp)
+                .padding(bottom = 65.dp)
 
         ) {
 
