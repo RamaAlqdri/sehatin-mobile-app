@@ -48,7 +48,7 @@ fun InputAge(modifier: Modifier = Modifier) {
 //                .background(color = Color.Blue)
 //                .fillMaxHeight(0.35f)
                 .padding(top = 120.dp)
-                .fillMaxWidth(0.75f)
+                .fillMaxWidth(0.90f)
 
         ) {
             Column (

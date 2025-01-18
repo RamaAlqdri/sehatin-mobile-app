@@ -15,8 +15,10 @@ import com.example.sehatin.view.screen.authentication.forgot.ForgotPassword
 import com.example.sehatin.view.screen.authentication.login.LoginScreen
 import com.example.sehatin.view.screen.authentication.register.OtpScreen
 import com.example.sehatin.view.screen.authentication.register.RegisterScreen
+import com.example.sehatin.view.screen.authentication.register.personalize.InputActivity
 import com.example.sehatin.view.screen.authentication.register.personalize.InputAge
 import com.example.sehatin.view.screen.authentication.register.personalize.InputGender
+import com.example.sehatin.view.screen.authentication.register.personalize.InputGoal
 import com.example.sehatin.view.screen.authentication.register.personalize.InputHeight
 import com.example.sehatin.view.screen.authentication.register.personalize.InputName
 import com.example.sehatin.view.screen.authentication.register.personalize.InputWeight
@@ -37,7 +39,9 @@ class MainActivity : AppCompatActivity() {
 //                    InputName()
 //                InputGender()
 //                InputHeight()
-                InputWeight()
+//                InputWeight()
+//                InputActivity()
+                InputGoal()
             }
         }
     }
