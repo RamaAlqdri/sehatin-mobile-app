@@ -2,7 +2,8 @@ package com.example.compose
 
 import androidx.compose.ui.graphics.Color
 
-
+val caloriesColor = Color(0xFFE58B32)
+val waterColor = Color(0xFF63A8CF)
 val onBoardingBGcolor = Color(0xFFB3DF93)
 val primaryLight = Color(0xFF70A44C)
 //val primaryLight = Color(0xFF476730)
