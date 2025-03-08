@@ -2,6 +2,16 @@ package com.example.compose
 
 import androidx.compose.ui.graphics.Color
 
+val textColor = Color(0xFF333333)
+val numberBack = Color(0x0D000000)
+val numberPick = Color(0xFFC6C5C5)
+val waterGlass = Color(0xFF63A8CF)
+val backGlass = Color(0x2463A8CF)
+val backValue = Color(0x9963A8CF)
+val ter = Color(0x2470A44C)
+val sec = Color(0x2370A44C)
+val back = Color(0xFFF3F3F3)
+val bNavBarColor = Color(0xFF9A9CAD)
 val caloriesColor = Color(0xFFE58B32)
 val waterColor = Color(0xFF63A8CF)
 val onBoardingBGcolor = Color(0xFFB3DF93)

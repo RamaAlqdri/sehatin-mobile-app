@@ -39,7 +39,10 @@ import com.example.sehatin.R
 import com.example.sehatin.view.components.CircularProgressBar
 
 @Composable
-fun HomeScreen(modifier: Modifier = Modifier) {
+fun HomeScreen(
+    modifier: Modifier = Modifier,
+    onSnackClick: (Long, String) -> Unit
+) {
     val vectorImages = listOf(
         R.drawable.ic_male,
         R.drawable.ic_female,
@@ -154,7 +157,7 @@ fun HomeScreen(modifier: Modifier = Modifier) {
                     contentAlignment = Alignment.Center
                 ) {
                     CircularProgressBar(
-                        percentage = 0.69f, // Progress 69%
+                        percentage = 0.90f, // Progress 69%
                         size = 110.dp,
                         strokeWidth = 16.dp,
                         backgroundColor = Color.White.copy(0.3f), // Warna abu-abu terang

@@ -65,6 +65,7 @@ fun LoginScreen(modifier: Modifier = Modifier) {
                         .size(80.dp)
                         .offset(x = 5.dp, y = 80.dp)
                 )
+
                 Image(
                     painter = painterResource(id = cloudVector),
                     contentDescription = null,
@@ -72,6 +73,7 @@ fun LoginScreen(modifier: Modifier = Modifier) {
                         .size(100.dp)
                         .offset(x = 180.dp, y = 40.dp)
                 )
+
                 Image(
                     painter = painterResource(id = cloudVector),
                     contentDescription = null,
@@ -79,6 +81,7 @@ fun LoginScreen(modifier: Modifier = Modifier) {
                         .size(90.dp)
                         .offset(x = 280.dp, y = 130.dp)
                 )
+
                 Surface(
                     modifier = Modifier
                         .size(10.dp)
@@ -87,6 +90,7 @@ fun LoginScreen(modifier: Modifier = Modifier) {
                     color = MaterialTheme.colorScheme.background
                 ) {
                 }
+
                 Surface(
                     modifier = Modifier
                         .size(10.dp)
@@ -95,14 +99,16 @@ fun LoginScreen(modifier: Modifier = Modifier) {
                     color = MaterialTheme.colorScheme.background
                 ) {
                 }
+
                 Surface(
                     modifier = Modifier
                         .size(10.dp)
                         .offset(x = 320.dp, y = 70.dp),
-                    shape = CircleShape, // menentukan bentuk lingkaran
-                    color = MaterialTheme.colorScheme.tertiary // warna latar lingkaran
+                    shape = CircleShape,
+                    color = MaterialTheme.colorScheme.tertiary
                 ) {
                 }
+
                 Image(
                     painter = painterResource(id = vectorIcon),
                     contentDescription = null,
