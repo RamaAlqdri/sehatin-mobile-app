@@ -64,6 +64,9 @@ object FakeData {
     val meals = listOf(
         Meal("Salad", "09.15", 1499, R.drawable.salad),
         Meal("Telur Ceplok", "12.30", 1499, R.drawable.telur),
+        Meal("Telur Ceplok", "12.30", 1499, R.drawable.telur),
+        Meal("Telur Ceplok", "12.30", 1499, R.drawable.telur),
+        Meal("Telur Ceplok", "12.30", 1499, R.drawable.telur),
         Meal("Roti Tawar", "17.30", 1499, R.drawable.roti)
     )
 

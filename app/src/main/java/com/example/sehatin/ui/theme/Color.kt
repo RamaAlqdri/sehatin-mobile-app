@@ -3,6 +3,7 @@ package com.example.compose
 import androidx.compose.ui.graphics.Color
 
 val textColor = Color(0xFF333333)
+val  noAvail = Color(0x8093C775)
 val numberBack = Color(0x0D000000)
 val numberPick = Color(0xFFC6C5C5)
 val waterGlass = Color(0xFF63A8CF)

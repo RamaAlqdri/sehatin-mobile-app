@@ -28,7 +28,6 @@ import com.example.sehatin.view.screen.authentication.register.personalize.Input
 import com.example.sehatin.view.screen.authentication.register.personalize.InputHeight
 import com.example.sehatin.view.screen.authentication.register.personalize.InputName
 import com.example.sehatin.view.screen.authentication.register.personalize.InputWeight
-import com.example.sehatin.view.screen.dashboard.home.HomeScreen
 import com.example.sehatin.view.screen.onboarding.OnBoardingScreen
 
 class MainActivity : ComponentActivity() {

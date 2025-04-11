@@ -27,6 +27,7 @@ import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.TextUnit
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import com.example.compose.noAvail
 import com.example.compose.onPrimaryLight
 import com.example.compose.primaryDark
 import com.example.compose.primaryLight
@@ -47,6 +48,7 @@ fun CustomButton(
     icon: Painter? = null, // Parameter untuk ikon atau gambar
     iconSpacing: Dp = 8.dp, // Jarak antara ikon dan teks
     borderWidth: Dp = 2.dp,
+    isAvailable: Boolean = true,
     onClick: () -> Unit
 ) {
     val buttonModifier = modifier
@@ -59,7 +61,9 @@ fun CustomButton(
             contentAlignment = Alignment.Center,
             modifier = buttonModifier
                 .border(width = borderWidth, color = outlinedColor, shape = shape)
-                .clickable(onClick = onClick,
+                .clickable(
+                    enabled = isAvailable,
+                    onClick = onClick,
                     indication = null,
                     interactionSource = remember { MutableInteractionSource() })
                 .padding(vertical = 0.dp, horizontal = 24.dp)
@@ -90,10 +94,12 @@ fun CustomButton(
             contentAlignment = Alignment.Center,
             modifier = buttonModifier
                 .background(
-                    color = backgroundColor,
+                    color = if (isAvailable) backgroundColor else noAvail,
                     shape = shape
                 )
-                .clickable(onClick = onClick,
+                .clickable(
+                    enabled = isAvailable,
+                    onClick = onClick,
                     indication = null,
                     interactionSource = remember { MutableInteractionSource() })
                 .padding(vertical = 0.dp, horizontal = 24.dp)

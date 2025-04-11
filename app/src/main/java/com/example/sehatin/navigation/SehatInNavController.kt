@@ -29,6 +29,7 @@ object MainDestinations {
     const val SNACK_DETAIL_ROUTE = "snack"
     const val SNACK_ID_KEY = "snackId"
     const val ORIGIN = "origin"
+    const val CHECK_ROUTE = "check"
 }
 
 object DetailDestinations {
@@ -38,6 +39,10 @@ object DetailDestinations {
     const val FOOD_RECOMENDATION_DETAIL_ROUTE = "foodRecomendation"
     const val FOOD_LIST_DETAIL_ROUTE = "foodList"
     const val FOOD_DETAIL_ROUTE = "foodDetail"
+}
+
+object QueryKeys {
+    const val EMAIL = "email"
 }
 
 @Composable
@@ -67,6 +72,20 @@ class SehatInNavController(
             }
         }
     }
+
+    fun navigateToNonBottomBarRoute(route: String, isPopBackStack: Boolean = false) {
+        if (route != navController.currentDestination?.route) {
+            if (isPopBackStack) {
+                navController.popBackStack()
+            }
+            navController.navigate(route) {
+                launchSingleTop = true
+                restoreState = true
+            }
+        }
+    }
+
+
 
     fun navigateToSnackDetail(snackId: Long, origin: String, from: NavBackStackEntry) {
         if (from.lifecycleIsResumed()) {

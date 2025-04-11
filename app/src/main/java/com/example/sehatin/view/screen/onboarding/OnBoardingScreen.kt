@@ -12,6 +12,7 @@ import androidx.compose.foundation.layout.*
 import androidx.compose.ui.unit.dp
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
+import androidx.compose.foundation.clickable
 import androidx.compose.foundation.pager.HorizontalPager
 import androidx.compose.foundation.pager.PagerState
 import androidx.compose.foundation.pager.rememberPagerState
@@ -27,6 +28,7 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.sp
 import com.example.sehatin.R
+import com.example.sehatin.navigation.MainDestinations
 import com.example.sehatin.view.components.BackgroundCurve
 import com.example.sehatin.view.components.CustomButton
 import kotlinx.coroutines.launch
@@ -35,6 +37,9 @@ import kotlinx.coroutines.launch
 fun OnBoardingScreen(
     modifier: Modifier = Modifier,
 //    navController: NavHostController
+    navigateToRoute: (String, Boolean) -> Unit,
+    setOnBoardingCompleted: (Boolean) -> Unit
+
 ) {
     val vectorImages = listOf(
         R.drawable.on_boarding_1,
@@ -79,13 +84,18 @@ fun OnBoardingScreen(
             activeColor = MaterialTheme.colorScheme.primary,
             inactiveColor = MaterialTheme.colorScheme.onBackground.copy(alpha = 0.3f)
         )
-        ButtonSection(pagerState = pagerState)
+        ButtonSection(pagerState = pagerState,
+            navigateToRoute = navigateToRoute,
+            setOnBoardingCompleted = setOnBoardingCompleted
+        )
     }
 }
 
 @Composable
 fun ButtonSection(
-    pagerState: PagerState
+    pagerState: PagerState,
+    navigateToRoute: (String, Boolean) -> Unit,
+    setOnBoardingCompleted: (Boolean) -> Unit
 ) {
     val coroutineScope = rememberCoroutineScope()
 
@@ -126,7 +136,7 @@ fun ButtonSection(
 
                 text =
                 if (pagerState.currentPage == pagerState.pageCount - 1) {
-                    stringResource(id = R.string.sign_up)
+                    stringResource(id = R.string.get_started)
                 } else {
                     stringResource(id = R.string.on_boarding_next_page)
                 },
@@ -135,31 +145,14 @@ fun ButtonSection(
                 modifier = Modifier,
                 onClick = {
                     if (pagerState.currentPage == pagerState.pageCount - 1) {
-                        // Logika jika currentPage - 1 memenuhi kondisi
+                        setOnBoardingCompleted(true)
+                        navigateToRoute(MainDestinations.LOGIN_ROUTE, true)
+
                     } else {
                         navigateToNextPage() // Aksi yang dilakukan jika kondisi tidak terpenuhi
                     }
                 }
             )
-            if (pagerState.currentPage == pagerState.pageCount - 1) {
-                Row (modifier = Modifier
-                    .padding(top = 10.dp)){
-                    Text(text = stringResource(id = R.string.already_have_acc),
-                        fontSize = 12.sp,
-                        fontWeight = FontWeight.Medium,
-                        color = MaterialTheme.colorScheme.onBackground,
-                        letterSpacing = -0.15.sp
-                        )
-                    Text(
-                        text = " " + stringResource(id = R.string.sign_in),
-                        fontSize = 12.sp,
-                        fontWeight = FontWeight.Bold,
-                        color = MaterialTheme.colorScheme.onBackground,
-                        letterSpacing = -0.15.sp
-                    )
-
-                }
-            }
         }
     }
 }

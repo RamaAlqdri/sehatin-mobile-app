@@ -162,7 +162,7 @@ fun CustomTextField(
                 textAlign = TextAlign.Start
             )
         } else {
-            Spacer(modifier = Modifier.height(12.dp)) // Menambahkan spacer tetap saat tidak ada error
+            Spacer(modifier = Modifier.height(16.dp)) // Menambahkan spacer tetap saat tidak ada error
         }
     }
 }

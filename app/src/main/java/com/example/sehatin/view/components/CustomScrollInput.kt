@@ -23,23 +23,23 @@ import com.example.sehatin.view.screen.authentication.register.personalize.Optio
 fun CustomScrollInput(
     modifier: Modifier = Modifier,
     shape: RoundedCornerShape = RoundedCornerShape(16.dp),
-    firstUnitMax: Int = 300,  // Parameter cmMax
-    secondUnitMax: Int = 10,   // Parameter ftMax
-    commaMax:Int=99,
+    firstUnitMax: Int = 300,  // contoh range cm
+    secondUnitMax: Int = 10,  // contoh range ft
+    commaMax: Int = 99,       // contoh range bagian koma
     unitOptions: List<Option> = listOf(
         Option(0, "cm"),
         Option(1, "ft")
-    )  // Parameter unitOptions
+    ),
+    // Callback untuk mengirim nilai Float yang sudah digabung
+    onValueChanged: (Float) -> Unit
 ) {
-
     val firstUnitRange = (-1..firstUnitMax + 1).toList()
     val secondUnitRange = (-1..secondUnitMax + 1).toList()
+    val commaRange = (-1..commaMax + 1).toList()
 
     var selectedUnitOption by remember { mutableStateOf(unitOptions[0]) }
 
-
-    val commaRange = (-1..commaMax+1).toList()
-
+    // Pilih range mana yang dipakai untuk kolom pertama (integer part)
     val currentUnitRange by remember(selectedUnitOption) {
         derivedStateOf {
             if (selectedUnitOption.index == 0) firstUnitRange else secondUnitRange
@@ -50,23 +50,72 @@ fun CustomScrollInput(
             if (selectedUnitOption.index == 0) firstUnitMax else secondUnitMax
         }
     }
-    // LazyListState for height and weight columns
-    val unitListState = rememberLazyListState()
-    val commaListState = rememberLazyListState()
-    val coroutineScope = rememberCoroutineScope()
-    // Derive the selected height and weight from the middle item in the viewport
+
+    // State untuk LazyColumn
+    val unitListState = rememberLazyListState()   // kolom pertama (angka depan)
+    val commaListState = rememberLazyListState()  // kolom kedua (angka setelah koma)
+
+    // Ambil nilai integer dari kolom pertama
+    val selectedIntPart by remember {
+        derivedStateOf {
+            val index = unitListState.firstVisibleItemIndex + 1
+            // Pastikan index masih dalam range valid (tidak -1, tidak melebihi boundary)
+            if (index in currentUnitRange.indices) {
+                currentUnitRange[index]
+            } else {
+                0
+            }
+        }
+    }
+
+    // Ambil nilai decimal (setelah koma) dari kolom kedua
+    val selectedDecimalPart by remember {
+        derivedStateOf {
+            val index = commaListState.firstVisibleItemIndex + 1
+            if (index in commaRange.indices) {
+                commaRange[index]
+            } else {
+                0
+            }
+        }
+    }
+
+    // Gabungkan keduanya menjadi satu Float
+    // Misal: 9 (angka depan) + 48/100 = 9.48
+    // Anda bisa menambahkan logika konversi berbeda untuk ft/inch jika diperlukan.
+    val finalValue by remember(selectedUnitOption, selectedIntPart, selectedDecimalPart) {
+        derivedStateOf {
+            when (selectedUnitOption.index) {
+                0 -> {
+                    // Jika unit cm: integer + decimal/100
+                    selectedIntPart.toFloat() + (selectedDecimalPart.toFloat() / 100f)
+                }
+                1 -> {
+                    // Jika unit ft: misalnya integer + decimal/100
+                    // Atau jika decimal mewakili inches, Anda bisa buat logika konversi lain
+                    selectedIntPart.toFloat() + (selectedDecimalPart.toFloat() / 100f)
+                }
+                else -> 0f
+            }
+        }
+    }
+
+    // Kirim finalValue ke parent setiap kali berubah
+    LaunchedEffect(finalValue) {
+        onValueChanged(finalValue)
+    }
 
     Row(
         modifier = modifier,
         horizontalArrangement = Arrangement.Center,
         verticalAlignment = Alignment.CenterVertically
     ) {
-        // Height Picker
+        // Kolom pertama (angka depan)
         LazyColumn(
             state = unitListState,
             modifier = Modifier.height(160.dp),
             verticalArrangement = Arrangement.spacedBy(12.dp),
-            horizontalAlignment = Alignment.CenterHorizontally,
+            horizontalAlignment = Alignment.CenterHorizontally
         ) {
             items(currentUnitRange.size) { index ->
                 val isSelected = (index == unitListState.firstVisibleItemIndex + 1)
@@ -81,13 +130,15 @@ fun CustomScrollInput(
             }
         }
 
+        // Koma
         Text(
             text = ",",
             fontSize = 32.sp,
             fontWeight = FontWeight.SemiBold,
-            modifier = Modifier
-                .padding(horizontal = 8.dp)
+            modifier = Modifier.padding(horizontal = 8.dp)
         )
+
+        // Kolom kedua (angka setelah koma)
         LazyColumn(
             state = commaListState,
             modifier = Modifier.height(160.dp),
@@ -107,6 +158,8 @@ fun CustomScrollInput(
                 }
             }
         }
+
+        // Pilihan unit (cm / ft)
         Column(
             modifier = Modifier.padding(start = 18.dp),
             horizontalAlignment = Alignment.Start
@@ -116,9 +169,6 @@ fun CustomScrollInput(
                     selected = (option == selectedUnitOption),
                     onClick = {
                         selectedUnitOption = option
-//                        coroutineScope.launch {
-//                            heightListState.scrollToItem(0)
-//                        }
                     },
                     label = option.label
                 )
@@ -249,20 +299,3 @@ fun HeightBoxItem(
         }
     }
 }
-
-//fun cmToFt(front: Int, back: Int): Pair<Int, Int> {
-//    val totalCm = front + back / 100.0  // Menggabungkan integer dan bagian belakang
-//    val totalFeet = totalCm / 30.48
-//    val feet = totalFeet.toInt()
-//    val inches = ((totalFeet - feet) * 12).toInt()
-//    return Pair(feet, inches)
-//}
-//
-//fun ftToCm(feet: Int, inches: Int): Pair<Int, Int> {
-//    val totalFeet = feet + inches / 12.0  // Menggabungkan feet dan inci
-//    val totalCm = totalFeet * 30.48
-//    val cm = totalCm.toInt()
-//    val remainingCm = (totalCm - cm) * 100
-//    return Pair(cm, remainingCm.toInt())
-//}
-

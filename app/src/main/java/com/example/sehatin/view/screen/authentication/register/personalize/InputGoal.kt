@@ -1,14 +1,19 @@
 package com.example.sehatin.view.screen.authentication.register.personalize
 
+import android.util.Log
+import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
+import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.saveable.rememberSaveable
@@ -23,101 +28,196 @@ import com.example.sehatin.view.components.AgeDisplay
 import com.example.sehatin.view.components.CustomButton
 import com.example.sehatin.view.components.CustomDatePicker
 import androidx.compose.runtime.remember
+import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.res.painterResource
+import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.example.sehatin.R
+import com.example.sehatin.common.ResultResponse
+import com.example.sehatin.navigation.MainDestinations
 import com.example.sehatin.view.components.CustomGenderRadioButton
 import com.example.sehatin.view.components.CustomRadioButton
+import com.example.sehatin.view.screen.authentication.login.LoginScreenViewModel
+
+
+data class OptionGoal(val index: Int, val label: String, val level: String)
 
 @Composable
-fun InputGoal(modifier: Modifier = Modifier) {
+fun InputGoal(
+    modifier: Modifier = Modifier,
+    navigateToRoute: (String, Boolean) -> Unit,
+    personalizeViewModel: PersonalizeViewModel,
+    loginScreenViewModel: LoginScreenViewModel
+) {
     val vectorImages = listOf(
         R.drawable.weight,
         R.drawable.muscle,
         R.drawable.healthy,
     )
     val options = listOf(
-        Option(0, "Menurunkan berat badan"),
-        Option(1, "Membentuk otot"),
-        Option(2, "Tetap sehat"),
+        OptionGoal(0, "Menurunkan berat badan", "weight"),
+        OptionGoal(1, "Membentuk otot", "muscle"),
+        OptionGoal(2, "Tetap sehat", "health"),
 
-    )
+        )
     var selectedOption by remember { mutableStateOf(options[0]) }
-    Column(
-        horizontalAlignment = Alignment.CenterHorizontally,
-        verticalArrangement = Arrangement.SpaceBetween,
+
+    var showCircularProgress by remember { mutableStateOf(false) }
+
+    LaunchedEffect(selectedOption) {
+        Log.e("selectedOption", selectedOption.level)
+    }
+
+    val selectionState by personalizeViewModel.personalizeState.collectAsStateWithLifecycle(
+        initialValue = ResultResponse.None
+    )
+
+    val userState by loginScreenViewModel.userState.collectAsStateWithLifecycle(initialValue = ResultResponse.None)
+
+    val personalizeState by loginScreenViewModel.isPersonalizeFilled()
+        .collectAsStateWithLifecycle(initialValue = false)
+
+    LaunchedEffect(selectionState) {
+        when (selectionState) {
+            is ResultResponse.Success -> {
+                showCircularProgress = true
+                loginScreenViewModel.getUser()
+            }
+
+            is ResultResponse.Loading -> {
+                showCircularProgress = true
+            }
+
+            is ResultResponse.Error -> {
+                showCircularProgress = false
+            }
+
+            else -> {}
+        }
+    }
+
+    LaunchedEffect(userState) {
+        when (userState) {
+            is ResultResponse.Success -> {
+                showCircularProgress = false
+                val detail = (userState as ResultResponse.Success).data.data
+                Log.e("GoalScreen", "User detail: $detail")
+                // Cek langsung pada detail yang diterima
+                if (detail.isProfileComplete()) {
+                    loginScreenViewModel.setPersonalizeCompleted()
+                    navigateToRoute(MainDestinations.DASHBOARD_ROUTE, true)
+                } else {
+                    navigateToRoute(MainDestinations.INPUT_NAME_ROUTE, true)
+                }
+            }
+            is ResultResponse.Loading -> {
+                showCircularProgress = true
+            }
+            is ResultResponse.Error -> {
+                showCircularProgress = false
+                Log.e("LoginScreen", "Get user error: ${(userState as ResultResponse.Error).error}")
+            }
+            else -> {}
+        }
+    }
+
+
+
+    Box(
         modifier = Modifier
-//            .background(color = Color.Black)
             .fillMaxSize()
     ) {
         Column(
-            verticalArrangement = Arrangement.Bottom,
             horizontalAlignment = Alignment.CenterHorizontally,
+            verticalArrangement = Arrangement.SpaceBetween,
             modifier = Modifier
+//            .background(color = Color.Black)
+                .fillMaxSize()
+        ) {
+            Column(
+                verticalArrangement = Arrangement.Bottom,
+                horizontalAlignment = Alignment.CenterHorizontally,
+                modifier = Modifier
 //                .background(color = Color.Blue)
 //                .fillMaxHeight(0.35f)
-                .padding(top = 120.dp)
-                .fillMaxWidth(0.90f)
-
-        ) {
-            Column(
-                verticalArrangement = Arrangement.spacedBy(16.dp)
-            ) {
-                Text(
-                    text = "7/7",
-                    textAlign = TextAlign.Center,
-                    fontSize = 20.sp,
-                    fontWeight = FontWeight.SemiBold,
-                    color = MaterialTheme.colorScheme.primary,
-                    modifier = Modifier
-                        .fillMaxWidth()
-                )
-                Text(
-                    text = "Apa tujuan diet Anda?",
-                    textAlign = TextAlign.Center,
-                    fontSize = 20.sp,
-                    fontWeight = FontWeight.SemiBold,
-                    color = MaterialTheme.colorScheme.onBackground,
-                    modifier = Modifier
-                        .fillMaxWidth()
-                )
-                Text(
-                    text = "Beri tahu kami apa yang ingin Anda capai sehingga kami dapat menyesuaikan rencana untuk Anda",
-                    textAlign = TextAlign.Center,
-                    fontSize = 16.sp,
-                    fontWeight = FontWeight.Normal,
-                    color = MaterialTheme.colorScheme.secondary,
-                    modifier = Modifier
-                        .fillMaxWidth()
-                )
-
-            }
-            Column(
-                verticalArrangement = Arrangement.spacedBy(18.dp),
-                modifier = Modifier
-                    .padding(top = 20.dp)
+                    .padding(top = 120.dp)
+                    .fillMaxWidth(0.90f)
 
             ) {
-
-
-                options.forEach { option ->
-                    CustomRadioButton(
-                        icon = painterResource(id = vectorImages[option.index]),
-                        selected = (option == selectedOption),
-                        onClick = { selectedOption = option },
-//                        defaultIconSize = 70.dp,
-                        label = option.label, // Menggunakan label dari objek option
-
+                Column(
+                    verticalArrangement = Arrangement.spacedBy(16.dp)
+                ) {
+                    Text(
+                        text = "7/7",
+                        textAlign = TextAlign.Center,
+                        fontSize = 20.sp,
+                        fontWeight = FontWeight.SemiBold,
+                        color = MaterialTheme.colorScheme.primary,
+                        modifier = Modifier
+                            .fillMaxWidth()
                     )
+                    Text(
+                        text = "Apa tujuan diet Anda?",
+                        textAlign = TextAlign.Center,
+                        fontSize = 20.sp,
+                        fontWeight = FontWeight.SemiBold,
+                        color = MaterialTheme.colorScheme.onBackground,
+                        modifier = Modifier
+                            .fillMaxWidth()
+                    )
+                    Text(
+                        text = "Beri tahu kami apa yang ingin Anda capai sehingga kami dapat menyesuaikan rencana untuk Anda",
+                        textAlign = TextAlign.Center,
+                        fontSize = 16.sp,
+                        fontWeight = FontWeight.Normal,
+                        color = MaterialTheme.colorScheme.secondary,
+                        modifier = Modifier
+                            .fillMaxWidth()
+                    )
+
+                }
+                Column(
+                    verticalArrangement = Arrangement.spacedBy(18.dp),
+                    modifier = Modifier
+                        .padding(top = 20.dp)
+
+                ) {
+
+
+                    options.forEach { option ->
+                        CustomRadioButton(
+                            icon = painterResource(id = vectorImages[option.index]),
+                            selected = (option == selectedOption),
+                            onClick = {
+                                selectedOption = option
+                                personalizeViewModel.setGoal(option.level)
+                            },
+//                        defaultIconSize = 70.dp,
+                            label = option.label, // Menggunakan label dari objek option
+
+                        )
+                    }
                 }
             }
+
+            CustomButton(
+                text = "Selanjutnya",
+                onClick = {
+                    personalizeViewModel.inputGoal()
+                },
+                modifier = Modifier
+                    .padding(bottom = 65.dp)
+
+            )
         }
-        CustomButton(
-            text = "Selanjutnya",
-            modifier = Modifier
-                .padding(bottom = 65.dp)
-
-        ) {
-
+        if (showCircularProgress) {
+            Box(
+                contentAlignment = Alignment.Center,
+                modifier = Modifier
+                    .fillMaxSize()
+                    .background(Color.Black.copy(alpha = 0.8f))
+            ) {
+                CircularProgressIndicator(color = MaterialTheme.colorScheme.primary)
+            }
         }
     }
 }

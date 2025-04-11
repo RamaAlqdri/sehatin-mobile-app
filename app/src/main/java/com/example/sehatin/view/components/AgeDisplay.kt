@@ -1,5 +1,6 @@
 package com.example.sehatin.view.components
 
+import android.util.Log
 import androidx.compose.foundation.background
 import androidx.compose.foundation.border
 import androidx.compose.foundation.layout.Box
@@ -15,6 +16,9 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import java.text.SimpleDateFormat
+import java.time.LocalDate
+import java.time.Period
+import java.time.format.DateTimeFormatter
 import java.util.Calendar
 import java.util.Locale
 
@@ -50,28 +54,41 @@ fun AgeDisplay(
     }
 }
 
-// Fungsi untuk menghitung usia dari tanggal yang dipilih
+
 fun calculateAge(birthDate: String): Int {
+    if(birthDate.isEmpty()){
+        return 0
+    }
     return try {
-        val dateFormatter = SimpleDateFormat("dd/MM/yyyy", Locale.getDefault())
-        val birthDateParsed = dateFormatter.parse(birthDate)
-
-        birthDateParsed?.let {
-            val now = Calendar.getInstance()
-            val birthCalendar = Calendar.getInstance().apply {
-                time = birthDateParsed
-            }
-
-            var age = now.get(Calendar.YEAR) - birthCalendar.get(Calendar.YEAR)
-
-            // Periksa apakah hari ulang tahun sudah lewat tahun ini
-            if (now.get(Calendar.DAY_OF_YEAR) < birthCalendar.get(Calendar.DAY_OF_YEAR)) {
-                age--
-            }
-
-            age
-        } ?: 0
+        val formatter = DateTimeFormatter.ofPattern("d/M/yyyy", Locale.getDefault())
+        val birthLocalDate = LocalDate.parse(birthDate, formatter)
+        val now = LocalDate.now()
+        Period.between(birthLocalDate, now).years
     } catch (e: Exception) {
-        0 // Jika parsing gagal, default usia adalah 0
+        0
     }
 }
+
+//fun calculateAge(birthDate: String): Int {
+//    return try {
+//        val dateFormatter = SimpleDateFormat("dd/MM/yyyy", Locale.getDefault())
+//        val birthDateParsed = dateFormatter.parse(birthDate)
+//
+//        birthDateParsed?.let {
+//            val now = Calendar.getInstance()
+//            val birthCalendar = Calendar.getInstance().apply {
+//                time = birthDateParsed
+//            }
+//
+//            var age = now.get(Calendar.YEAR) - birthCalendar.get(Calendar.YEAR)
+//
+//            if (now.get(Calendar.DAY_OF_YEAR) < birthCalendar.get(Calendar.DAY_OF_YEAR)) {
+//                age--
+//            }
+//
+//            age
+//        } ?: 0
+//    } catch (e: Exception) {
+//        0
+//    }
+//}

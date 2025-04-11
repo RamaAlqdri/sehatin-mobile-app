@@ -21,7 +21,7 @@ import com.example.sehatin.view.components.HomeSections
 import com.example.sehatin.view.screen.dashboard.consultation.ConsultationScreen
 import com.example.sehatin.view.screen.dashboard.diet.DietScreen
 import com.example.sehatin.view.screen.dashboard.home.DashboardScreen
-import com.example.sehatin.view.screen.dashboard.home.HomeScreen
+import com.example.sehatin.view.screen.dashboard.home.DashboardViewModel
 import com.example.sehatin.view.screen.dashboard.profile.ProfileScreen
 
 fun <T> spatialExpressiveSpring() = spring<T>(
@@ -81,6 +81,7 @@ fun NavGraphBuilder.composableWithCompositionLocal(
 
 
 fun NavGraphBuilder.addHomeGraph(
+    dashboardViewModel: DashboardViewModel,
     onSnackSelected: (Long, String, NavBackStackEntry) -> Unit,
     modifier: Modifier = Modifier
 ) {
@@ -95,6 +96,7 @@ fun NavGraphBuilder.addHomeGraph(
             onSnackClick = { id, origin ->
                 onSnackSelected(id, origin, from)
             },
+            dashboardViewModel = dashboardViewModel,
             modifier = modifier
         )
     }
