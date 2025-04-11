@@ -36,6 +36,7 @@ import androidx.compose.ui.unit.sp
 import com.example.compose.onPrimaryLight
 import com.example.compose.primaryDark
 import com.example.compose.primaryLight
+import android.util.Log
 @Composable
 fun CircularProgressBar(
     percentage: Float, // Nilai progress dalam bentuk desimal (0f - 1f)
@@ -46,6 +47,7 @@ fun CircularProgressBar(
     progressColor: Color = Color.White, // Warna progress
     textColor: Color = Color.White // Warna teks
 ) {
+    Log.d("CircularProgressBar", "Percentage: $percentage")
     Box(
         contentAlignment = Alignment.Center,
         modifier = modifier.size(size)

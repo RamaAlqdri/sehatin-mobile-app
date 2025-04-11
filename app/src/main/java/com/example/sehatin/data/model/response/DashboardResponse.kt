@@ -10,7 +10,7 @@ data class CaloriesADayRequest(
 data class DietProgressResponse(
 
     @field:SerializedName("data")
-    val data: Double,
+    val data: ProgressItem,
 
     @field:SerializedName("message")
     val message: String,
@@ -86,6 +86,17 @@ data class DataItem(
 
     @field:SerializedName("is_completed")
     val isCompleted: Boolean
+)
+
+data class ProgressItem(
+    @field:SerializedName("persentase")
+    val persentase: Double,
+
+    @field:SerializedName("short_message")
+    val short_message: String,
+
+    @field:SerializedName("desc")
+    val desc: String,
 )
 
 

@@ -262,28 +262,30 @@ fun DashboardScreen(
                                         ) {
 
                                             Text(
-                                                text = "Hebat!",
+                                                text = "${dietProgressData?.data?.short_message ?: " "}",
                                                 color = MaterialTheme.colorScheme.onPrimary,
                                                 fontWeight = FontWeight.Bold,
                                                 fontSize = 32.sp
                                             )
                                             Text(
-                                                text = "Kamu berada di jalur yang tepat",
+                                                text = "${dietProgressData?.data?.desc ?: " " }",
                                                 color = MaterialTheme.colorScheme.onPrimary,
                                                 fontWeight = FontWeight.Normal,
                                                 fontSize = 10.sp
                                             )
                                         }
                                     }
+
                                     Box(
                                         modifier = Modifier
                                             .fillMaxSize(),
 //                        .background(Color(0xFF8BC34A)), // Warna hijau sebagai background layar
                                         contentAlignment = Alignment.Center
                                     ) {
+                                        val persentase = dietProgressData?.data?.persentase ?: 0.99
                                         CircularProgressBar(
                                             percentage = formatPercentageToFloat(
-                                                (dietProgressData?.data ?: 0.99)
+                                                persentase
                                             ), // Progress 69%
                                             size = 110.dp,
                                             strokeWidth = 16.dp,
@@ -464,7 +466,9 @@ fun formattedCurrentDate(): String? {
 }
 
 fun formatPercentageToFloat(percentage: Double): Float {
+    Log.d("Debug", "Raw percentage: $percentage")
     val decimalValue = percentage / 100.0
+    Log.d("Debug", "Converted to decimal: $decimalValue")
     return (Math.round(decimalValue * 10.0) / 10.0f)
 }
 
