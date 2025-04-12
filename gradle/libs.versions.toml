@@ -26,8 +26,10 @@ retrofit = "2.11.0"
 ui = "1.7.7"
 uiTextGoogleFonts = "1.7.7"
 uiTooling = "1.7.7"
+coil = "2.4.0"
 
 [libraries]
+coil-compose = { module = "io.coil-kt:coil-compose", version.ref = "coil" }
 accompanist-pager = { module = "com.google.accompanist:accompanist-pager", version.ref = "accompanistPager" }
 accompanist-pager-indicators = { module = "com.google.accompanist:accompanist-pager-indicators", version.ref = "accompanistPager" }
 androidx-animation = { module = "androidx.compose.animation:animation", version.ref = "animation" }

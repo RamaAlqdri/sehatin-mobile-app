@@ -1,5 +1,6 @@
 package com.example.sehatin.view.screen.dashboard.home
 
+import android.util.Log
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.example.sehatin.common.ResultResponse
@@ -12,12 +13,15 @@ import com.example.sehatin.data.model.response.ScheduleADayResponse
 import com.example.sehatin.data.model.response.VerifyOtpRequest
 import com.example.sehatin.data.model.response.WaterADayResponse
 import com.example.sehatin.data.repository.DashboardRepository
+import com.example.sehatin.utils.parseDate
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.launch
 import java.time.LocalDateTime
 import java.time.format.DateTimeFormatter
+import kotlin.text.compareTo
+import kotlin.text.format
 
 class DashboardViewModel(
     private val dashboardRepository: DashboardRepository
@@ -48,8 +52,8 @@ class DashboardViewModel(
     val waterADay = _waterADay.asStateFlow()
 
 // SEPARATOR
-private val _scheduleADayState =
-    MutableStateFlow<ResultResponse<ScheduleADayResponse>>(ResultResponse.None)
+    private val _scheduleADayState =
+        MutableStateFlow<ResultResponse<ScheduleADayResponse>>(ResultResponse.None)
     val scheduleADayState: StateFlow<ResultResponse<ScheduleADayResponse>> = _scheduleADayState
 
     private val _scheduleADay = MutableStateFlow<ScheduleADayResponse?>(null)
@@ -75,6 +79,7 @@ private val _scheduleADayState =
         getUserDietProgress(forceRefresh = false)
          getCaloriesADay(forceRefresh = false)
         getWaterADay(forceRefresh = false)
+        getScheduleADay(forceRefresh = false)
     }
 
     private fun getUserDietProgress(forceRefresh: Boolean = false) {
@@ -115,8 +120,10 @@ private val _scheduleADayState =
         viewModelScope.launch {
             try {
                 val currentDate = LocalDateTime.now()
-                val formatter = DateTimeFormatter.ISO_DATE_TIME
-                val formattedDate = currentDate.format(formatter)
+                val formatter = DateTimeFormatter.ISO_INSTANT
+//                val formattedDate = currentDate.format(formatter)
+                val date = java.util.Date.from(currentDate.atZone(java.time.ZoneId.of("UTC")).toInstant())
+
 
                 val currentTime = System.currentTimeMillis()
                 val shouldRefresh = _waterADayState.value is ResultResponse.None ||
@@ -127,7 +134,7 @@ private val _scheduleADayState =
                     _waterADayState.value = ResultResponse.Loading
                     _isRefreshing.value = true
 
-                    dashboardRepository.getWaterADay(formattedDate)
+                    dashboardRepository.getWaterADay(date)
                         .collect { result ->
                             _waterADayState.value = result
                             if (result !is ResultResponse.Loading) {
@@ -153,8 +160,12 @@ private val _scheduleADayState =
         viewModelScope.launch {
             try {
                 val currentDate = LocalDateTime.now()
-                val formatter = DateTimeFormatter.ISO_DATE_TIME
-                val formattedDate = currentDate.format(formatter)
+                val formatter = DateTimeFormatter.ISO_INSTANT
+                val formattedDate = currentDate.atZone(java.time.ZoneId.of("UTC")).format(formatter)
+                val date = java.util.Date.from(currentDate.atZone(java.time.ZoneId.of("UTC")).toInstant())
+
+
+//                Log.e("RESULT", "getCaloriesADay: $formattedDate")
 
                 val currentTime = System.currentTimeMillis()
                 val shouldRefresh = _caloriesADayState.value is ResultResponse.None ||
@@ -165,7 +176,7 @@ private val _scheduleADayState =
                     _caloriesADayState.value = ResultResponse.Loading
                     _isRefreshing.value = true
 
-                    dashboardRepository.getCaloriesADay(formattedDate)
+                    dashboardRepository.getCaloriesADay(date)
                         .collect { result ->
                             _caloriesADayState.value = result
                             if (result !is ResultResponse.Loading) {
@@ -186,13 +197,14 @@ private val _scheduleADayState =
             }
         }
     }
-
     private fun getScheduleADay(forceRefresh: Boolean = false) {
         viewModelScope.launch {
             try {
                 val currentDate = LocalDateTime.now()
-                val formatter = DateTimeFormatter.ISO_DATE_TIME
-                val formattedDate = currentDate.format(formatter)
+                val formatter = DateTimeFormatter.ISO_INSTANT
+                val formattedDate = currentDate.atZone(java.time.ZoneId.of("UTC")).format(formatter)
+                val date = java.util.Date.from(currentDate.atZone(java.time.ZoneId.of("UTC")).toInstant())
+
 
                 val currentTime = System.currentTimeMillis()
                 val shouldRefresh = _scheduleADayState.value is ResultResponse.None ||
@@ -203,7 +215,7 @@ private val _scheduleADayState =
                     _scheduleADayState.value = ResultResponse.Loading
                     _isRefreshing.value = true
 
-                    dashboardRepository.getScheduleADay(formattedDate)
+                    dashboardRepository.getScheduleADay(date)
                         .collect { result ->
                             _scheduleADayState.value = result
                             if (result !is ResultResponse.Loading) {
@@ -229,6 +241,7 @@ private val _scheduleADayState =
         getUserDietProgress(forceRefresh = true)
         getCaloriesADay(forceRefresh = true)
         getWaterADay(forceRefresh = true)
+        getScheduleADay(forceRefresh = true)
     }
 
     suspend fun getUserDetail(): Detail? {

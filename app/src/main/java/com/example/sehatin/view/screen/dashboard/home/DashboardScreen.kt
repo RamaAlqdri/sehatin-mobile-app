@@ -54,6 +54,7 @@ import com.example.sehatin.R
 import com.example.sehatin.common.FakeData
 import com.example.sehatin.common.Meal
 import com.example.sehatin.common.ResultResponse
+import com.example.sehatin.data.model.response.CaloriesADayResponse
 import com.example.sehatin.data.model.response.Detail
 import com.example.sehatin.data.model.response.DietProgressResponse
 import com.example.sehatin.data.model.response.ScheduleADayResponse
@@ -62,6 +63,7 @@ import com.example.sehatin.data.store.DataStoreManager
 import com.example.sehatin.di.factory.DashboardViewModelFactory
 import com.example.sehatin.di.factory.RegisterViewModelFactory
 import com.example.sehatin.navigation.SehatInSurface
+import com.example.sehatin.utils.convertToHoursAndMinutes
 import com.example.sehatin.view.components.CircularProgressBar
 import com.example.sehatin.view.components.MealCard
 import com.example.sehatin.view.components.RefreshIndicator
@@ -94,6 +96,17 @@ fun DashboardScreen(
     val dietProgressState by dashboardViewModel.dietProgressState.collectAsStateWithLifecycle(
         initialValue = ResultResponse.None
     )
+    val waterADayState by dashboardViewModel.waterADayState.collectAsStateWithLifecycle(
+        initialValue = ResultResponse.None
+    )
+    val caloriesADayState by dashboardViewModel.caloriesADayState.collectAsStateWithLifecycle(
+        initialValue = ResultResponse.None
+    )
+
+    val scheduleADayState by dashboardViewModel.scheduleADayState.collectAsStateWithLifecycle(
+        initialValue = ResultResponse.None
+    )
+
     val dietProgressData by dashboardViewModel.dietProgress.collectAsStateWithLifecycle(initialValue = null)
     val caloriesADay by dashboardViewModel.caloriesADay.collectAsStateWithLifecycle(initialValue = null)
     val waterADay by dashboardViewModel.waterADay.collectAsStateWithLifecycle(initialValue = null)
@@ -140,6 +153,29 @@ fun DashboardScreen(
             else -> {}
         }
     }
+
+//    LaunchedEffect(caloriesADayState){
+//        when (caloriesADayState) {
+//            is ResultResponse.Loading -> {
+//                Log.e("RESULT", "Loading")
+//
+//            }
+//
+//            is ResultResponse.Success -> {
+//                Log.e("RESULT", "Success")
+//                Log.e(
+//                    "RESULT",
+//                    "Success: ${(caloriesADayState as ResultResponse.Success<CaloriesADayResponse>).data}"
+//                )
+//            }
+//
+//            is ResultResponse.Error -> {
+//                Log.e("RESULT", "Error: ${(caloriesADayState as ResultResponse.Error).error}")
+//            }
+//
+//            else -> {}
+//        }
+//    }
 
 
     PullToRefreshBox(
@@ -258,20 +294,20 @@ fun DashboardScreen(
                                         )
                                         Spacer(modifier = Modifier.height(2.dp))
                                         Column(
-                                            verticalArrangement = Arrangement.spacedBy(-10.dp)
+                                            verticalArrangement = Arrangement.spacedBy(-2.dp)
                                         ) {
 
                                             Text(
                                                 text = "${dietProgressData?.data?.short_message ?: " "}",
                                                 color = MaterialTheme.colorScheme.onPrimary,
                                                 fontWeight = FontWeight.Bold,
-                                                fontSize = 32.sp
+                                                fontSize = 28.sp
                                             )
                                             Text(
                                                 text = "${dietProgressData?.data?.desc ?: " " }",
                                                 color = MaterialTheme.colorScheme.onPrimary,
                                                 fontWeight = FontWeight.Normal,
-                                                fontSize = 10.sp
+                                                fontSize = 12.sp
                                             )
                                         }
                                     }
@@ -284,9 +320,7 @@ fun DashboardScreen(
                                     ) {
                                         val persentase = dietProgressData?.data?.persentase ?: 0.99
                                         CircularProgressBar(
-                                            percentage = formatPercentageToFloat(
-                                                persentase
-                                            ), // Progress 69%
+                                            percentage = persentase.toFloat(),
                                             size = 110.dp,
                                             strokeWidth = 16.dp,
                                             backgroundColor = Color.White.copy(0.3f), // Warna abu-abu terang
@@ -344,13 +378,13 @@ fun DashboardScreen(
                                                     color = caloriesColor,
                                                     fontSize = 12.sp,
                                                     fontWeight = FontWeight.SemiBold,
-                                                    text = caloriesADay.toString()
+                                                    text = caloriesADay?.data?.calories.toString() ?:"0"
                                                 )
                                                 Text(
                                                     color = caloriesColor.copy(alpha = 0.5f),
                                                     fontSize = 12.sp,
                                                     fontWeight = FontWeight.SemiBold,
-                                                    text = "/1000"
+                                                    text = "/${caloriesADay?.data?.target.toString() ?:"0"}"
                                                 )
                                                 Text(
                                                     color = MaterialTheme.colorScheme.onBackground.copy(
@@ -410,13 +444,13 @@ fun DashboardScreen(
                                                     color = waterColor,
                                                     fontSize = 12.sp,
                                                     fontWeight = FontWeight.SemiBold,
-                                                    text = waterADay.toString()
+                                                    text = waterADay?.data?.water.toString() ?:"0"
                                                 )
                                                 Text(
                                                     color = waterColor.copy(alpha = 0.5f),
                                                     fontSize = 12.sp,
                                                     fontWeight = FontWeight.SemiBold,
-                                                    text = "/1000"
+                                                    text = "/${waterADay?.data?.target.toString() ?:"0"}"
                                                 )
                                                 Text(
                                                     color = MaterialTheme.colorScheme.onBackground.copy(
@@ -465,12 +499,12 @@ fun formattedCurrentDate(): String? {
     return formattedDate
 }
 
-fun formatPercentageToFloat(percentage: Double): Float {
-    Log.d("Debug", "Raw percentage: $percentage")
-    val decimalValue = percentage / 100.0
-    Log.d("Debug", "Converted to decimal: $decimalValue")
-    return (Math.round(decimalValue * 10.0) / 10.0f)
-}
+//fun formatPercentageToFloat(percentage: Double): Float {
+//    Log.d("Debug", "Raw percentage: $percentage")
+//    val decimalValue = percentage / 100.0
+//    Log.d("Debug", "Converted to decimal: $decimalValue")
+//    return (Math.round(decimalValue * 10.0) / 10.0f)
+//}
 
 @Composable
 private fun ScheduleSection(
@@ -501,10 +535,10 @@ private fun ScheduleSection(
                 items(data.data) { meal ->
                     MealCard(
                         //MASIH PAKE DUMMY KARENA APINYA TIDAK PROVIDE DATA
-                        imageRes = FakeData.meals[0].imageRes,
-                        title = FakeData.meals[0].title,
-                        time = FakeData.meals[0].time,
-                        calories = FakeData.meals[0].calories,
+                        imageUrl = meal.food.image,
+                        title = meal.food.name,
+                        time = convertToHoursAndMinutes(meal.scheduledAt),
+                        calories = meal.food.calories.toDouble(),
                     )
                 }
             }

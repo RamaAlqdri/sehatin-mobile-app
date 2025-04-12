@@ -73,7 +73,7 @@ fun CircularProgressBar(
             drawArc(
                 color = progressColor,
                 startAngle = -90f,
-                sweepAngle = 360f * percentage,
+                sweepAngle = 360f * (percentage/100),
                 useCenter = false,
                 style = Stroke(width = strokeWidth.toPx(), cap = StrokeCap.Round),
                 size = Size(circleSize, circleSize),
@@ -86,7 +86,7 @@ fun CircularProgressBar(
 
         // Teks di tengah progress bar
         Text(
-            text = "${(percentage * 100).toInt()}%",
+            text = "${(percentage).toInt()}%",
             style = MaterialTheme.typography.bodyLarge.copy(
                 color = textColor,
                 fontWeight = FontWeight.Bold

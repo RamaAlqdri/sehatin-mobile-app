@@ -24,13 +24,14 @@ import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import coil.compose.AsyncImage
 import com.example.compose.sec
 import com.example.sehatin.R
 
 @Composable
 fun MealCard(
-    imageRes: Int,
-    title: String, time: String, calories: Int,
+    imageUrl: String,
+    title: String, time: String, calories: Double,
     onClick: () -> Unit = {}
 ) {
     Row(
@@ -44,8 +45,15 @@ fun MealCard(
             ),
         verticalAlignment = Alignment.CenterVertically
     ) {
-        Image(
-            painter = painterResource(id = imageRes),
+//        Image(
+//            painter = painterResource(id = imageRes),
+//            contentDescription = title,
+//            modifier = Modifier
+//                .size(64.dp)
+//                .clip(RoundedCornerShape(8.dp))
+//        )
+        AsyncImage(
+            model = imageUrl, // Load image from URL
             contentDescription = title,
             modifier = Modifier
                 .size(64.dp)

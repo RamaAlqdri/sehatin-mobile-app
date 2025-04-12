@@ -11,10 +11,13 @@ import com.example.sehatin.data.model.response.ScheduleADayResponse
 import com.example.sehatin.data.model.response.WaterADayResponse
 import com.example.sehatin.data.store.DataStoreManager
 import com.example.sehatin.retrofit.api.ApiConfig
+import com.example.sehatin.utils.formatDateToISO8601
+import com.example.sehatin.utils.parseDate
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.flow
 import kotlinx.coroutines.flow.flowOn
+import java.util.Date
 
 class DashboardRepository private constructor(
     context: Context
@@ -44,10 +47,11 @@ class DashboardRepository private constructor(
         }
     }.flowOn(Dispatchers.IO)
 
-    fun getCaloriesADay(date: String): Flow<ResultResponse<CaloriesADayResponse>> = flow {
+    fun getCaloriesADay(date: Date): Flow<ResultResponse<CaloriesADayResponse>> = flow {
         emit(ResultResponse.Loading)
         try {
-            val response = dashboardService.getCaloriesADay(CaloriesADayRequest(date))
+            val formattedDate = formatDateToISO8601(date) // Format date to ISO 8601
+            val response = dashboardService.getCaloriesADay(formattedDate) // Pass only the date
             if (response.isSuccessful) {
                 response.body()?.let {
                     emit(ResultResponse.Success(it))
@@ -60,11 +64,11 @@ class DashboardRepository private constructor(
         }
     }.flowOn(Dispatchers.IO)
 
-
-    fun getWaterADay(date: String): Flow<ResultResponse<WaterADayResponse>> = flow {
+    fun getWaterADay(date: Date): Flow<ResultResponse<WaterADayResponse>> = flow {
         emit(ResultResponse.Loading)
         try {
-            val response = dashboardService.getWaterADay(CaloriesADayRequest(date))
+            val formattedDate = formatDateToISO8601(date) // Format date to ISO 8601
+            val response = dashboardService.getWaterADay(formattedDate)
             if (response.isSuccessful) {
                 response.body()?.let {
                     emit(ResultResponse.Success(it))
@@ -77,10 +81,11 @@ class DashboardRepository private constructor(
         }
     }.flowOn(Dispatchers.IO)
 
-    fun getScheduleADay(date: String): Flow<ResultResponse<ScheduleADayResponse>> = flow {
+    fun getScheduleADay(date: Date): Flow<ResultResponse<ScheduleADayResponse>> = flow {
         emit(ResultResponse.Loading)
         try {
-            val response = dashboardService.getScheduleADay(CaloriesADayRequest(date))
+            val formattedDate = formatDateToISO8601(date) // Format date to ISO 8601
+            val response = dashboardService.getScheduleADay(formattedDate)
             if (response.isSuccessful) {
                 response.body()?.let {
                     emit(ResultResponse.Success(it))
