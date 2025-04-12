@@ -38,19 +38,22 @@ import com.example.sehatin.view.components.CustomTopAppBar
 
 @Composable
 fun CaloriesDetail(
-    modifier: Modifier = Modifier
+    modifier: Modifier = Modifier,
+    onBackClick: () -> Unit
 ) {
     //Call API Here
     CaloriesDetail(
         modifier = modifier,
-        id = 1
+        id = 1,
+        onBackClick = onBackClick
     )
 }
 
 @Composable
 private fun CaloriesDetail(
     modifier: Modifier = Modifier,
-    id: Int = 0
+    id: Int = 0,
+    onBackClick: () -> Unit // 👈 Tambahkan ini
 ) {
 
     var caloriesValue by remember { mutableIntStateOf(1500) }
@@ -72,8 +75,9 @@ private fun CaloriesDetail(
                 horizontalAlignment = Alignment.CenterHorizontally,
             ) {
                 CustomTopAppBar(
-                    title = "Calories",
-                    showNavigationIcon = true
+                    title = "Kalori",
+                    showNavigationIcon = true,
+                    onBackClick = onBackClick // 👈 Ini penting!
                 )
 
                 LazyColumn(
@@ -121,7 +125,7 @@ fun CaloriesConsumptionHistory(
             .padding(horizontal = 21.dp, vertical = 12.dp),
     ) {
         Text(
-            text = "Riwayat Konsumsi Air",
+            text = "Riwayat Konsumsi Kalori",
             fontSize = 14.sp,
             fontWeight = FontWeight.Bold,
             color = Color.Black,

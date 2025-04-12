@@ -33,7 +33,8 @@ fun CustomTopAppBar(
     modifier: Modifier = Modifier,
     onBackClick: () -> Unit = {},
     title: String,
-    showNavigationIcon: Boolean = false
+    showNavigationIcon: Boolean = false,
+    onNavigationClick: (() -> Unit)? = null
 ) {
     Box(
         modifier = modifier

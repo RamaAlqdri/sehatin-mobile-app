@@ -543,7 +543,6 @@ private fun ScheduleSection(
             if (data != null) {
                 items(data.data) { meal ->
                     MealCard(
-                        //MASIH PAKE DUMMY KARENA APINYA TIDAK PROVIDE DATA
                         imageUrl = meal.food.image,
                         title = meal.food.name,
                         time = convertToHoursAndMinutes(meal.scheduledAt),

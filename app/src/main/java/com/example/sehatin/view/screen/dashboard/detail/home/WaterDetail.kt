@@ -44,12 +44,14 @@ import java.time.format.DateTimeFormatter
 
 @Composable
 fun WaterDetail(
-    modifier: Modifier = Modifier
+    modifier: Modifier = Modifier,
+    onBackClick: () -> Unit
 ) {
 
     WaterDetail(
         modifier = modifier,
-        id = 0
+        id = 0,
+        onBackClick = onBackClick
     )
 
 }
@@ -57,7 +59,8 @@ fun WaterDetail(
 @Composable
 private fun WaterDetail(
     modifier: Modifier = Modifier,
-    id: Int = 0
+    id: Int = 0,
+    onBackClick: () -> Unit // 👈 Tambahkan ini
 ) {
 
     // Variabel temp saja, selanjutnya handle di viewModel
@@ -82,7 +85,8 @@ private fun WaterDetail(
             ) {
                 CustomTopAppBar(
                     title = "Water",
-                    showNavigationIcon = true
+                    showNavigationIcon = true,
+                    onBackClick = onBackClick // 👈 Ini penting!
                 )
                 LazyColumn(
                     modifier = Modifier.fillMaxSize()

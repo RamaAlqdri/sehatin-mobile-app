@@ -221,19 +221,13 @@ fun SehatInApp() {
                             ChangePassword()
                         }
 
-                        composableWithCompositionLocal(
-                            route = DetailDestinations.WATER_DETAIL_ROUTE
-                        ) { backStackEntry ->
-                            WaterDetail(
 
-                            )
-                        }
 
                         composableWithCompositionLocal(
                             route = DetailDestinations.WATER_DETAIL_ROUTE
                         ) { backStackEntry ->
                             WaterDetail(
-
+                                onBackClick = sehatInNavController::upPress
                             )
                         }
 
@@ -256,7 +250,9 @@ fun SehatInApp() {
                         composableWithCompositionLocal(
                             route = DetailDestinations.CALORIES_DETAIL_ROUTE
                         ) { backStackEntry ->
-                            CaloriesDetail()
+                            CaloriesDetail(
+                                onBackClick = sehatInNavController::upPress // ✅ Navigasi kembali
+                            )
                         }
 
                         composableWithCompositionLocal(
