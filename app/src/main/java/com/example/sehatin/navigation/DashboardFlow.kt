@@ -83,7 +83,9 @@ fun NavGraphBuilder.composableWithCompositionLocal(
 fun NavGraphBuilder.addHomeGraph(
     dashboardViewModel: DashboardViewModel,
     onSnackSelected: (Long, String, NavBackStackEntry) -> Unit,
-    modifier: Modifier = Modifier
+    modifier: Modifier = Modifier,
+    navigateToRoute: (String) -> Unit,
+    navigateToRootRoute: (String) -> Unit // <--- Tambahkan ini
 ) {
     composable(HomeSections.Dashboard.route) { from ->
 //        HomeScreen(
@@ -97,7 +99,10 @@ fun NavGraphBuilder.addHomeGraph(
                 onSnackSelected(id, origin, from)
             },
             dashboardViewModel = dashboardViewModel,
-            modifier = modifier
+            modifier = modifier,
+            navigateToDetail = { route -> // 👈 Tambahkan ini
+                navigateToRootRoute(route) // 👈 Ini akan mengarah ke root NavController
+            }
         )
     }
     composable(HomeSections.Consultation.route) { from ->

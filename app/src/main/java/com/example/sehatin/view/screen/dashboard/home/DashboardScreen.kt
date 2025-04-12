@@ -5,6 +5,7 @@ import android.content.ClipData.Item
 import android.util.Log
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
+import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
@@ -62,6 +63,7 @@ import com.example.sehatin.data.resource.Resource
 import com.example.sehatin.data.store.DataStoreManager
 import com.example.sehatin.di.factory.DashboardViewModelFactory
 import com.example.sehatin.di.factory.RegisterViewModelFactory
+import com.example.sehatin.navigation.DetailDestinations
 import com.example.sehatin.navigation.SehatInSurface
 import com.example.sehatin.utils.convertToHoursAndMinutes
 import com.example.sehatin.view.components.CircularProgressBar
@@ -76,7 +78,8 @@ import java.util.Locale
 fun DashboardScreen(
     modifier: Modifier = Modifier,
     onSnackClick: (Long, String) -> Unit,
-    dashboardViewModel: DashboardViewModel
+    dashboardViewModel: DashboardViewModel,
+    navigateToDetail: (String) -> Unit // 👈 Tambahan
 ) {
     val vectorImages = listOf(
         R.drawable.ic_male,
@@ -223,7 +226,7 @@ fun DashboardScreen(
                                     modifier = Modifier
                                         .clip(CircleShape)
                                         .background(
-                                            color = Color.Black,
+                                            color = Color(0x2370A44C),
                                         )
                                 ) {
                                     Image(
@@ -354,6 +357,9 @@ fun DashboardScreen(
 
 //                    .fillMaxWidth(0.55f)
                                         .padding(vertical = 16.dp, horizontal = 16.dp)
+                                        .clickable {
+                                            navigateToDetail(DetailDestinations.CALORIES_DETAIL_ROUTE)
+                                        }
                                 ) {
 
                                     Row(
@@ -418,6 +424,9 @@ fun DashboardScreen(
 //                    .width(151.dp)
 //                    .fillMaxWidth()
                                         .padding(vertical = 16.dp, horizontal = 16.dp)
+                                        .clickable {
+                                            navigateToDetail(DetailDestinations.WATER_DETAIL_ROUTE)
+                                        }
                                 ) {
 
                                     Row(

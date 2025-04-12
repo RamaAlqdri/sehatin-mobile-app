@@ -44,6 +44,7 @@ import com.example.sehatin.di.factory.PersonalizeViewModelFactory
 import com.example.sehatin.navigation.DetailDestinations
 import com.example.sehatin.navigation.MainDestinations
 import com.example.sehatin.navigation.QueryKeys
+import com.example.sehatin.navigation.SehatInNavController
 import com.example.sehatin.navigation.SehatiInScaffold
 import com.example.sehatin.navigation.addHomeGraph
 import com.example.sehatin.navigation.composableWithCompositionLocal
@@ -338,7 +339,8 @@ fun SehatInApp() {
                         ) { backStackEntry ->
                             MainContainer(
                                 dashboardViewModel = dashboardViewModel,
-                                onSnackSelected = sehatInNavController::navigateToSnackDetail
+                                onSnackSelected = sehatInNavController::navigateToSnackDetail,
+                                sehatInNavController = sehatInNavController
                             )
                         }
 
@@ -374,7 +376,8 @@ fun SehatInApp() {
 fun MainContainer(
     dashboardViewModel: DashboardViewModel,
     modifier: Modifier = Modifier,
-    onSnackSelected: (Long, String, NavBackStackEntry) -> Unit
+    onSnackSelected: (Long, String, NavBackStackEntry) -> Unit,
+    sehatInNavController: SehatInNavController // ✅ TAMBAHKAN INI
 ) {
     val fleuraScaffoldState = rememberSehatiInScaffoldState()
     val nestedNavController = rememberSehatInNavController()
@@ -425,7 +428,9 @@ fun MainContainer(
                 onSnackSelected = onSnackSelected,
                 modifier = Modifier
                     .padding(padding)
-                    .consumeWindowInsets(padding)
+                    .consumeWindowInsets(padding),
+                navigateToRoute = nestedNavController::navigateToNonBottomBarRoute,
+                navigateToRootRoute = sehatInNavController::navigateToNonBottomBarRoute // 👈 ini penting!
             )
         }
     }

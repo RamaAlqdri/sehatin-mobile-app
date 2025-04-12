@@ -44,7 +44,6 @@ import com.example.sehatin.navigation.SehatInSurface
 
 @Composable
 fun ProfileScreen(modifier: Modifier = Modifier) {
-    // CAll API HERE THEN PASS UR FUKING DATA
     val temp = getProfileItems()
     ProfileScreen(
         modifier = modifier,
