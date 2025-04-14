@@ -37,7 +37,7 @@ fun CaloriesProgress(
     modifier: Modifier = Modifier,
     currentCalories: Int = 0,
     maxCaloriesValue: Int = 0,
-    onAdd : () -> Unit
+//    onAdd : () -> Unit
 ) {
 
     var percentage by remember { mutableIntStateOf(((currentCalories.toFloat() / maxCaloriesValue) * 100).toInt()) }

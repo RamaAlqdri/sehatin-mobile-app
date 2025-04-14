@@ -4,24 +4,22 @@ import android.util.Log
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.example.sehatin.common.ResultResponse
-import com.example.sehatin.data.model.response.CaloriesADayRequest
 import com.example.sehatin.data.model.response.CaloriesADayResponse
+import com.example.sehatin.data.model.response.CaloriesHistoryResponse
 import com.example.sehatin.data.model.response.Detail
 import com.example.sehatin.data.model.response.DietProgressResponse
-import com.example.sehatin.data.model.response.RegisterResponse
 import com.example.sehatin.data.model.response.ScheduleADayResponse
-import com.example.sehatin.data.model.response.VerifyOtpRequest
 import com.example.sehatin.data.model.response.WaterADayResponse
 import com.example.sehatin.data.repository.DashboardRepository
-import com.example.sehatin.utils.parseDate
+import com.example.sehatin.utils.getTodayUtcDate
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.launch
+import kotlinx.datetime.LocalDate
 import java.time.LocalDateTime
 import java.time.format.DateTimeFormatter
-import kotlin.text.compareTo
-import kotlin.text.format
+import java.util.Date
 
 class DashboardViewModel(
     private val dashboardRepository: DashboardRepository
@@ -43,6 +41,19 @@ class DashboardViewModel(
     private val _caloriesADay = MutableStateFlow<CaloriesADayResponse?>(null)
     val caloriesADay = _caloriesADay.asStateFlow()
 
+    private val _caloriesDailyState =
+        MutableStateFlow<ResultResponse<CaloriesADayResponse>>(ResultResponse.None)
+    val caloriesDailyState: StateFlow<ResultResponse<CaloriesADayResponse>> = _caloriesDailyState
+
+    private val _caloriesDaily = MutableStateFlow<CaloriesADayResponse?>(null)
+    val caloriesDaily = _caloriesDaily.asStateFlow()
+
+    private val _caloriesHistoryState = MutableStateFlow<ResultResponse<CaloriesHistoryResponse>>(ResultResponse.None)
+    val caloriesHistoryState: StateFlow<ResultResponse<CaloriesHistoryResponse>> = _caloriesHistoryState
+
+    private val _caloriesHistory = MutableStateFlow<CaloriesHistoryResponse?>(null)
+    val caloriesHistory = _caloriesHistory.asStateFlow()
+
 //    SEPARATOR
     private val _waterADayState =
         MutableStateFlow<ResultResponse<WaterADayResponse>>(ResultResponse.None)
@@ -58,6 +69,17 @@ class DashboardViewModel(
 
     private val _scheduleADay = MutableStateFlow<ScheduleADayResponse?>(null)
     val scheduleADay = _scheduleADay.asStateFlow()
+
+
+
+    private val _selectedDate = MutableStateFlow<Date>(getTodayUtcDate())
+    val selectedDate: StateFlow<Date> = _selectedDate.asStateFlow()
+
+    fun setSelectedDate(date: Date) {
+        _selectedDate.value = date
+    }
+
+
 
 
     private val _isRefreshing = MutableStateFlow(false)
@@ -76,10 +98,24 @@ class DashboardViewModel(
     private val ScheduleCacheValidityPeriod = 5 * 60 * 1000L
 
     init {
+        // Memperbarui data saat tanggal dipilih berubah
+        viewModelScope.launch {
+            selectedDate.collect { date ->
+                getCaloriesDaily(forceRefresh = true)
+                getCaloriesHistory(forceRefresh = true)
+//                getWaterADay(forceRefresh = true)
+                // Memanggil API lainnya yang bergantung pada tanggal terpilih
+            }
+        }
+
         getUserDietProgress(forceRefresh = false)
-         getCaloriesADay(forceRefresh = false)
+        getCaloriesADay(forceRefresh = false)
         getWaterADay(forceRefresh = false)
         getScheduleADay(forceRefresh = false)
+        getCaloriesDaily(forceRefresh = false)
+        getCaloriesHistory(forceRefresh = false)
+
+
     }
 
     private fun getUserDietProgress(forceRefresh: Boolean = false) {
@@ -197,6 +233,81 @@ class DashboardViewModel(
             }
         }
     }
+
+    private fun getCaloriesDaily(forceRefresh: Boolean = false) {
+        viewModelScope.launch {
+            try {
+                val date = selectedDate.value
+
+                val currentTime = System.currentTimeMillis()
+                val shouldRefresh = _caloriesDailyState.value is ResultResponse.None ||
+                        forceRefresh ||
+                        (currentTime - lastCaloriesFetchTime > caloriesCacheValidityPeriod)
+
+                if (shouldRefresh) {
+                    _caloriesDailyState.value = ResultResponse.Loading
+                    _isRefreshing.value = true
+
+                    dashboardRepository.getCaloriesADay(date)
+                        .collect { result ->
+                            _caloriesDailyState.value = result
+                            if (result !is ResultResponse.Loading) {
+                                _isRefreshing.value = false
+                                if (result is ResultResponse.Success) {
+                                    _caloriesDaily.value = result.data
+                                    lastCaloriesFetchTime = System.currentTimeMillis()
+                                }
+                            }
+                        }
+                } else {
+                    _isRefreshing.value = false
+                }
+            } catch (e: Exception) {
+                _caloriesDailyState.value =
+                    ResultResponse.Error(e.localizedMessage ?: "Network error")
+                _isRefreshing.value = false
+            }
+        }
+    }
+
+
+    private fun getCaloriesHistory(forceRefresh: Boolean = false) {
+        viewModelScope.launch {
+            try {
+                val date = selectedDate.value
+
+                val currentTime = System.currentTimeMillis()
+                val shouldRefresh = _caloriesDailyState.value is ResultResponse.None ||
+                        forceRefresh ||
+                        (currentTime - lastCaloriesFetchTime > caloriesCacheValidityPeriod)
+
+                if (shouldRefresh) {
+                    _caloriesDailyState.value = ResultResponse.Loading
+                    _isRefreshing.value = true
+
+                    dashboardRepository.getCaloriesHistory(date)
+                        .collect { result ->
+                            _caloriesHistoryState.value = result
+                            if (result !is ResultResponse.Loading) {
+                                _isRefreshing.value = false
+                                if (result is ResultResponse.Success) {
+                                    _caloriesHistory.value = result.data
+                                    lastCaloriesFetchTime = System.currentTimeMillis()
+                                }
+                            }
+                        }
+                } else {
+                    _isRefreshing.value = false
+                }
+            } catch (e: Exception) {
+                _caloriesHistoryState.value =
+                    ResultResponse.Error(e.localizedMessage ?: "Network error")
+                _isRefreshing.value = false
+            }
+        }
+    }
+
+
     private fun getScheduleADay(forceRefresh: Boolean = false) {
         viewModelScope.launch {
             try {
@@ -240,6 +351,8 @@ class DashboardViewModel(
     fun refresh() {
         getUserDietProgress(forceRefresh = true)
         getCaloriesADay(forceRefresh = true)
+        getCaloriesDaily(forceRefresh = true)
+        getCaloriesHistory(forceRefresh = true)
         getWaterADay(forceRefresh = true)
         getScheduleADay(forceRefresh = true)
     }

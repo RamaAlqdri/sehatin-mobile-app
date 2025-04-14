@@ -2,6 +2,7 @@ package com.example.sehatin.retrofit.services
 
 import com.example.sehatin.data.model.response.CaloriesADayRequest
 import com.example.sehatin.data.model.response.CaloriesADayResponse
+import com.example.sehatin.data.model.response.CaloriesHistoryResponse
 import com.example.sehatin.data.model.response.DietProgressResponse
 import com.example.sehatin.data.model.response.GetUserResponse
 import com.example.sehatin.data.model.response.LoginRequest
@@ -26,6 +27,9 @@ interface DashboardService {
 
     @GET("api/schedule/day")
     suspend fun getScheduleADay(@Query("date") date: String): Response<ScheduleADayResponse>
+
+    @GET("api/schedule/calories/history")
+    suspend fun getCaloriesHistory(@Query("date") date: String): Response<CaloriesHistoryResponse>
 
 }
 

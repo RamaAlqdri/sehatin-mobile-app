@@ -1,5 +1,7 @@
 package com.example.sehatin.utils
 
+import kotlinx.datetime.LocalDateTime
+import network.chaintech.kmp_date_time_picker.utils.now
 import java.text.SimpleDateFormat
 import java.time.ZoneOffset
 import java.time.ZonedDateTime
@@ -36,4 +38,8 @@ fun getSevenDaysFormattedDates(): List<String> {
     return (-3..3).map { offset ->
         today.plusDays(offset.toLong()).format(formatter)
     }
+}
+fun getTodayUtcDate(): Date {
+    val currentDateTime = ZonedDateTime.now(ZoneOffset.UTC) // Get current ZonedDateTime in UTC
+    return Date.from(currentDateTime.toInstant()) // Convert ZonedDateTime to Date in UTC
 }

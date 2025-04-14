@@ -117,13 +117,14 @@ fun SehatInApp() {
         .collectAsStateWithLifecycle(initialValue = false)
 
 //    val isPersonalizeCompleted = loginViewModel.checkFilled()
-    val isPersonalizeCompleted by loginViewModel.isPersonalizeFilled().collectAsStateWithLifecycle(initialValue = false)
+    val isPersonalizeCompleted by loginViewModel.isPersonalizeFilled()
+        .collectAsStateWithLifecycle(initialValue = false)
 
-    LaunchedEffect (isPersonalizeCompleted){
+    LaunchedEffect(isPersonalizeCompleted) {
         Log.e("isPersonalizeCompleted", isPersonalizeCompleted.toString())
     }
 
-    LaunchedEffect (onBoardingStatus) {
+    LaunchedEffect(onBoardingStatus) {
         Log.e("onBoarding", onBoardingStatus.toString())
     }
 
@@ -151,217 +152,218 @@ fun SehatInApp() {
                 LocalSharedTransitionScope provides this
             ) {
 //                destination?.let {
-                    NavHost(
-                        navController = sehatInNavController.navController,
-                        startDestination = destination
-            //                        when {
-            //                        !onBoardingStatus -> MainDestinations.ONBOARDING_ROUTE
-            //                         !isUserLoggedIn -> MainDestinations.LOGIN_ROUTE
-            ////                        !isPersonalizeCompleted -> MainDestinations.INPUT_NAME_ROUTE
-            //                        else -> MainDestinations.DASHBOARD_ROUTE
-            //                    }
-                        ,
-                        contentAlignment = Alignment.Center
-                    ) {
+                NavHost(
+                    navController = sehatInNavController.navController,
+                    startDestination = destination
+                    //                        when {
+                    //                        !onBoardingStatus -> MainDestinations.ONBOARDING_ROUTE
+                    //                         !isUserLoggedIn -> MainDestinations.LOGIN_ROUTE
+                    ////                        !isPersonalizeCompleted -> MainDestinations.INPUT_NAME_ROUTE
+                    //                        else -> MainDestinations.DASHBOARD_ROUTE
+                    //                    }
+                    ,
+                    contentAlignment = Alignment.Center
+                ) {
 
-            //                    composableWithCompositionLocal(
-            //                        route = MainDestinations.????
-            //                    ) { backStackEntry ->
-            //                        Masukkan Screen yang bukan merupakan bagian dari bottom navbar
-            //                    }
+                    //                    composableWithCompositionLocal(
+                    //                        route = MainDestinations.????
+                    //                    ) { backStackEntry ->
+                    //                        Masukkan Screen yang bukan merupakan bagian dari bottom navbar
+                    //                    }
 
-                        composableWithCompositionLocal(
-                            route = MainDestinations.CHECK_ROUTE
-                        ) { backStackEntry ->
-            //                        CheckScreen(
-            //                            navigateToRoute = sehatInNavController::navigateToNonBottomBarRoute,
-            //                            loginScreenViewModel = loginViewModel
-            //                        )
-                        }
-
-                        composableWithCompositionLocal(
-                            route = MainDestinations.LOGIN_ROUTE
-                        ) { backStackEntry ->
-                            LoginScreen(
-                                navigateToRoute = sehatInNavController::navigateToNonBottomBarRoute
-                            )
-                        }
-
-                        composableWithCompositionLocal(
-                            route = MainDestinations.ONBOARDING_ROUTE
-                        ) { backStackEntry ->
-                            OnBoardingScreen(
-                                navigateToRoute = sehatInNavController::navigateToNonBottomBarRoute,
-                                setOnBoardingCompleted = onBoardingViewModel::setOnBoardingCompleted
-                            )
-                        }
-
-                        composableWithCompositionLocal(
-                            route = MainDestinations.REGISTER_ROUTE
-                        ) { backStackEntry ->
-                            RegisterScreen(
-                                navigateToRoute = sehatInNavController::navigateToNonBottomBarRoute
-                            )
-                        }
-
-                        composableWithCompositionLocal(
-                            route = "${MainDestinations.OTP_ROUTE}?" + "email={${QueryKeys.EMAIL}}"
-                        ) { backStackEntry ->
-                            val arguments = requireNotNull(backStackEntry.arguments)
-                            val email = arguments.getString(QueryKeys.EMAIL) ?: "Email tidak ditemukan"
-                            OtpScreen(
-                                email = email,
-                                navigateToRoute = sehatInNavController::navigateToNonBottomBarRoute,
-                            )
-                        }
-
-                        composableWithCompositionLocal(
-                            route = MainDestinations.CHANGE_PASSWORD_ROUTE
-                        ) { backStackEntry ->
-                            ChangePassword()
-                        }
-
-
-
-                        composableWithCompositionLocal(
-                            route = DetailDestinations.WATER_DETAIL_ROUTE
-                        ) { backStackEntry ->
-                            WaterDetail(
-                                onBackClick = sehatInNavController::upPress
-                            )
-                        }
-
-                        composableWithCompositionLocal(
-                            route = DetailDestinations.FOOD_RECOMENDATION_DETAIL_ROUTE
-                        ) { backStackEntry ->
-                            FoodRecomendationDetail(
-
-                            )
-                        }
-
-                        composableWithCompositionLocal(
-                            route = DetailDestinations.FOOD_LIST_DETAIL_ROUTE
-                        ) { backStackEntry ->
-                            FoodListDetail(
-
-                            )
-                        }
-
-                        composableWithCompositionLocal(
-                            route = DetailDestinations.CALORIES_DETAIL_ROUTE
-                        ) { backStackEntry ->
-                            CaloriesDetail(
-                                onBackClick = sehatInNavController::upPress // ✅ Navigasi kembali
-                            )
-                        }
-
-                        composableWithCompositionLocal(
-                            route = DetailDestinations.FOOD_DETAIL_ROUTE
-                        ) { backStackEntry ->
-                            FoodDetail(
-                                onBackClick = sehatInNavController::upPress
-                            )
-                        }
-
-                        // PERSONALIZE SCREEN
-
-                        composableWithCompositionLocal(
-                            route = MainDestinations.INPUT_NAME_ROUTE
-                        ) { backStackEntry ->
-                            InputName(
-                                navigateToRoute = sehatInNavController::navigateToNonBottomBarRoute,
-                                personalizeViewModel = personalizeViewModel
-                            )
-                        }
-
-                        composableWithCompositionLocal(
-                            route = MainDestinations.INPUT_AGE_ROUTE
-                        ) { backStackEntry ->
-                            InputAge(
-                                navigateToRoute = sehatInNavController::navigateToNonBottomBarRoute,
-                                personalizeViewModel = personalizeViewModel
-                            )
-                        }
-
-                        composableWithCompositionLocal(
-                            route = MainDestinations.INPUT_GENDER_ROUTE
-                        ) { backStackEntry ->
-                            InputGender(
-                                navigateToRoute = sehatInNavController::navigateToNonBottomBarRoute,
-                                personalizeViewModel = personalizeViewModel
-                            )
-                        }
-
-                        composableWithCompositionLocal(
-                            route = MainDestinations.INPUT_HEIGHT_ROUTE
-                        ) { backStackEntry ->
-                            InputHeight(
-                                navigateToRoute = sehatInNavController::navigateToNonBottomBarRoute,
-                                personalizeViewModel = personalizeViewModel
-                            )
-                        }
-
-                        composableWithCompositionLocal(
-                            route = MainDestinations.INPUT_WEIGHT_ROUTE
-                        ) { backStackEntry ->
-                            InputWeight(
-                                navigateToRoute = sehatInNavController::navigateToNonBottomBarRoute,
-                                personalizeViewModel = personalizeViewModel
-                            )
-                        }
-
-                        composableWithCompositionLocal(
-                            route = MainDestinations.INPUT_ACTIVITY_ROUTE
-                        ) { backStackEntry ->
-                            InputActivity(
-                                navigateToRoute = sehatInNavController::navigateToNonBottomBarRoute,
-                                personalizeViewModel = personalizeViewModel
-                            )
-                        }
-
-                        composableWithCompositionLocal(
-                            route = MainDestinations.INPUT_GOAL_ROUTE
-                        ) { backStackEntry ->
-                            InputGoal(
-                                navigateToRoute = sehatInNavController::navigateToNonBottomBarRoute,
-                                personalizeViewModel = personalizeViewModel,
-                                loginScreenViewModel = loginViewModel
-                            )
-                        }
-
-                        // TIDAK MENYARANKAN PASSING OBJEK, Melainkan menggunakan callbacks
-                        composableWithCompositionLocal(
-                            route = MainDestinations.DASHBOARD_ROUTE
-                        ) { backStackEntry ->
-                            MainContainer(
-                                dashboardViewModel = dashboardViewModel,
-                                onSnackSelected = sehatInNavController::navigateToSnackDetail,
-                                sehatInNavController = sehatInNavController
-                            )
-                        }
-
-                        //BUAT NGECEK BISA ATAU TIDAK NAVIGASI KE SCREEN NON-BOTTOM NAVBAR
-                        composableWithCompositionLocal(
-                            "${MainDestinations.SNACK_DETAIL_ROUTE}/" +
-                                    "{${MainDestinations.SNACK_ID_KEY}}" +
-                                    "?origin={${MainDestinations.ORIGIN}}",
-                            arguments = listOf(
-                                navArgument(MainDestinations.SNACK_ID_KEY) {
-                                    type = NavType.LongType
-                                }
-                            ),
-
-                            ) { backStackEntry ->
-                            val arguments = requireNotNull(backStackEntry.arguments)
-                            val id = arguments.getLong(MainDestinations.SNACK_ID_KEY)
-                            val origin = arguments.getString(MainDestinations.ORIGIN)
-                            DetailTest(
-                                id,
-                                origin = origin ?: "",
-                                upPress = sehatInNavController::upPress
-                            )
-                        }
+                    composableWithCompositionLocal(
+                        route = MainDestinations.CHECK_ROUTE
+                    ) { backStackEntry ->
+                        //                        CheckScreen(
+                        //                            navigateToRoute = sehatInNavController::navigateToNonBottomBarRoute,
+                        //                            loginScreenViewModel = loginViewModel
+                        //                        )
                     }
+
+                    composableWithCompositionLocal(
+                        route = MainDestinations.LOGIN_ROUTE
+                    ) { backStackEntry ->
+                        LoginScreen(
+                            navigateToRoute = sehatInNavController::navigateToNonBottomBarRoute
+                        )
+                    }
+
+                    composableWithCompositionLocal(
+                        route = MainDestinations.ONBOARDING_ROUTE
+                    ) { backStackEntry ->
+                        OnBoardingScreen(
+                            navigateToRoute = sehatInNavController::navigateToNonBottomBarRoute,
+                            setOnBoardingCompleted = onBoardingViewModel::setOnBoardingCompleted
+                        )
+                    }
+
+                    composableWithCompositionLocal(
+                        route = MainDestinations.REGISTER_ROUTE
+                    ) { backStackEntry ->
+                        RegisterScreen(
+                            navigateToRoute = sehatInNavController::navigateToNonBottomBarRoute
+                        )
+                    }
+
+                    composableWithCompositionLocal(
+                        route = "${MainDestinations.OTP_ROUTE}?" + "email={${QueryKeys.EMAIL}}"
+                    ) { backStackEntry ->
+                        val arguments = requireNotNull(backStackEntry.arguments)
+                        val email = arguments.getString(QueryKeys.EMAIL) ?: "Email tidak ditemukan"
+                        OtpScreen(
+                            email = email,
+                            navigateToRoute = sehatInNavController::navigateToNonBottomBarRoute,
+                        )
+                    }
+
+                    composableWithCompositionLocal(
+                        route = MainDestinations.CHANGE_PASSWORD_ROUTE
+                    ) { backStackEntry ->
+                        ChangePassword()
+                    }
+
+
+
+                    composableWithCompositionLocal(
+                        route = DetailDestinations.WATER_DETAIL_ROUTE
+                    ) { backStackEntry ->
+                        WaterDetail(
+                            onBackClick = sehatInNavController::upPress
+                        )
+                    }
+
+                    composableWithCompositionLocal(
+                        route = DetailDestinations.FOOD_RECOMENDATION_DETAIL_ROUTE
+                    ) { backStackEntry ->
+                        FoodRecomendationDetail(
+
+                        )
+                    }
+
+                    composableWithCompositionLocal(
+                        route = DetailDestinations.FOOD_LIST_DETAIL_ROUTE
+                    ) { backStackEntry ->
+                        FoodListDetail(
+
+                        )
+                    }
+
+                    composableWithCompositionLocal(
+                        route = DetailDestinations.CALORIES_DETAIL_ROUTE
+                    ) { backStackEntry ->
+                        CaloriesDetail(
+                            onBackClick = sehatInNavController::upPress, // ✅ Navigasi kembali
+                            dashboardViewModel = dashboardViewModel
+                        )
+                    }
+
+                    composableWithCompositionLocal(
+                        route = DetailDestinations.FOOD_DETAIL_ROUTE
+                    ) { backStackEntry ->
+                        FoodDetail(
+                            onBackClick = sehatInNavController::upPress
+                        )
+                    }
+
+                    // PERSONALIZE SCREEN
+
+                    composableWithCompositionLocal(
+                        route = MainDestinations.INPUT_NAME_ROUTE
+                    ) { backStackEntry ->
+                        InputName(
+                            navigateToRoute = sehatInNavController::navigateToNonBottomBarRoute,
+                            personalizeViewModel = personalizeViewModel
+                        )
+                    }
+
+                    composableWithCompositionLocal(
+                        route = MainDestinations.INPUT_AGE_ROUTE
+                    ) { backStackEntry ->
+                        InputAge(
+                            navigateToRoute = sehatInNavController::navigateToNonBottomBarRoute,
+                            personalizeViewModel = personalizeViewModel
+                        )
+                    }
+
+                    composableWithCompositionLocal(
+                        route = MainDestinations.INPUT_GENDER_ROUTE
+                    ) { backStackEntry ->
+                        InputGender(
+                            navigateToRoute = sehatInNavController::navigateToNonBottomBarRoute,
+                            personalizeViewModel = personalizeViewModel
+                        )
+                    }
+
+                    composableWithCompositionLocal(
+                        route = MainDestinations.INPUT_HEIGHT_ROUTE
+                    ) { backStackEntry ->
+                        InputHeight(
+                            navigateToRoute = sehatInNavController::navigateToNonBottomBarRoute,
+                            personalizeViewModel = personalizeViewModel
+                        )
+                    }
+
+                    composableWithCompositionLocal(
+                        route = MainDestinations.INPUT_WEIGHT_ROUTE
+                    ) { backStackEntry ->
+                        InputWeight(
+                            navigateToRoute = sehatInNavController::navigateToNonBottomBarRoute,
+                            personalizeViewModel = personalizeViewModel
+                        )
+                    }
+
+                    composableWithCompositionLocal(
+                        route = MainDestinations.INPUT_ACTIVITY_ROUTE
+                    ) { backStackEntry ->
+                        InputActivity(
+                            navigateToRoute = sehatInNavController::navigateToNonBottomBarRoute,
+                            personalizeViewModel = personalizeViewModel
+                        )
+                    }
+
+                    composableWithCompositionLocal(
+                        route = MainDestinations.INPUT_GOAL_ROUTE
+                    ) { backStackEntry ->
+                        InputGoal(
+                            navigateToRoute = sehatInNavController::navigateToNonBottomBarRoute,
+                            personalizeViewModel = personalizeViewModel,
+                            loginScreenViewModel = loginViewModel
+                        )
+                    }
+
+                    // TIDAK MENYARANKAN PASSING OBJEK, Melainkan menggunakan callbacks
+                    composableWithCompositionLocal(
+                        route = MainDestinations.DASHBOARD_ROUTE
+                    ) { backStackEntry ->
+                        MainContainer(
+                            dashboardViewModel = dashboardViewModel,
+                            onSnackSelected = sehatInNavController::navigateToSnackDetail,
+                            sehatInNavController = sehatInNavController
+                        )
+                    }
+
+                    //BUAT NGECEK BISA ATAU TIDAK NAVIGASI KE SCREEN NON-BOTTOM NAVBAR
+                    composableWithCompositionLocal(
+                        "${MainDestinations.SNACK_DETAIL_ROUTE}/" +
+                                "{${MainDestinations.SNACK_ID_KEY}}" +
+                                "?origin={${MainDestinations.ORIGIN}}",
+                        arguments = listOf(
+                            navArgument(MainDestinations.SNACK_ID_KEY) {
+                                type = NavType.LongType
+                            }
+                        ),
+
+                        ) { backStackEntry ->
+                        val arguments = requireNotNull(backStackEntry.arguments)
+                        val id = arguments.getLong(MainDestinations.SNACK_ID_KEY)
+                        val origin = arguments.getString(MainDestinations.ORIGIN)
+                        DetailTest(
+                            id,
+                            origin = origin ?: "",
+                            upPress = sehatInNavController::upPress
+                        )
+                    }
+                }
 //                }
             }
         }
@@ -431,7 +433,6 @@ fun MainContainer(
         }
     }
 }
-
 
 
 val LocalNavAnimatedVisibilityScope = compositionLocalOf<AnimatedVisibilityScope?> { null }

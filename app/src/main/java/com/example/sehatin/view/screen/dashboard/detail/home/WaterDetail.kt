@@ -41,6 +41,7 @@ import com.example.sehatin.view.components.CustomTopAppBar
 import com.example.sehatin.view.components.WaterIntake
 import java.time.LocalDate
 import java.time.format.DateTimeFormatter
+import java.util.Date
 
 @Composable
 fun WaterDetail(
@@ -94,8 +95,8 @@ private fun WaterDetail(
 
                     item {
                         Spacer(modifier = Modifier.height(14.dp))
-                        CalendarSection(
-                        )
+//                        CalendarSection(
+//                        )
                     }
 
                     item {
@@ -128,9 +129,10 @@ private fun WaterDetail(
 
 @Composable
 fun CalendarSection(
-    modifier: Modifier = Modifier
+    modifier: Modifier = Modifier,
+    selectedDate: LocalDate,
+    onDateSelected: (LocalDate) -> Unit
 ) {
-    var selectedDate by remember { mutableStateOf<LocalDate?>(LocalDate.now()) }
     val today = LocalDate.now()
     val last7Days = (today.minusDays(6)..today).toList()
 
@@ -144,9 +146,8 @@ fun CalendarSection(
             .padding(20.dp),
         horizontalAlignment = Alignment.CenterHorizontally
     ) {
-
         Text(
-            text = selectedDate?.format(DateTimeFormatter.ofPattern("dd MMMM yyyy")) ?: "",
+            text = selectedDate.format(DateTimeFormatter.ofPattern("dd MMMM yyyy")),
             fontSize = 14.sp,
             fontWeight = FontWeight.Bold,
             color = Color.Black,
@@ -161,12 +162,13 @@ fun CalendarSection(
                 DateItem(
                     date = date,
                     isSelected = date == selectedDate,
-                    onClick = { selectedDate = date }
+                    onClick = { onDateSelected(date) }
                 )
             }
         }
     }
 }
+
 
 @Composable
 fun WaterConsumptionHistory(

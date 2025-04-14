@@ -4,6 +4,7 @@ import android.content.Context
 import com.example.sehatin.common.ResultResponse
 import com.example.sehatin.data.model.response.CaloriesADayRequest
 import com.example.sehatin.data.model.response.CaloriesADayResponse
+import com.example.sehatin.data.model.response.CaloriesHistoryResponse
 import com.example.sehatin.data.model.response.Detail
 import com.example.sehatin.data.model.response.DietProgressResponse
 import com.example.sehatin.data.model.response.GetUserResponse
@@ -52,6 +53,23 @@ class DashboardRepository private constructor(
         try {
             val formattedDate = formatDateToISO8601(date) // Format date to ISO 8601
             val response = dashboardService.getCaloriesADay(formattedDate) // Pass only the date
+            if (response.isSuccessful) {
+                response.body()?.let {
+                    emit(ResultResponse.Success(it))
+                } ?: emit(ResultResponse.Error("Empty response body"))
+            } else {
+                emit(ResultResponse.Error("Error: ${response.errorBody()?.string() ?: "Unknown error"}"))
+            }
+        } catch (e: Exception) {
+            emit(ResultResponse.Error(e.localizedMessage ?: "Network error"))
+        }
+    }.flowOn(Dispatchers.IO)
+
+    fun getCaloriesHistory(date: Date): Flow<ResultResponse<CaloriesHistoryResponse>> = flow {
+        emit(ResultResponse.Loading)
+        try {
+            val formattedDate = formatDateToISO8601(date) // Format date to ISO 8601
+            val response = dashboardService.getCaloriesHistory(formattedDate) // Pass only the date
             if (response.isSuccessful) {
                 response.body()?.let {
                     emit(ResultResponse.Success(it))
