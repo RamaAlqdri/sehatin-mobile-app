@@ -228,7 +228,8 @@ fun SehatInApp() {
                         route = DetailDestinations.WATER_DETAIL_ROUTE
                     ) { backStackEntry ->
                         WaterDetail(
-                            onBackClick = sehatInNavController::upPress
+                            onBackClick = sehatInNavController::upPress,
+                            dashboardViewModel = dashboardViewModel
                         )
                     }
 

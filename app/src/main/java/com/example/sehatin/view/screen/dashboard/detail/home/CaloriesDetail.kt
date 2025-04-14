@@ -82,8 +82,7 @@ private fun CaloriesDetail(
     )
     val isRefreshing by dashboardViewModel.isRefreshing.collectAsStateWithLifecycle()
 
-//    var caloriesValue by remember { mutableIntStateOf(1500) }
-    val maxCaloriesValue by remember { mutableIntStateOf(3000) }
+
 
     val caloriesDailyState by dashboardViewModel.caloriesDailyState.collectAsStateWithLifecycle(initialValue = ResultResponse.None)
 

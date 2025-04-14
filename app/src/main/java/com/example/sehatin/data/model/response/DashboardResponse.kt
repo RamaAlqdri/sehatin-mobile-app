@@ -6,6 +6,22 @@ data class CaloriesADayRequest(
     @SerializedName("date") val date: String
 )
 
+data class WaterHistoryRequest(
+    @SerializedName("water") val water: Double
+)
+
+data class CreateWaterHistoryResponse(
+
+    @field:SerializedName("message")
+    val message: String,
+
+    @field:SerializedName("statusCode")
+    val statusCode: Int,
+
+    @field:SerializedName("timestamp")
+    val timestamp: String
+)
+
 data class DietProgressResponse(
 
     @field:SerializedName("data") val data: ProgressItem,
@@ -26,6 +42,23 @@ data class CaloriesADayResponse(
     @field:SerializedName("statusCode") val statusCode: Int,
 
     @field:SerializedName("timestamp") val timestamp: String
+)
+
+data class WaterHistoryResponse(
+
+    @field:SerializedName("data") val data: List<WaterHistoryItem>,
+
+    @field:SerializedName("message") val message: String,
+
+    @field:SerializedName("statusCode") val statusCode: Int,
+
+    @field:SerializedName("timestamp") val timestamp: String
+)
+
+data class WaterHistoryItem(
+    @field:SerializedName("id") val id: String,
+    @field:SerializedName("water") val calories: Double,
+    @field:SerializedName("createdAt") val createdAt: String,
 )
 
 data class CaloriesHistoryResponse(

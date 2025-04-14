@@ -41,7 +41,8 @@ fun WaterIntake(
     onSelectedChange: (Int) -> Unit,
     currentWater: Int,
     maxWaterValue: Int,
-    selectedValue: Int
+    selectedValue: Int,
+    enableButton: Boolean // 👈 Tambahkan ini
 ) {
 
     var percentage by remember { mutableIntStateOf(((currentWater.toFloat() / maxWaterValue) * 100).toInt()) }
@@ -88,7 +89,7 @@ fun WaterIntake(
                     )
                     .border(1.dp, color = Color.Unspecified, shape = RoundedCornerShape(8.dp))
                     .clickable(
-                        enabled = currentWater - selectedValue > 0,
+                        enabled = enableButton && currentWater - selectedValue > 0,
                         onClick =
                             onMinus,
                         indication = null,
@@ -120,6 +121,7 @@ fun WaterIntake(
                     )
                     .border(1.dp, color = Color.Unspecified, shape = RoundedCornerShape(8.dp))
                     .clickable(
+                        enabled = enableButton,
                         onClick = onAdd,
                         indication = null,
                         interactionSource = remember { MutableInteractionSource() }

@@ -6,10 +6,14 @@ import androidx.lifecycle.viewModelScope
 import com.example.sehatin.common.ResultResponse
 import com.example.sehatin.data.model.response.CaloriesADayResponse
 import com.example.sehatin.data.model.response.CaloriesHistoryResponse
+import com.example.sehatin.data.model.response.CreateWaterHistoryResponse
 import com.example.sehatin.data.model.response.Detail
 import com.example.sehatin.data.model.response.DietProgressResponse
+import com.example.sehatin.data.model.response.RegisterResponse
 import com.example.sehatin.data.model.response.ScheduleADayResponse
 import com.example.sehatin.data.model.response.WaterADayResponse
+import com.example.sehatin.data.model.response.WaterHistoryRequest
+import com.example.sehatin.data.model.response.WaterHistoryResponse
 import com.example.sehatin.data.repository.DashboardRepository
 import com.example.sehatin.utils.getTodayUtcDate
 import kotlinx.coroutines.flow.MutableStateFlow
@@ -62,6 +66,25 @@ class DashboardViewModel(
     private val _waterADay = MutableStateFlow<WaterADayResponse?>(null)
     val waterADay = _waterADay.asStateFlow()
 
+    private val _waterDailyState =
+        MutableStateFlow<ResultResponse<WaterADayResponse>>(ResultResponse.None)
+    val waterDailyState: StateFlow<ResultResponse<WaterADayResponse>> = _waterDailyState
+
+    private val _waterDaily = MutableStateFlow<WaterADayResponse?>(null)
+    val waterDaily = _waterDaily.asStateFlow()
+
+    private val _waterHistoryState = MutableStateFlow<ResultResponse<WaterHistoryResponse>>(ResultResponse.None)
+    val waterHistoryState: StateFlow<ResultResponse<WaterHistoryResponse>> = _waterHistoryState
+
+    private val _waterHistory = MutableStateFlow<WaterHistoryResponse?>(null)
+    val waterHistory = _waterHistory.asStateFlow()
+
+
+    private val _createWaterState =
+        MutableStateFlow<ResultResponse<CreateWaterHistoryResponse>>(ResultResponse.Loading)
+    val createWaterState: StateFlow<ResultResponse<CreateWaterHistoryResponse>> = _createWaterState
+
+
 // SEPARATOR
     private val _scheduleADayState =
         MutableStateFlow<ResultResponse<ScheduleADayResponse>>(ResultResponse.None)
@@ -103,6 +126,8 @@ class DashboardViewModel(
             selectedDate.collect { date ->
                 getCaloriesDaily(forceRefresh = true)
                 getCaloriesHistory(forceRefresh = true)
+                getWaterHistory(forceRefresh = true)
+                getWaterDaily(forceRefresh = true)
 //                getWaterADay(forceRefresh = true)
                 // Memanggil API lainnya yang bergantung pada tanggal terpilih
             }
@@ -114,8 +139,22 @@ class DashboardViewModel(
         getScheduleADay(forceRefresh = false)
         getCaloriesDaily(forceRefresh = false)
         getCaloriesHistory(forceRefresh = false)
+        getWaterHistory(forceRefresh = false)
+        getWaterDaily(forceRefresh = false)
 
 
+    }
+
+
+    fun createWaterHistory(water: Double) {
+        viewModelScope.launch {
+            dashboardRepository.createWaterHistory(water).collect {
+                _createWaterState.value = it
+            }
+        }
+    }
+    fun resetCreateWaterState() {
+        _createWaterState.value = ResultResponse.None
     }
 
     private fun getUserDietProgress(forceRefresh: Boolean = false) {
@@ -269,6 +308,41 @@ class DashboardViewModel(
             }
         }
     }
+    private fun getWaterDaily(forceRefresh: Boolean = false) {
+        viewModelScope.launch {
+            try {
+                val date = selectedDate.value
+
+                val currentTime = System.currentTimeMillis()
+                val shouldRefresh = _waterDailyState.value is ResultResponse.None ||
+                        forceRefresh ||
+                        (currentTime - lastWaterFetchTime > WaterCacheValidityPeriod)
+
+                if (shouldRefresh) {
+                    _waterDailyState.value = ResultResponse.Loading
+                    _isRefreshing.value = true
+
+                    dashboardRepository.getWaterADay(date)
+                        .collect { result ->
+                            _waterDailyState.value = result
+                            if (result !is ResultResponse.Loading) {
+                                _isRefreshing.value = false
+                                if (result is ResultResponse.Success) {
+                                    _waterDaily.value = result.data
+                                    lastWaterFetchTime = System.currentTimeMillis()
+                                }
+                            }
+                        }
+                } else {
+                    _isRefreshing.value = false
+                }
+            } catch (e: Exception) {
+                _waterDailyState.value =
+                    ResultResponse.Error(e.localizedMessage ?: "Network error")
+                _isRefreshing.value = false
+            }
+        }
+    }
 
 
     private fun getCaloriesHistory(forceRefresh: Boolean = false) {
@@ -277,12 +351,12 @@ class DashboardViewModel(
                 val date = selectedDate.value
 
                 val currentTime = System.currentTimeMillis()
-                val shouldRefresh = _caloriesDailyState.value is ResultResponse.None ||
+                val shouldRefresh = _caloriesHistoryState.value is ResultResponse.None ||
                         forceRefresh ||
                         (currentTime - lastCaloriesFetchTime > caloriesCacheValidityPeriod)
 
                 if (shouldRefresh) {
-                    _caloriesDailyState.value = ResultResponse.Loading
+                    _caloriesHistoryState.value = ResultResponse.Loading
                     _isRefreshing.value = true
 
                     dashboardRepository.getCaloriesHistory(date)
@@ -301,6 +375,42 @@ class DashboardViewModel(
                 }
             } catch (e: Exception) {
                 _caloriesHistoryState.value =
+                    ResultResponse.Error(e.localizedMessage ?: "Network error")
+                _isRefreshing.value = false
+            }
+        }
+    }
+
+    private fun getWaterHistory(forceRefresh: Boolean = false) {
+        viewModelScope.launch {
+            try {
+                val date = selectedDate.value
+
+                val currentTime = System.currentTimeMillis()
+                val shouldRefresh = _waterHistoryState.value is ResultResponse.None ||
+                        forceRefresh ||
+                        (currentTime - lastWaterFetchTime > WaterCacheValidityPeriod)
+
+                if (shouldRefresh) {
+                    _waterHistoryState.value = ResultResponse.Loading
+                    _isRefreshing.value = true
+
+                    dashboardRepository.getWaterHistory(date)
+                        .collect { result ->
+                            _waterHistoryState.value = result
+                            if (result !is ResultResponse.Loading) {
+                                _isRefreshing.value = false
+                                if (result is ResultResponse.Success) {
+                                    _waterHistory.value = result.data
+                                    lastWaterFetchTime = System.currentTimeMillis()
+                                }
+                            }
+                        }
+                } else {
+                    _isRefreshing.value = false
+                }
+            } catch (e: Exception) {
+                _waterHistoryState.value =
                     ResultResponse.Error(e.localizedMessage ?: "Network error")
                 _isRefreshing.value = false
             }
@@ -355,6 +465,8 @@ class DashboardViewModel(
         getCaloriesHistory(forceRefresh = true)
         getWaterADay(forceRefresh = true)
         getScheduleADay(forceRefresh = true)
+        getWaterHistory(forceRefresh = true)
+        getWaterDaily(forceRefresh = true)
     }
 
     suspend fun getUserDetail(): Detail? {

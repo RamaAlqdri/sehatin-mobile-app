@@ -5,11 +5,14 @@ import com.example.sehatin.common.ResultResponse
 import com.example.sehatin.data.model.response.CaloriesADayRequest
 import com.example.sehatin.data.model.response.CaloriesADayResponse
 import com.example.sehatin.data.model.response.CaloriesHistoryResponse
+import com.example.sehatin.data.model.response.CreateWaterHistoryResponse
 import com.example.sehatin.data.model.response.Detail
 import com.example.sehatin.data.model.response.DietProgressResponse
 import com.example.sehatin.data.model.response.GetUserResponse
 import com.example.sehatin.data.model.response.ScheduleADayResponse
 import com.example.sehatin.data.model.response.WaterADayResponse
+import com.example.sehatin.data.model.response.WaterHistoryRequest
+import com.example.sehatin.data.model.response.WaterHistoryResponse
 import com.example.sehatin.data.store.DataStoreManager
 import com.example.sehatin.retrofit.api.ApiConfig
 import com.example.sehatin.utils.formatDateToISO8601
@@ -30,6 +33,25 @@ class DashboardRepository private constructor(
     suspend fun getUserDetail(): Detail? {
         return dataStoreManager.getUserDetail()
     }
+
+
+    fun createWaterHistory(
+        water: Double
+    ): Flow<ResultResponse<CreateWaterHistoryResponse>> = flow {
+        emit(ResultResponse.Loading)
+        try {
+            val response = dashboardService.postWaterHistory(WaterHistoryRequest(water))
+            if (response.isSuccessful) {
+                response.body()?.let {
+                    emit(ResultResponse.Success(it))
+                } ?: emit(ResultResponse.Error("Empty response body"))
+            } else {
+                emit(ResultResponse.Error("Error: ${response.errorBody()?.string() ?: "Unknown error"}"))
+            }
+        } catch (e: Exception) {
+            emit(ResultResponse.Error(e.localizedMessage ?: "Network error"))
+        }
+    }.flowOn(Dispatchers.IO)
 
     fun getUserDietProgress(): Flow<ResultResponse<DietProgressResponse>> = flow {
         emit(ResultResponse.Loading)
@@ -87,6 +109,23 @@ class DashboardRepository private constructor(
         try {
             val formattedDate = formatDateToISO8601(date) // Format date to ISO 8601
             val response = dashboardService.getWaterADay(formattedDate)
+            if (response.isSuccessful) {
+                response.body()?.let {
+                    emit(ResultResponse.Success(it))
+                } ?: emit(ResultResponse.Error("Empty response body"))
+            } else {
+                emit(ResultResponse.Error("Error: ${response.errorBody()?.string() ?: "Unknown error"}"))
+            }
+        } catch (e: Exception) {
+            emit(ResultResponse.Error(e.localizedMessage ?: "Network error"))
+        }
+    }.flowOn(Dispatchers.IO)
+
+    fun getWaterHistory(date: Date): Flow<ResultResponse<WaterHistoryResponse>> = flow {
+        emit(ResultResponse.Loading)
+        try {
+            val formattedDate = formatDateToISO8601(date) // Format date to ISO 8601
+            val response = dashboardService.getWaterHistory(formattedDate) // Pass only the date
             if (response.isSuccessful) {
                 response.body()?.let {
                     emit(ResultResponse.Success(it))
