@@ -20,6 +20,7 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
@@ -41,7 +42,8 @@ fun MealCard(
             .background(color = sec, shape = RoundedCornerShape(16.dp))
             .padding(16.dp)
             .clickable(
-                onClick = { /* Handle click event */ }
+                onClick =
+                    onClick,
             ),
         verticalAlignment = Alignment.CenterVertically
     ) {
@@ -57,7 +59,8 @@ fun MealCard(
             contentDescription = title,
             modifier = Modifier
                 .size(64.dp)
-                .clip(RoundedCornerShape(8.dp))
+                .clip(RoundedCornerShape(8.dp)),
+            contentScale = ContentScale.Crop
         )
         Spacer(modifier = Modifier.width(16.dp))
         Column {

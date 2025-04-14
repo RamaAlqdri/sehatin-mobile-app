@@ -27,8 +27,10 @@ ui = "1.7.7"
 uiTextGoogleFonts = "1.7.7"
 uiTooling = "1.7.7"
 coil = "2.4.0"
+accompanist = "0.28.0"
 
 [libraries]
+accompanist-flowlayout = { module = "com.google.accompanist:accompanist-flowlayout", version.ref = "accompanist" }
 coil-compose = { module = "io.coil-kt:coil-compose", version.ref = "coil" }
 accompanist-pager = { module = "com.google.accompanist:accompanist-pager", version.ref = "accompanistPager" }
 accompanist-pager-indicators = { module = "com.google.accompanist:accompanist-pager-indicators", version.ref = "accompanistPager" }

@@ -20,6 +20,7 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.statusBarsPadding
 import androidx.compose.foundation.layout.width
+import androidx.compose.foundation.layout.widthIn
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.shape.CircleShape
@@ -131,6 +132,7 @@ fun DashboardScreen(
 
     LaunchedEffect(Unit) {
         profile = dashboardViewModel.getUserDetail()
+        dashboardViewModel.refresh()
         Log.e("DETAIL", "DashboardScreen: $profile")
     }
 
@@ -301,17 +303,21 @@ fun DashboardScreen(
                                         ) {
 
                                             Text(
-                                                text = "${dietProgressData?.data?.short_message ?: " "}",
+                                                text = dietProgressData?.data?.short_message ?: " ",
                                                 color = MaterialTheme.colorScheme.onPrimary,
                                                 fontWeight = FontWeight.Bold,
                                                 fontSize = 28.sp
                                             )
-                                            Text(
-                                                text = "${dietProgressData?.data?.desc ?: " " }",
-                                                color = MaterialTheme.colorScheme.onPrimary,
-                                                fontWeight = FontWeight.Normal,
-                                                fontSize = 12.sp
-                                            )
+                                            Box(
+                                                modifier = Modifier.widthIn(max = 200.dp) // Set the maximum width
+                                            ) {
+                                                Text(
+                                                    text = dietProgressData?.data?.desc ?: " ",
+                                                    color = MaterialTheme.colorScheme.onPrimary,
+                                                    fontWeight = FontWeight.Normal,
+                                                    fontSize = 12.sp
+                                                )
+                                            }
                                         }
                                     }
 
@@ -488,8 +494,8 @@ fun DashboardScreen(
 
                         item {
                             ScheduleSection(
-//                                data = FakeData.meals
-                                data = scheduleADay
+                                data = scheduleADay,
+                                navigateToFoodDetail = navigateToDetail // ⬅️ parameternya harus sesuai
                             )
                         }
                     }
@@ -519,7 +525,8 @@ fun formattedCurrentDate(): String? {
 private fun ScheduleSection(
     modifier: Modifier = Modifier,
 //    data: List<Meal>,
-    data: ScheduleADayResponse? = null
+    data: ScheduleADayResponse? = null,
+    navigateToFoodDetail: (String) -> Unit // 👈 Tambahan
 
 ) {
     Column(
@@ -547,6 +554,17 @@ private fun ScheduleSection(
                         title = meal.food.name,
                         time = convertToHoursAndMinutes(meal.scheduledAt),
                         calories = meal.food.calories.toDouble(),
+
+                        onClick = {
+                            Log.d("Debug", "Meal clicked: ${meal.food.name}")
+//                            navigateToDetail(
+//                                DetailDestinations.FOOD_DETAIL_ROUTE
+//                            )
+
+                            val foodId = meal.food.id.toString()
+                            navigateToFoodDetail(DetailDestinations.foodDetailRouteWithId(foodId))
+                        },
+
                     )
                 }
             }

@@ -258,11 +258,22 @@ fun SehatInApp() {
                         )
                     }
 
+//                    composableWithCompositionLocal(
+//                        route = DetailDestinations.FOOD_DETAIL_ROUTE
+//                    ) { backStackEntry ->
+//                        FoodDetail(
+//                            onBackClick = sehatInNavController::upPress
+//                        )
+//                    }
+
                     composableWithCompositionLocal(
                         route = DetailDestinations.FOOD_DETAIL_ROUTE
                     ) { backStackEntry ->
+                        val foodId = backStackEntry.arguments?.getString(DetailDestinations.FOOD_ID_ARG) ?: ""
                         FoodDetail(
-                            onBackClick = sehatInNavController::upPress
+                            foodId = foodId,
+                            onBackClick = sehatInNavController::upPress,
+                            dashboardViewModel = dashboardViewModel
                         )
                     }
 

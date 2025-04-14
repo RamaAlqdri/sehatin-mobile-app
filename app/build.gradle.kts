@@ -104,5 +104,6 @@ dependencies {
     implementation(libs.converter.gson)
     implementation(libs.logging.interceptor)
     implementation(libs.coil.compose)
+    implementation(libs.accompanist.flowlayout)
 
 }

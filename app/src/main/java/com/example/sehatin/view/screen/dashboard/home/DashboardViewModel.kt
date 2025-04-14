@@ -9,6 +9,7 @@ import com.example.sehatin.data.model.response.CaloriesHistoryResponse
 import com.example.sehatin.data.model.response.CreateWaterHistoryResponse
 import com.example.sehatin.data.model.response.Detail
 import com.example.sehatin.data.model.response.DietProgressResponse
+import com.example.sehatin.data.model.response.FoodDetailResponse
 import com.example.sehatin.data.model.response.RegisterResponse
 import com.example.sehatin.data.model.response.ScheduleADayResponse
 import com.example.sehatin.data.model.response.WaterADayResponse
@@ -92,6 +93,15 @@ class DashboardViewModel(
 
     private val _scheduleADay = MutableStateFlow<ScheduleADayResponse?>(null)
     val scheduleADay = _scheduleADay.asStateFlow()
+
+//
+
+    private val _foodDetailState =
+        MutableStateFlow<ResultResponse<FoodDetailResponse>>(ResultResponse.None)
+    val foodDetailState: StateFlow<ResultResponse<FoodDetailResponse>> = _foodDetailState
+
+    private val _foodDetail = MutableStateFlow<FoodDetailResponse?>(null)
+    val foodDetail = _foodDetail.asStateFlow()
 
 
 
@@ -187,6 +197,23 @@ class DashboardViewModel(
                 _dietProgressState.value =
                     ResultResponse.Error(e.localizedMessage ?: "Network error")
                 _isRefreshing.value = false
+            }
+        }
+    }
+
+    fun getFoodDetail(foodId: String, forceRefresh: Boolean = false) {
+        viewModelScope.launch {
+            try {
+                _foodDetailState.value = ResultResponse.Loading
+                dashboardRepository.getFoodDetail(foodId).collect { result ->
+                    _foodDetailState.value = result
+                    if (result is ResultResponse.Success) {
+                        _foodDetail.value = result.data
+                    }
+                }
+            } catch (e: Exception) {
+                _foodDetailState.value =
+                    ResultResponse.Error(e.localizedMessage ?: "Network error")
             }
         }
     }
@@ -343,6 +370,7 @@ class DashboardViewModel(
             }
         }
     }
+
 
 
     private fun getCaloriesHistory(forceRefresh: Boolean = false) {

@@ -5,6 +5,7 @@ import com.example.sehatin.data.model.response.CaloriesADayResponse
 import com.example.sehatin.data.model.response.CaloriesHistoryResponse
 import com.example.sehatin.data.model.response.CreateWaterHistoryResponse
 import com.example.sehatin.data.model.response.DietProgressResponse
+import com.example.sehatin.data.model.response.FoodDetailResponse
 import com.example.sehatin.data.model.response.GetUserResponse
 import com.example.sehatin.data.model.response.LoginRequest
 import com.example.sehatin.data.model.response.LoginResponse
@@ -39,6 +40,9 @@ interface DashboardService {
 
     @POST("api/schedule/water")
     suspend fun postWaterHistory(@Body request: WaterHistoryRequest) : Response<CreateWaterHistoryResponse>
+
+    @GET("api/food/detail")
+    suspend fun getFoodDetail(@Query("foodId") id: String): Response<FoodDetailResponse>
 
 }
 

@@ -132,6 +132,16 @@ data class ScheduleDataItem(
     @field:SerializedName("food") val food: FoodItem
 )
 
+data class FoodDetailResponse(
+    @field:SerializedName("data") val data: FoodItem,
+
+    @field:SerializedName("message") val message: String,
+
+    @field:SerializedName("statusCode") val statusCode: Int,
+
+    @field:SerializedName("timestamp") val timestamp: String
+)
+
 data class FoodItem(
     @field:SerializedName("id") val id: String,
 
@@ -139,15 +149,15 @@ data class FoodItem(
 
     @field:SerializedName("description") val description: String,
 
-    @field:SerializedName("calories") val calories: String,
+    @field:SerializedName("calories") val calories: Double,
 
-    @field:SerializedName("protein") val protein: String,
+    @field:SerializedName("protein") val protein: Double,
 
-    @field:SerializedName("fat") val fat: String,
+    @field:SerializedName("fat") val fat: Double,
 
-    @field:SerializedName("carb") val carb: String,
+    @field:SerializedName("carb") val carb: Double,
 
-    @field:SerializedName("fiber") val fiber: String,
+    @field:SerializedName("fiber") val fiber: Double,
 
     @field:SerializedName("image") val image: String
 )
@@ -159,5 +169,7 @@ data class ProgressItem(
 
     @field:SerializedName("desc") val desc: String,
 )
+
+
 
 

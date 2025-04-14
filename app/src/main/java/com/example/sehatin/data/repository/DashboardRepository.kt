@@ -8,6 +8,7 @@ import com.example.sehatin.data.model.response.CaloriesHistoryResponse
 import com.example.sehatin.data.model.response.CreateWaterHistoryResponse
 import com.example.sehatin.data.model.response.Detail
 import com.example.sehatin.data.model.response.DietProgressResponse
+import com.example.sehatin.data.model.response.FoodDetailResponse
 import com.example.sehatin.data.model.response.GetUserResponse
 import com.example.sehatin.data.model.response.ScheduleADayResponse
 import com.example.sehatin.data.model.response.WaterADayResponse
@@ -126,6 +127,22 @@ class DashboardRepository private constructor(
         try {
             val formattedDate = formatDateToISO8601(date) // Format date to ISO 8601
             val response = dashboardService.getWaterHistory(formattedDate) // Pass only the date
+            if (response.isSuccessful) {
+                response.body()?.let {
+                    emit(ResultResponse.Success(it))
+                } ?: emit(ResultResponse.Error("Empty response body"))
+            } else {
+                emit(ResultResponse.Error("Error: ${response.errorBody()?.string() ?: "Unknown error"}"))
+            }
+        } catch (e: Exception) {
+            emit(ResultResponse.Error(e.localizedMessage ?: "Network error"))
+        }
+    }.flowOn(Dispatchers.IO)
+
+    fun getFoodDetail(id: String): Flow<ResultResponse<FoodDetailResponse>> = flow {
+        emit(ResultResponse.Loading)
+        try {
+            val response = dashboardService.getFoodDetail(id)
             if (response.isSuccessful) {
                 response.body()?.let {
                     emit(ResultResponse.Success(it))

@@ -1,5 +1,6 @@
 package com.example.sehatin.view.screen.dashboard.detail.diet
 
+import android.util.Log
 import androidx.compose.animation.core.animateDpAsState
 import androidx.compose.animation.core.tween
 import androidx.compose.foundation.*
@@ -12,6 +13,7 @@ import androidx.compose.material3.*
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import com.google.accompanist.flowlayout.FlowRow
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.input.pointer.pointerInput
@@ -19,37 +21,75 @@ import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.platform.LocalConfiguration
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import androidx.lifecycle.compose.collectAsStateWithLifecycle
+import androidx.lifecycle.viewmodel.compose.viewModel
+import coil.compose.AsyncImage
 import com.example.compose.back
 import com.example.compose.ter
 import com.example.compose.textColor
 import com.example.sehatin.R
-import com.example.sehatin.common.FakeData
-import com.example.sehatin.common.FoodDetail
+import com.example.sehatin.common.ResultResponse
+import com.example.sehatin.data.model.response.FoodDetailResponse
 import com.example.sehatin.navigation.SehatInSurface
 import com.example.sehatin.view.components.CustomTopAppBar
+import com.example.sehatin.view.screen.dashboard.home.DashboardViewModel
+import com.google.accompanist.flowlayout.FlowCrossAxisAlignment
+import com.google.accompanist.flowlayout.FlowMainAxisAlignment
 import kotlinx.coroutines.launch
 
 
 @Composable
 fun FoodDetail(
-    modifier: Modifier = Modifier,
-    onBackClick: () -> Unit
-) {
-    FoodDetail(
-        onBackClick = {
-
-        },
-        item = FakeData.foods[0]
-    )
-}
-
-@Composable
-private fun FoodDetail(
+    foodId: String,
     modifier: Modifier = Modifier,
     onBackClick: () -> Unit,
-    item: FoodDetail
+    dashboardViewModel: DashboardViewModel
+) {
+
+    Log.e("FoodDetail", "FoodDetail: $foodId")
+
+    LaunchedEffect(foodId) {
+        dashboardViewModel.getFoodDetail(foodId)
+    }
+
+    val foodState by dashboardViewModel.foodDetailState.collectAsStateWithLifecycle(initialValue = null)
+
+    when (val state = foodState) {
+        is ResultResponse.Loading -> {
+            Log.e("RESULT", "Loading")
+        }
+
+        is ResultResponse.Success -> {
+            FoodDetailContent(
+                item = state.data,
+                onBackClick = onBackClick
+            )
+        }
+
+        is ResultResponse.Error -> {
+            Log.e("RESULT", "Error: ${state.error}")
+        }
+
+        else -> {
+
+        }
+    }
+
+//    FoodDetail(
+//        onBackClick = onBackClick,
+//        item = FakeData.foods[0]
+//    )
+}
+
+@OptIn(ExperimentalLayoutApi::class)
+@Composable
+private fun FoodDetailContent(
+    modifier: Modifier = Modifier,
+    onBackClick: () -> Unit,
+    item: FoodDetailResponse
 ) {
     val sheetMaxHeight = (getScreenHeightDp() - 100).dp
     val sheetNormalHeight = (getScreenHeightDp() - 300).dp
@@ -64,33 +104,37 @@ private fun FoodDetail(
     val coroutineScope = rememberCoroutineScope()
 
     SehatInSurface(
-        modifier = modifier.fillMaxSize(),
+        modifier = modifier.fillMaxSize()
     ) {
         Box(
-            modifier = Modifier
-                .fillMaxSize(),
+            modifier = Modifier.fillMaxSize(),
             contentAlignment = Alignment.Center
         ) {
             Column(
                 modifier = Modifier
                     .fillMaxSize()
                     .background(back),
-                horizontalAlignment = Alignment.CenterHorizontally,
+                horizontalAlignment = Alignment.CenterHorizontally
             ) {
                 Box(modifier = Modifier.fillMaxSize()) {
-                    Image(
-                        painter = painterResource(id = R.drawable.telor),
-                        contentDescription = "Food Image",
-                        modifier = Modifier
-                            .fillMaxWidth(),
+//                    Image(
+//                        painter = painterResource(id = R.drawable.telor), // Ganti jika ingin pakai `item.data.image` dengan `rememberAsyncImagePainter`
+//                        contentDescription = "Food Image",
+//                        modifier = Modifier.fillMaxWidth(),
+//                        contentScale = ContentScale.Crop
+//                    )
+                    AsyncImage(
+                        model = item.data.image, // Load image from URL
+                        contentDescription = item.data.name,
+                        modifier = Modifier.fillMaxWidth(),
                         contentScale = ContentScale.Crop
                     )
 
                     CustomTopAppBar(
                         title = "",
                         showNavigationIcon = true,
-                        modifier = Modifier
-                            .statusBarsPadding()
+                        modifier = Modifier.statusBarsPadding(),
+                        onBackClick = onBackClick
                     )
 
                     Box(
@@ -103,19 +147,16 @@ private fun FoodDetail(
                             .pointerInput(Unit) {
                                 coroutineScope.launch {
                                     detectVerticalDragGestures(
-                                        onVerticalDrag = { change, dragAmount ->
+                                        onVerticalDrag = { _, dragAmount ->
                                             sheetHeight = (sheetHeight - dragAmount.dp).coerceIn(
                                                 sheetNormalHeight,
                                                 sheetMaxHeight
                                             )
                                         },
                                         onDragEnd = {
-                                            sheetHeight =
-                                                if (sheetHeight > (sheetNormalHeight + sheetMaxHeight) / 2) {
-                                                    sheetMaxHeight
-                                                } else {
-                                                    sheetNormalHeight
-                                                }
+                                            sheetHeight = if (sheetHeight > (sheetNormalHeight + sheetMaxHeight) / 2)
+                                                sheetMaxHeight
+                                            else sheetNormalHeight
                                         }
                                     )
                                 }
@@ -125,25 +166,20 @@ private fun FoodDetail(
                             modifier = Modifier
                                 .fillMaxSize()
                                 .padding(horizontal = 21.dp, vertical = 16.dp)
-                                .verticalScroll(
-                                    if (sheetHeight == sheetMaxHeight) scrollState else rememberScrollState(
-                                        0
-                                    )
-                                ),
+                                .verticalScroll(scrollState),
                             horizontalAlignment = Alignment.CenterHorizontally
                         ) {
-
-                            Box(
-                                modifier = Modifier
-                                    .width(60.dp)
-                                    .height(6.dp)
-                                    .background(back, shape = RoundedCornerShape(3.dp))
-                            )
+//                            Box(
+//                                modifier = Modifier
+//                                    .width(60.dp)
+//                                    .height(6.dp)
+//                                    .background(back, shape = RoundedCornerShape(3.dp))
+//                            )
 
                             Spacer(modifier = Modifier.height(20.dp))
 
                             Text(
-                                text = item.name,
+                                text = item.data.name,
                                 fontSize = 24.sp,
                                 fontWeight = FontWeight.Bold,
                                 color = MaterialTheme.colorScheme.primary
@@ -151,25 +187,46 @@ private fun FoodDetail(
 
                             Spacer(modifier = Modifier.height(16.dp))
 
+                            // Nutritional Info Row
                             Row(
                                 horizontalArrangement = Arrangement.SpaceBetween,
                                 modifier = Modifier.fillMaxWidth()
                             ) {
-                                item.listDetail.forEach {
-                                    NutritionInfo(
-                                        units = it.units,
-                                        weight = it.weight,
-                                        position = item.listDetail.indexOf(it)
-                                    )
+                                val nutritionItems = listOf(
+                                    Triple("Kalori", item.data.calories.toInt(), 0),
+                                    Triple("Protein", item.data.protein.toInt(), 1),
+                                    Triple("Lemak", item.data.fat.toInt(), 2),
+                                    Triple("Karbo", item.data.carb.toInt(), 3),
+                                    Triple("Serat", item.data.fiber.toInt(), 4)
+                                )
+
+                                FlowRow(
+                                    modifier = Modifier
+                                        .fillMaxWidth()
+                                        .padding(horizontal = 0.dp),
+                                    mainAxisSpacing = 2.dp,
+                                    crossAxisSpacing = 10.dp,
+                                    mainAxisAlignment = FlowMainAxisAlignment.Center,
+                                    crossAxisAlignment = FlowCrossAxisAlignment.Center
+                                ) {
+                                    nutritionItems.forEach { (label, value, position) ->
+                                        NutritionInfo(
+                                            units = label,
+                                            weight = value,
+                                            position = position
+                                        )
+                                    }
                                 }
                             }
 
-                            Spacer(modifier = Modifier.height(16.dp))
+                            Spacer(modifier = Modifier.height(20.dp))
 
                             Text(
-                                text = item.description ,
-                                fontSize = 13.sp,
-                                color = textColor
+                                text = item.data.description,
+                                fontSize = 18.sp,
+                                color = textColor,
+                                textAlign = TextAlign.Justify, // ⬅️ ini yang bikin teks rata kiri kanan
+                                modifier = Modifier.fillMaxWidth()
                             )
                         }
                     }
@@ -186,11 +243,14 @@ fun NutritionInfo(
     position: Int = 0
 ) {
     Row(
+        verticalAlignment = Alignment.CenterVertically,
+        modifier = Modifier
+            .padding(horizontal = 4.dp)
     )
     {
         Box(
             modifier = Modifier
-                .size(25.dp)
+                .size(32.dp)
                 .background(ter, RoundedCornerShape(50.dp)),
             contentAlignment = Alignment.Center
         ) {
@@ -204,13 +264,16 @@ fun NutritionInfo(
                 }),
                 contentDescription = "",
                 tint = MaterialTheme.colorScheme.primary,
-                modifier = Modifier.size(15.dp)
+                modifier = Modifier.size(18.dp)
             )
         }
         Spacer(modifier = Modifier.width(8.dp))
-        Column(horizontalAlignment = Alignment.Start) {
+        Row(
+            verticalAlignment = Alignment.CenterVertically,
+            horizontalArrangement = Arrangement.spacedBy(4.dp) // Adds spacing between items
+        ) {
             Text(
-                text = weight.toString(),
+                text = weight.toString()+"g",
                 fontSize = 14.sp,
                 fontWeight = FontWeight.Bold,
                 color = Color(0xFF4CAF50)
@@ -218,8 +281,7 @@ fun NutritionInfo(
             Text(
                 text = units,
                 fontSize = 12.sp,
-                color = Color.Gray,
-                modifier = Modifier.absoluteOffset(x = 0.dp, y = (-9).dp)
+                color = Color.Gray
             )
         }
     }

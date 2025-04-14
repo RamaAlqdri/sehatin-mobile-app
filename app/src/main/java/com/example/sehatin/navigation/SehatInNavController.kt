@@ -38,7 +38,15 @@ object DetailDestinations {
     const val DIET_SCHEDULE_DETAIL_ROUTE = "dietSchedule"
     const val FOOD_RECOMENDATION_DETAIL_ROUTE = "foodRecomendation"
     const val FOOD_LIST_DETAIL_ROUTE = "foodList"
-    const val FOOD_DETAIL_ROUTE = "foodDetail"
+    const val FOOD_DETAIL_ROUTE_BASE = "foodDetail"
+    const val FOOD_ID_ARG = "foodId"
+    // Untuk navigasi
+    fun foodDetailRouteWithId(foodId: String): String {
+        return "$FOOD_DETAIL_ROUTE_BASE/$foodId"
+    }
+
+    // Untuk deklarasi route di NavHost
+    const val FOOD_DETAIL_ROUTE = "$FOOD_DETAIL_ROUTE_BASE/{$FOOD_ID_ARG}"
 }
 
 object QueryKeys {
@@ -82,6 +90,12 @@ class SehatInNavController(
                 launchSingleTop = true
                 restoreState = true
             }
+        }
+    }
+
+    fun navigateToFoodDetail(foodId: String, from: NavBackStackEntry) {
+        if (from.lifecycleIsResumed()) {
+            navController.navigate("foodDetail/$foodId")
         }
     }
 
