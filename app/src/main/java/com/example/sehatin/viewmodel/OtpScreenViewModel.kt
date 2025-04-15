@@ -1,4 +1,4 @@
-package com.example.sehatin.view.screen.authentication.register
+package com.example.sehatin.viewmodel
 
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf

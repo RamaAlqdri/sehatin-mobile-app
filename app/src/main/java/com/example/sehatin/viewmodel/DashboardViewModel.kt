@@ -1,6 +1,5 @@
-package com.example.sehatin.view.screen.dashboard.home
+package com.example.sehatin.viewmodel
 
-import android.util.Log
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.example.sehatin.common.ResultResponse
@@ -10,10 +9,8 @@ import com.example.sehatin.data.model.response.CreateWaterHistoryResponse
 import com.example.sehatin.data.model.response.Detail
 import com.example.sehatin.data.model.response.DietProgressResponse
 import com.example.sehatin.data.model.response.FoodDetailResponse
-import com.example.sehatin.data.model.response.RegisterResponse
 import com.example.sehatin.data.model.response.ScheduleADayResponse
 import com.example.sehatin.data.model.response.WaterADayResponse
-import com.example.sehatin.data.model.response.WaterHistoryRequest
 import com.example.sehatin.data.model.response.WaterHistoryResponse
 import com.example.sehatin.data.repository.DashboardRepository
 import com.example.sehatin.utils.getTodayUtcDate
@@ -21,8 +18,8 @@ import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.launch
-import kotlinx.datetime.LocalDate
 import java.time.LocalDateTime
+import java.time.ZoneId
 import java.time.format.DateTimeFormatter
 import java.util.Date
 
@@ -32,7 +29,7 @@ class DashboardViewModel(
 
 //    SEPARATOR
     private val _dietProgressState =
-        MutableStateFlow<ResultResponse<DietProgressResponse>>(ResultResponse.None)
+    MutableStateFlow<ResultResponse<DietProgressResponse>>(ResultResponse.None)
     val dietProgressState: StateFlow<ResultResponse<DietProgressResponse>> = _dietProgressState
 
     private val _dietProgress = MutableStateFlow<DietProgressResponse?>(null)
@@ -40,7 +37,7 @@ class DashboardViewModel(
 
 //    SEPARATOR
     private val _caloriesADayState =
-        MutableStateFlow<ResultResponse<CaloriesADayResponse>>(ResultResponse.None)
+    MutableStateFlow<ResultResponse<CaloriesADayResponse>>(ResultResponse.None)
     val caloriesADayState: StateFlow<ResultResponse<CaloriesADayResponse>> = _caloriesADayState
 
     private val _caloriesADay = MutableStateFlow<CaloriesADayResponse?>(null)
@@ -53,7 +50,8 @@ class DashboardViewModel(
     private val _caloriesDaily = MutableStateFlow<CaloriesADayResponse?>(null)
     val caloriesDaily = _caloriesDaily.asStateFlow()
 
-    private val _caloriesHistoryState = MutableStateFlow<ResultResponse<CaloriesHistoryResponse>>(ResultResponse.None)
+    private val _caloriesHistoryState =
+        MutableStateFlow<ResultResponse<CaloriesHistoryResponse>>(ResultResponse.None)
     val caloriesHistoryState: StateFlow<ResultResponse<CaloriesHistoryResponse>> = _caloriesHistoryState
 
     private val _caloriesHistory = MutableStateFlow<CaloriesHistoryResponse?>(null)
@@ -61,7 +59,7 @@ class DashboardViewModel(
 
 //    SEPARATOR
     private val _waterADayState =
-        MutableStateFlow<ResultResponse<WaterADayResponse>>(ResultResponse.None)
+    MutableStateFlow<ResultResponse<WaterADayResponse>>(ResultResponse.None)
     val waterADayState: StateFlow<ResultResponse<WaterADayResponse>> = _waterADayState
 
     private val _waterADay = MutableStateFlow<WaterADayResponse?>(null)
@@ -74,7 +72,8 @@ class DashboardViewModel(
     private val _waterDaily = MutableStateFlow<WaterADayResponse?>(null)
     val waterDaily = _waterDaily.asStateFlow()
 
-    private val _waterHistoryState = MutableStateFlow<ResultResponse<WaterHistoryResponse>>(ResultResponse.None)
+    private val _waterHistoryState =
+        MutableStateFlow<ResultResponse<WaterHistoryResponse>>(ResultResponse.None)
     val waterHistoryState: StateFlow<ResultResponse<WaterHistoryResponse>> = _waterHistoryState
 
     private val _waterHistory = MutableStateFlow<WaterHistoryResponse?>(null)
@@ -88,7 +87,7 @@ class DashboardViewModel(
 
 // SEPARATOR
     private val _scheduleADayState =
-        MutableStateFlow<ResultResponse<ScheduleADayResponse>>(ResultResponse.None)
+    MutableStateFlow<ResultResponse<ScheduleADayResponse>>(ResultResponse.None)
     val scheduleADayState: StateFlow<ResultResponse<ScheduleADayResponse>> = _scheduleADayState
 
     private val _scheduleADay = MutableStateFlow<ScheduleADayResponse?>(null)
@@ -224,7 +223,7 @@ class DashboardViewModel(
                 val currentDate = LocalDateTime.now()
                 val formatter = DateTimeFormatter.ISO_INSTANT
 //                val formattedDate = currentDate.format(formatter)
-                val date = java.util.Date.from(currentDate.atZone(java.time.ZoneId.of("UTC")).toInstant())
+                val date = Date.from(currentDate.atZone(ZoneId.of("UTC")).toInstant())
 
 
                 val currentTime = System.currentTimeMillis()
@@ -263,8 +262,8 @@ class DashboardViewModel(
             try {
                 val currentDate = LocalDateTime.now()
                 val formatter = DateTimeFormatter.ISO_INSTANT
-                val formattedDate = currentDate.atZone(java.time.ZoneId.of("UTC")).format(formatter)
-                val date = java.util.Date.from(currentDate.atZone(java.time.ZoneId.of("UTC")).toInstant())
+                val formattedDate = currentDate.atZone(ZoneId.of("UTC")).format(formatter)
+                val date = Date.from(currentDate.atZone(ZoneId.of("UTC")).toInstant())
 
 
 //                Log.e("RESULT", "getCaloriesADay: $formattedDate")
@@ -451,8 +450,8 @@ class DashboardViewModel(
             try {
                 val currentDate = LocalDateTime.now()
                 val formatter = DateTimeFormatter.ISO_INSTANT
-                val formattedDate = currentDate.atZone(java.time.ZoneId.of("UTC")).format(formatter)
-                val date = java.util.Date.from(currentDate.atZone(java.time.ZoneId.of("UTC")).toInstant())
+                val formattedDate = currentDate.atZone(ZoneId.of("UTC")).format(formatter)
+                val date = Date.from(currentDate.atZone(ZoneId.of("UTC")).toInstant())
 
 
                 val currentTime = System.currentTimeMillis()

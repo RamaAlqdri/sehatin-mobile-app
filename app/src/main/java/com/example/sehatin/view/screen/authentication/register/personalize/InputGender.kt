@@ -35,6 +35,7 @@ import com.example.sehatin.R
 import com.example.sehatin.common.ResultResponse
 import com.example.sehatin.navigation.MainDestinations
 import com.example.sehatin.view.components.CustomGenderRadioButton
+import com.example.sehatin.viewmodel.PersonalizeViewModel
 
 
 data class Option(val index: Int, val label: String)

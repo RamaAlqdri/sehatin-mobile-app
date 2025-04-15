@@ -36,7 +36,8 @@ import com.example.sehatin.common.ResultResponse
 import com.example.sehatin.navigation.MainDestinations
 import com.example.sehatin.view.components.CustomGenderRadioButton
 import com.example.sehatin.view.components.CustomRadioButton
-import com.example.sehatin.view.screen.authentication.login.LoginScreenViewModel
+import com.example.sehatin.viewmodel.LoginScreenViewModel
+import com.example.sehatin.viewmodel.PersonalizeViewModel
 
 
 data class OptionGoal(val index: Int, val label: String, val level: String)

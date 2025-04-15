@@ -6,8 +6,8 @@ import androidx.lifecycle.ViewModelProvider
 import com.example.sehatin.data.repository.DashboardRepository
 import com.example.sehatin.data.repository.LoginRepository
 import com.example.sehatin.di.Injection
-import com.example.sehatin.view.screen.authentication.login.LoginScreenViewModel
-import com.example.sehatin.view.screen.dashboard.home.DashboardViewModel
+import com.example.sehatin.viewmodel.LoginScreenViewModel
+import com.example.sehatin.viewmodel.DashboardViewModel
 
 class DashboardViewModelFactory private constructor(private val dashboardRepository: DashboardRepository) :
     ViewModelProvider.NewInstanceFactory() {

@@ -5,7 +5,7 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.ViewModelProvider
 import com.example.sehatin.data.repository.RegisterRepository
 import com.example.sehatin.di.Injection
-import com.example.sehatin.view.screen.authentication.register.RegisterScreenViewModel
+import com.example.sehatin.viewmodel.RegisterScreenViewModel
 
 class RegisterViewModelFactory private constructor(private val registerRepository: RegisterRepository) :
     ViewModelProvider.NewInstanceFactory() {

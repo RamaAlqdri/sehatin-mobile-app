@@ -1,4 +1,4 @@
-package com.example.sehatin.view.screen.authentication.login
+package com.example.sehatin.viewmodel
 
 import android.util.Patterns
 import androidx.compose.runtime.getValue
@@ -7,13 +7,9 @@ import androidx.compose.runtime.setValue
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.example.sehatin.common.ResultResponse
-import com.example.sehatin.data.model.response.Data
 import com.example.sehatin.data.model.response.GetUserResponse
 import com.example.sehatin.data.model.response.LoginResponse
-import com.example.sehatin.data.model.response.RegisterResponse
 import com.example.sehatin.data.repository.LoginRepository
-import com.example.sehatin.data.repository.RegisterRepository
-import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.launch

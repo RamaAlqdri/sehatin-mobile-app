@@ -1,4 +1,4 @@
-package com.example.sehatin.view.screen.authentication.register
+package com.example.sehatin.viewmodel
 
 import android.util.Patterns
 import androidx.compose.runtime.getValue
@@ -10,7 +10,6 @@ import com.example.sehatin.common.ResultResponse
 import com.example.sehatin.data.model.response.OtpResponse
 import com.example.sehatin.data.model.response.RegisterResponse
 import com.example.sehatin.data.repository.RegisterRepository
-import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.launch

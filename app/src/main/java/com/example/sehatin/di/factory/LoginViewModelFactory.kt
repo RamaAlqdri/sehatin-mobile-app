@@ -6,8 +6,8 @@ import androidx.lifecycle.ViewModelProvider
 import com.example.sehatin.data.repository.LoginRepository
 import com.example.sehatin.data.repository.OnBoardingRepository
 import com.example.sehatin.di.Injection
-import com.example.sehatin.view.screen.authentication.login.LoginScreenViewModel
-import com.example.sehatin.view.screen.onboarding.OnBoardingViewModel
+import com.example.sehatin.viewmodel.LoginScreenViewModel
+import com.example.sehatin.viewmodel.OnBoardingViewModel
 
 class LoginViewModelFactory private constructor(private val loginRepository: LoginRepository) :
     ViewModelProvider.NewInstanceFactory() {

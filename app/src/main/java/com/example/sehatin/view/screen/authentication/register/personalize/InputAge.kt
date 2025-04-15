@@ -34,6 +34,7 @@ import com.example.sehatin.view.components.CustomButton
 import com.example.sehatin.view.components.CustomDatePicker
 import com.example.sehatin.view.components.CustomTextField
 import com.example.sehatin.view.screen.authentication.register.setPassword
+import com.example.sehatin.viewmodel.PersonalizeViewModel
 import java.time.LocalDate
 import java.time.format.DateTimeFormatter
 import java.util.Locale

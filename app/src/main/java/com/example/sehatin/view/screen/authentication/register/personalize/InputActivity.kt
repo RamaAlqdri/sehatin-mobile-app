@@ -36,6 +36,7 @@ import com.example.sehatin.common.ResultResponse
 import com.example.sehatin.navigation.MainDestinations
 import com.example.sehatin.view.components.CustomGenderRadioButton
 import com.example.sehatin.view.components.CustomRadioButton
+import com.example.sehatin.viewmodel.PersonalizeViewModel
 
 data class RadioOption(val index: Int, val label: String, val desc: String, val level: String)
 

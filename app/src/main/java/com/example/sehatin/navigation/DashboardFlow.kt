@@ -21,7 +21,7 @@ import com.example.sehatin.view.components.HomeSections
 import com.example.sehatin.view.screen.dashboard.consultation.ConsultationScreen
 import com.example.sehatin.view.screen.dashboard.diet.DietScreen
 import com.example.sehatin.view.screen.dashboard.home.DashboardScreen
-import com.example.sehatin.view.screen.dashboard.home.DashboardViewModel
+import com.example.sehatin.viewmodel.DashboardViewModel
 import com.example.sehatin.view.screen.dashboard.profile.ProfileScreen
 
 fun <T> spatialExpressiveSpring() = spring<T>(

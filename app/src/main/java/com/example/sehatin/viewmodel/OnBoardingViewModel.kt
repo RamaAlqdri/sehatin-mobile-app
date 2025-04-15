@@ -1,4 +1,4 @@
-package com.example.sehatin.view.screen.onboarding
+package com.example.sehatin.viewmodel
 
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope

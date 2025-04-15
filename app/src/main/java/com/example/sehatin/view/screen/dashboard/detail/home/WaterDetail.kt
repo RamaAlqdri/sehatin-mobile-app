@@ -49,7 +49,7 @@ import com.example.sehatin.navigation.SehatInSurface
 import com.example.sehatin.utils.convertToHoursAndMinutes
 import com.example.sehatin.view.components.CustomTopAppBar
 import com.example.sehatin.view.components.WaterIntake
-import com.example.sehatin.view.screen.dashboard.home.DashboardViewModel
+import com.example.sehatin.viewmodel.DashboardViewModel
 import java.time.LocalDate
 import java.time.ZoneId
 import java.time.format.DateTimeFormatter

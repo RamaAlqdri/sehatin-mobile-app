@@ -35,7 +35,7 @@ import com.example.sehatin.common.ResultResponse
 import com.example.sehatin.data.model.response.FoodDetailResponse
 import com.example.sehatin.navigation.SehatInSurface
 import com.example.sehatin.view.components.CustomTopAppBar
-import com.example.sehatin.view.screen.dashboard.home.DashboardViewModel
+import com.example.sehatin.viewmodel.DashboardViewModel
 import com.google.accompanist.flowlayout.FlowCrossAxisAlignment
 import com.google.accompanist.flowlayout.FlowMainAxisAlignment
 import kotlinx.coroutines.launch

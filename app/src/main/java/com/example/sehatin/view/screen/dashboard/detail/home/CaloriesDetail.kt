@@ -45,7 +45,7 @@ import com.example.sehatin.navigation.SehatInSurface
 import com.example.sehatin.utils.convertToHoursAndMinutes
 import com.example.sehatin.view.components.CaloriesProgress
 import com.example.sehatin.view.components.CustomTopAppBar
-import com.example.sehatin.view.screen.dashboard.home.DashboardViewModel
+import com.example.sehatin.viewmodel.DashboardViewModel
 
 import network.chaintech.kmp_date_time_picker.utils.now
 import java.time.LocalDate

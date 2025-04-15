@@ -33,6 +33,7 @@ import com.example.sehatin.navigation.MainDestinations
 import com.example.sehatin.view.components.CustomButton
 import com.example.sehatin.view.components.CustomTextField
 import com.example.sehatin.view.screen.authentication.register.setPassword
+import com.example.sehatin.viewmodel.PersonalizeViewModel
 
 
 fun setPassword(value: String) {

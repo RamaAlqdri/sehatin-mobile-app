@@ -5,7 +5,7 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.ViewModelProvider
 import com.example.sehatin.data.repository.OnBoardingRepository
 import com.example.sehatin.di.Injection
-import com.example.sehatin.view.screen.onboarding.OnBoardingViewModel
+import com.example.sehatin.viewmodel.OnBoardingViewModel
 
 class OnBoardingViewModelFactory private constructor(private val onBoardingRepository: OnBoardingRepository) :
     ViewModelProvider.NewInstanceFactory() {

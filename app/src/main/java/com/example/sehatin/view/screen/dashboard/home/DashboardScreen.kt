@@ -70,6 +70,7 @@ import com.example.sehatin.utils.convertToHoursAndMinutes
 import com.example.sehatin.view.components.CircularProgressBar
 import com.example.sehatin.view.components.MealCard
 import com.example.sehatin.view.components.RefreshIndicator
+import com.example.sehatin.viewmodel.DashboardViewModel
 import java.time.LocalDate
 import java.time.format.DateTimeFormatter
 import java.util.Locale

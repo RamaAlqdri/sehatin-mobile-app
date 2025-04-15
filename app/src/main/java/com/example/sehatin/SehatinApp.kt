@@ -56,7 +56,7 @@ import com.example.sehatin.view.components.HomeSections
 import com.example.sehatin.view.components.SehatInBottomBar
 import com.example.sehatin.view.screen.authentication.forgot.ChangePassword
 import com.example.sehatin.view.screen.authentication.login.LoginScreen
-import com.example.sehatin.view.screen.authentication.login.LoginScreenViewModel
+import com.example.sehatin.viewmodel.LoginScreenViewModel
 import com.example.sehatin.view.screen.authentication.register.OtpScreen
 import com.example.sehatin.view.screen.authentication.register.RegisterScreen
 import com.example.sehatin.view.screen.authentication.register.personalize.InputActivity
@@ -66,7 +66,7 @@ import com.example.sehatin.view.screen.authentication.register.personalize.Input
 import com.example.sehatin.view.screen.authentication.register.personalize.InputHeight
 import com.example.sehatin.view.screen.authentication.register.personalize.InputName
 import com.example.sehatin.view.screen.authentication.register.personalize.InputWeight
-import com.example.sehatin.view.screen.authentication.register.personalize.PersonalizeViewModel
+import com.example.sehatin.viewmodel.PersonalizeViewModel
 import com.example.sehatin.view.screen.dashboard.detail.diet.DietScheduleDetail
 import com.example.sehatin.view.screen.dashboard.detail.diet.FoodDetail
 import com.example.sehatin.view.screen.dashboard.detail.diet.FoodListDetail
@@ -74,9 +74,9 @@ import com.example.sehatin.view.screen.dashboard.detail.diet.FoodRecomendationDe
 import com.example.sehatin.view.screen.dashboard.detail.home.CaloriesDetail
 import com.example.sehatin.view.screen.dashboard.detail.home.WaterDetail
 import com.example.sehatin.view.screen.dashboard.home.CheckScreen
-import com.example.sehatin.view.screen.dashboard.home.DashboardViewModel
+import com.example.sehatin.viewmodel.DashboardViewModel
 import com.example.sehatin.view.screen.onboarding.OnBoardingScreen
-import com.example.sehatin.view.screen.onboarding.OnBoardingViewModel
+import com.example.sehatin.viewmodel.OnBoardingViewModel
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.combine

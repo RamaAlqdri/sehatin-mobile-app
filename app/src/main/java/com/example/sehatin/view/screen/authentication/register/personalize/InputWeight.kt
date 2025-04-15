@@ -31,6 +31,7 @@ import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.example.sehatin.common.ResultResponse
 import com.example.sehatin.navigation.MainDestinations
 import com.example.sehatin.view.components.CustomButton
+import com.example.sehatin.viewmodel.PersonalizeViewModel
 
 
 @Composable

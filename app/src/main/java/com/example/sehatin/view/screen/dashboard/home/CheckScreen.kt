@@ -18,7 +18,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.example.sehatin.navigation.MainDestinations
-import com.example.sehatin.view.screen.authentication.login.LoginScreenViewModel
+import com.example.sehatin.viewmodel.LoginScreenViewModel
 
 @Composable
 fun CheckScreen(

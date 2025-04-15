@@ -65,6 +65,7 @@ import com.example.sehatin.navigation.MainDestinations
 import com.example.sehatin.view.components.BackgroundCurve
 import com.example.sehatin.view.components.CustomButton
 import com.example.sehatin.view.components.CustomTextField
+import com.example.sehatin.viewmodel.OtpScreenViewModel
 import kotlinx.coroutines.delay
 
 
