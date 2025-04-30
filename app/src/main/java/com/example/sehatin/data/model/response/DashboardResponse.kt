@@ -57,7 +57,7 @@ data class WaterHistoryResponse(
 
 data class WaterHistoryItem(
     @field:SerializedName("id") val id: String,
-    @field:SerializedName("water") val calories: Double,
+    @field:SerializedName("water") val water: Double,
     @field:SerializedName("createdAt") val createdAt: String,
 )
 
@@ -99,6 +99,15 @@ data class ScheduleADayResponse(
 
     @field:SerializedName("timestamp") val timestamp: String
 )
+data class ScheduleClosestResponse(
+    @field:SerializedName("data") val data: ScheduleDataItem,
+
+    @field:SerializedName("message") val message: String,
+
+    @field:SerializedName("statusCode") val statusCode: Int,
+
+    @field:SerializedName("timestamp") val timestamp: String
+)
 
 data class CaloriesItem(
     @field:SerializedName("calories") val calories: Double,
@@ -114,10 +123,6 @@ data class WaterItem(
 
 data class ScheduleDataItem(
     @field:SerializedName("id") val id: String,
-
-    @field:SerializedName("calories_burned") val caloriesBurned: String,
-
-    @field:SerializedName("water_consum") val waterConsum: String,
 
     @field:SerializedName("calories_target") val caloriesTarget: String,
 

@@ -23,6 +23,7 @@ object MainDestinations {
     const val INPUT_GOAL_ROUTE = "inputGoal"
     const val INPUT_ACTIVITY_ROUTE = "inputActivity"
     const val OTP_ROUTE = "otp"
+    const val FORGOT_OTP_ROUTE = "forgotOtp"
     const val LOGIN_ROUTE = "login"
     const val REGISTER_ROUTE = "register"
     const val USERNAME_ROUTE = "username"
@@ -30,16 +31,34 @@ object MainDestinations {
     const val SNACK_ID_KEY = "snackId"
     const val ORIGIN = "origin"
     const val CHECK_ROUTE = "check"
+    const val PROFILE_ROUTE = "profile"
+    const val FORGOT_PASSWORD_ROUTE = "forgotPassword"
 }
 
 object DetailDestinations {
     const val WATER_DETAIL_ROUTE = "water"
     const val CALORIES_DETAIL_ROUTE = "calories"
     const val DIET_SCHEDULE_DETAIL_ROUTE = "dietSchedule"
-    const val FOOD_RECOMENDATION_DETAIL_ROUTE = "foodRecomendation"
+    const val FOOD_RECOMENDATION_DETAIL_ROUTE_BASE = "foodRecomendation"
     const val FOOD_LIST_DETAIL_ROUTE = "foodList"
     const val FOOD_DETAIL_ROUTE_BASE = "foodDetail"
     const val FOOD_ID_ARG = "foodId"
+    const val SCHEDULE_ID_ARG = "scheduleId"
+    const val CHANGE_PASSWORD_AUTHED_ROUTE = "changePasswordAuthed"
+    const val UPDATE_HEIGHT_ROUTE = "updateHeight"
+    const val UPDATE_WEIGHT_ROUTE = "updateWeight"
+    const val UPDATE_ACTIVITY_ROUTE = "updateActivity"
+    const val UPDATE_GOAL_ROUTE = "updateGoal"
+
+
+
+    fun foodRecomendationRouteWithId(scheduleId: String): String {
+        return "$FOOD_RECOMENDATION_DETAIL_ROUTE_BASE/$scheduleId"
+    }
+
+    const val FOOD_RECOMENDATION_DETAIL_ROUTE =
+        "$FOOD_RECOMENDATION_DETAIL_ROUTE_BASE/{$SCHEDULE_ID_ARG}"
+
     // Untuk navigasi
     fun foodDetailRouteWithId(foodId: String): String {
         return "$FOOD_DETAIL_ROUTE_BASE/$foodId"
@@ -93,12 +112,28 @@ class SehatInNavController(
         }
     }
 
+    fun navigateWithClear(route: String, clearBackStack: Boolean = false) {
+        if (route != navController.currentDestination?.route) {
+            if (clearBackStack) {
+                navController.navigate(route) {
+                    popUpTo(0) { inclusive = true }
+                    launchSingleTop = true
+                }
+            } else {
+                navController.navigate(route) {
+                    launchSingleTop = true
+                    restoreState = true
+                }
+            }
+        }
+    }
+
+
     fun navigateToFoodDetail(foodId: String, from: NavBackStackEntry) {
         if (from.lifecycleIsResumed()) {
             navController.navigate("foodDetail/$foodId")
         }
     }
-
 
 
     fun navigateToSnackDetail(snackId: Long, origin: String, from: NavBackStackEntry) {

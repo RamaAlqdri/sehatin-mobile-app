@@ -1,7 +1,9 @@
 package com.example.sehatin.view.screen.dashboard.profile
 
+import android.util.Log
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
+import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
@@ -10,6 +12,7 @@ import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
+import androidx.compose.foundation.layout.offset
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.statusBarsPadding
@@ -21,10 +24,14 @@ import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.HorizontalDivider
 import androidx.compose.material3.Icon
+import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
@@ -40,15 +47,27 @@ import com.example.compose.textColor
 import com.example.sehatin.R
 import com.example.sehatin.common.AccountList
 import com.example.sehatin.common.getProfileItems
+import com.example.sehatin.data.model.response.Detail
+import com.example.sehatin.navigation.DetailDestinations
+import com.example.sehatin.navigation.MainDestinations
 import com.example.sehatin.navigation.SehatInSurface
+import com.example.sehatin.viewmodel.LoginScreenViewModel
+import com.example.sehatin.viewmodel.PersonalizeViewModel
+import kotlinx.coroutines.delay
 
 @Composable
-fun ProfileScreen(modifier: Modifier = Modifier) {
+fun ProfileScreen(
+    modifier: Modifier = Modifier,
+    loginViewModel: LoginScreenViewModel,
+    personalizeViewModel: PersonalizeViewModel,
+    navigateToRoute: (String) -> Unit,
+    navigateToMain:(String,Boolean) -> Unit
+) {
     val temp = getProfileItems()
     ProfileScreen(
-        modifier = modifier,
-        id = 0,
-        data = temp
+        modifier = modifier, id = 0, data = temp, loginViewModel = loginViewModel,
+        navigateToRoute = navigateToRoute, personalizeViewModel = personalizeViewModel,
+        navigateToMain = navigateToMain
     )
 }
 
@@ -56,15 +75,25 @@ fun ProfileScreen(modifier: Modifier = Modifier) {
 private fun ProfileScreen(
     modifier: Modifier = Modifier,
     id: Int = 0,
-    data: List<AccountList>
+    data: List<AccountList>,
+    loginViewModel: LoginScreenViewModel,
+    personalizeViewModel: PersonalizeViewModel,
+    navigateToRoute: (String) -> Unit,
+    navigateToMain:(String,Boolean) -> Unit
 ) {
+
+    var profile by remember { mutableStateOf<Detail?>(null) }
+
+    LaunchedEffect(Unit) {
+        profile = personalizeViewModel.getUserDetail()
+    }
+
+
     SehatInSurface(
         modifier = modifier.fillMaxSize(),
     ) {
         Box(
-            modifier = Modifier
-                .fillMaxSize(),
-            contentAlignment = Alignment.Center
+            modifier = Modifier.fillMaxSize(), contentAlignment = Alignment.Center
         ) {
             Column(
                 modifier = Modifier
@@ -75,10 +104,29 @@ private fun ProfileScreen(
             ) {
                 Spacer(modifier = Modifier.height(60.dp))
                 HeaderSection(
+                    profile = profile ?: Detail(
+                        birthday = "",
+                        goal = "",
+                        gender = "",
+                        activity = "",
+                        bmr = "",
+                        weight = "",
+                        password = "",
+                        verifiedAt = "",
+                        name = "",
+                        id = "",
+                        email = "",
+                        height = "",
+                        bmi = ""
+                    ),
                 )
                 Spacer(modifier = Modifier.height(20.dp))
                 BodySection(
-                    data = data
+                    data = data,
+                    loginViewModel = loginViewModel,
+                    navigateToRoute = navigateToRoute,
+                    navigateToMain = navigateToMain
+
                 )
             }
         }
@@ -87,32 +135,46 @@ private fun ProfileScreen(
 
 @Composable
 private fun HeaderSection(
-    modifier: Modifier = Modifier
+    modifier: Modifier = Modifier,
+    profile: Detail
 ) {
+
+    val genderIcon = when (profile.gender.toString().lowercase()) {
+        "male" -> R.drawable.ic_male
+        "female" -> R.drawable.ic_female
+        else -> R.drawable.ic_male // default/fallback
+    }
     Column(
-        modifier = modifier
-            .fillMaxWidth(),
-        horizontalAlignment = Alignment.CenterHorizontally
+        modifier = modifier.fillMaxWidth(), horizontalAlignment = Alignment.CenterHorizontally
     ) {
-        Image(
-            painter = painterResource(id = R.drawable.profile_pict),
-            contentDescription = null,
-            contentScale = ContentScale.Crop,
+        Box(
             modifier = Modifier
-                .size(70.dp)
+                .size(90.dp) // Ukuran lingkaran luar
                 .clip(CircleShape)
-        )
+                .background(MaterialTheme.colorScheme.background), // Warna latar belakang lingkaran
+            contentAlignment = Alignment.Center
+        ) {
+            Image(
+                painter = painterResource(id = genderIcon),
+                contentDescription = null,
+                contentScale = ContentScale.Crop,
+                modifier = Modifier
+                    .size(85.dp) // Ukuran gambar lebih kecil dari lingkaran
+//                    .clip(CircleShape)
+                    .offset(y = 12.dp)
+            )
+        }
         Spacer(modifier = Modifier.size(9.dp))
         Text(
-            text = "Ramadhani Al-Qadri",
+            text = profile.name.toString(),
             fontWeight = FontWeight.ExtraBold,
             fontSize = 18.sp,
             color = textColor
         )
         Text(
-            text = "ramadhanialqadri12@gmail.com",
+            text = profile.email,
             fontWeight = FontWeight.Normal,
-            fontSize = 10.sp,
+            fontSize = 14.sp,
             color = Color(0xFF9C9C9C)
         )
     }
@@ -120,9 +182,18 @@ private fun HeaderSection(
 
 @Composable
 private fun BodySection(
-    modifier: Modifier = Modifier,
-    data: List<AccountList>
+    modifier: Modifier = Modifier, data: List<AccountList>,
+    loginViewModel: LoginScreenViewModel,
+    navigateToRoute: (String) -> Unit,
+    navigateToMain:    (String, Boolean) -> Unit
 ) {
+
+    val vectorImages = listOf(
+        R.drawable.update_data,
+        R.drawable.lock,
+        R.drawable.logout,
+    )
+
     Column(
         modifier = Modifier
             .padding(horizontal = 21.dp)
@@ -133,53 +204,88 @@ private fun BodySection(
         verticalArrangement = Arrangement.Center,
         horizontalAlignment = Alignment.CenterHorizontally
     ) {
-        LazyColumn (
+        LazyColumn(
             modifier = Modifier.fillMaxWidth()
-        ){
-            itemsIndexed(data) { index, item ->
-                val isLastItem = index == data.size - 1
-                ItemRow(
-                    icon = item.icon,
-                    title = item.title,
-                    color = item.color
-                )
+        ) {
 
-                if (!isLastItem) {
-                    Spacer(modifier = Modifier.height(13.dp))
+            item {
+                Row(
+                    modifier = modifier
+                        .fillMaxWidth()
+                        .clip(RoundedCornerShape(10.dp))
+                        .background(Color(0xFFF3F3F3))
+                        .padding(vertical = 15.dp, horizontal = 15.dp)
+                        .clickable { navigateToRoute(DetailDestinations.UPDATE_HEIGHT_ROUTE) },
+                    verticalAlignment = Alignment.CenterVertically
+                ) {
+                    Icon(
+                        painter = painterResource(id = vectorImages[0]),
+                        contentDescription = null,
+                        tint = MaterialTheme.colorScheme.primary,
+                        modifier = Modifier.size(24.dp)
+                    )
+                    Spacer(modifier = Modifier.size(10.dp))
+                    Text(
+                        text = "Perbarui Data Anda",
+                        fontWeight = FontWeight.Bold,
+                        fontSize = 14.sp,
+                        color = MaterialTheme.colorScheme.primary
+                    )
+                }
+                Spacer(modifier = Modifier.height(13.dp))
+                Row(
+                    modifier = modifier
+                        .fillMaxWidth()
+                        .clip(RoundedCornerShape(10.dp))
+                        .background(Color(0xFFF3F3F3))
+                        .padding(vertical = 15.dp, horizontal = 15.dp)
+                        .clickable { navigateToRoute(DetailDestinations.CHANGE_PASSWORD_AUTHED_ROUTE) },
+                    verticalAlignment = Alignment.CenterVertically
+                ) {
+                    Icon(
+                        painter = painterResource(id = vectorImages[1]),
+                        contentDescription = null,
+                        tint = MaterialTheme.colorScheme.primary,
+                        modifier = Modifier.size(24.dp)
+                    )
+                    Spacer(modifier = Modifier.size(10.dp))
+                    Text(
+                        text = "Ganti Kata Sandi",
+                        fontWeight = FontWeight.Bold,
+                        fontSize = 14.sp,
+                        color = MaterialTheme.colorScheme.primary
+                    )
+                }
+                Spacer(modifier = Modifier.height(13.dp))
+                Row(
+                    modifier = modifier
+                        .fillMaxWidth()
+                        .clip(RoundedCornerShape(10.dp))
+                        .background(Color(0xFFF3F3F3))
+                        .padding(vertical = 15.dp, horizontal = 15.dp)
+                        .clickable {
+                            loginViewModel.logout()
+//                            delay(1000)
+                            navigateToMain(MainDestinations.LOGIN_ROUTE,true)
+                        },
+                    verticalAlignment = Alignment.CenterVertically
+                ) {
+                    Icon(
+                        painter = painterResource(id = vectorImages[2]),
+                        contentDescription = null,
+                        tint = Color(0xFFC93E3E),
+                        modifier = Modifier.size(24.dp)
+                    )
+                    Spacer(modifier = Modifier.size(10.dp))
+                    Text(
+                        text = "Keluar",
+                        fontWeight = FontWeight.Bold,
+                        fontSize = 14.sp,
+                        color = Color(0xFFC93E3E)
+                    )
                 }
             }
         }
     }
 }
 
-@Composable
-fun ItemRow(
-    modifier: Modifier = Modifier,
-    icon: Int,
-    title: String,
-    color: Color
-) {
-
-    Row (
-        modifier = modifier
-            .fillMaxWidth()
-            .clip(RoundedCornerShape(10.dp))
-            .background(Color(0xFFF3F3F3))
-            .padding(vertical = 15.dp, horizontal = 15.dp),
-        verticalAlignment = Alignment.CenterVertically
-    ){
-        Icon(
-            painter = painterResource(id = icon),
-            contentDescription = null,
-            tint = color,
-            modifier = Modifier.size(24.dp)
-        )
-        Spacer(modifier = Modifier.size(10.dp))
-        Text(
-            text = title,
-            fontWeight = FontWeight.Bold,
-            fontSize = 14.sp,
-            color = color
-        )
-    }
-}

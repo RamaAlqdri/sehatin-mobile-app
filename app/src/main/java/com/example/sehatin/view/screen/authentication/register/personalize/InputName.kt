@@ -138,7 +138,7 @@ fun InputName(
                 }
                 Column(
                     modifier = Modifier
-                        .padding(top = 50.dp)
+                        .padding(top = 70.dp)
                 ) {
 
                     CustomTextField(
@@ -147,7 +147,7 @@ fun InputName(
                         onChange = personalizeViewModel::setUsername,
                         isError = false,
 //                isPassword = true,
-                        errorMessage = "KON",
+                        errorMessage = "Invalid",
                     )
                 }
             }

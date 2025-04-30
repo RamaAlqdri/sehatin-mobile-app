@@ -1,5 +1,6 @@
 package com.example.sehatin.view.components
 
+import android.util.Log
 import androidx.compose.foundation.background
 import androidx.compose.foundation.border
 import androidx.compose.foundation.clickable
@@ -31,10 +32,18 @@ import java.time.YearMonth
 import java.time.format.TextStyle
 import java.util.*
 import com.example.sehatin.R
+import java.time.Clock
+import java.time.ZoneId
 
 @Composable
-fun CalendarView() {
-    var selectedDate by remember { mutableStateOf(LocalDate.now()) }
+fun CalendarView(
+    selectedDate: Date,
+    OnDateSelected: (Date) -> Unit,
+
+    ) {
+
+
+//    var selectedDate by remember { mutableStateOf(LocalDate.now()) }
     var currentYearMonth by remember { mutableStateOf(YearMonth.now()) }
     val today = LocalDate.now()
 
@@ -92,10 +101,14 @@ fun CalendarView() {
                         Color.White,
                         shape = RoundedCornerShape(8.dp)
                     )
-                    .border(1.dp, color = MaterialTheme.colorScheme.primary, shape = RoundedCornerShape(8.dp))
+                    .border(
+                        1.dp,
+                        color = MaterialTheme.colorScheme.primary,
+                        shape = RoundedCornerShape(8.dp)
+                    )
                     .padding(horizontal = 6.dp),
                 contentAlignment = Alignment.Center
-            ){
+            ) {
                 Text(
                     text = currentYearMonth.month.getDisplayName(TextStyle.FULL, Locale("id")),
                     fontSize = 18.sp,
@@ -154,7 +167,7 @@ fun CalendarView() {
                     .padding(horizontal = 9.dp),
                 horizontalArrangement = Arrangement.SpaceBetween
             ) {
-                listOf("Sun", "Mon", "Tue", "Wed", "Thu", "Fri", "Sat").forEach {
+                listOf("Min", "Sen", "Sel", "Rab", "Kam", "Jum", "Sab").forEach {
                     Text(
                         text = it,
                         fontSize = 14.sp,
@@ -170,6 +183,17 @@ fun CalendarView() {
 
             val days = generateMonthCalendar(currentYearMonth)
 
+            val selectedLocalDate = remember(selectedDate) {
+                selectedDate.toInstant()
+                    .atZone(ZoneId.of("UTC+8"))
+                    .toLocalDate()
+            }
+
+//            Log.e(
+//                "DateItem",
+//                "date: $selectedLocalDate"
+//            )
+
             Column {
                 days.chunked(7).forEach { week ->
                     Row(
@@ -181,10 +205,19 @@ fun CalendarView() {
                         week.forEach { date ->
                             DateItem(
                                 date = date,
-                                isSelected = date == selectedDate,
+                                isSelected = date == selectedLocalDate,
                                 isToday = date == today,
                                 isOtherMonth = date.month != currentYearMonth.month,
-                                onClick = { selectedDate = date }
+                                onClick = {
+                                    val zoneId = ZoneId.of("UTC+8")
+                                    val zonedDateTime = date.atTime(12, 0).atZone(zoneId) // <- set jam 12 siang
+                                    val instant = zonedDateTime.toInstant()
+                                    Log.e(
+                                        "DateItem",
+                                        "date: $date, selectedDate: $selectedLocalDate"
+                                    )
+                                    OnDateSelected(Date.from(instant))
+                                }
                             )
                         }
                     }
@@ -210,6 +243,9 @@ fun DateItem(
 
     val textColor =
         if (isSelected) Color.White else if (isOtherMonth) Color(0xFF9C9C9C) else Color.Black
+
+
+
 
     Column(
         modifier = Modifier

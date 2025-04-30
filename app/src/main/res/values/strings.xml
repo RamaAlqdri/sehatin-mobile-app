@@ -23,9 +23,9 @@
     <string name="otp_desc">Masukkan kode 6 digit yang kami kirimkan ke email anda untuk memverifikasi akun Anda</string>
 
 <!--    Bottom Nav Item-->
-    <string name="dashboard">Dashboard</string>
-    <string name="consultation">Consultation</string>
+    <string name="dashboard">Beranda</string>
+    <string name="consultation">Konsultasi</string>
     <string name="Diet">Diet</string>
-    <string name="profile">Profile</string>
+    <string name="profile">Profil</string>
 
 </resources>

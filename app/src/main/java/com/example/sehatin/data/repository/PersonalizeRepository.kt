@@ -4,6 +4,7 @@ import android.content.Context
 import com.example.sehatin.common.ResultResponse
 import com.example.sehatin.data.model.response.ActivityRequest
 import com.example.sehatin.data.model.response.BirthdayRequest
+import com.example.sehatin.data.model.response.Detail
 import com.example.sehatin.data.model.response.GenderRequest
 import com.example.sehatin.data.model.response.GoalRequest
 import com.example.sehatin.data.model.response.HeightRequest
@@ -12,6 +13,7 @@ import com.example.sehatin.data.model.response.OtpRequest
 import com.example.sehatin.data.model.response.OtpResponse
 import com.example.sehatin.data.model.response.PersonalizeResponse
 import com.example.sehatin.data.model.response.WeightRequest
+import com.example.sehatin.data.store.DataStoreManager
 import com.example.sehatin.retrofit.api.ApiConfig
 import com.example.sehatin.retrofit.services.PersonalizeService
 import com.google.gson.annotations.SerializedName
@@ -24,8 +26,14 @@ class PersonalizeRepository private constructor(
     context: Context
 ) {
 
+
+    private val dataStoreManager = DataStoreManager(context)
     private val personalizeService: PersonalizeService = ApiConfig.getPersonalizeService(context)
 
+
+    suspend fun getUserDetail(): Detail? {
+        return dataStoreManager.getUserDetail()
+    }
 
     fun personalizeName(name: String): Flow<ResultResponse<PersonalizeResponse>> = flow {
         emit(ResultResponse.Loading)

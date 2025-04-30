@@ -24,10 +24,10 @@ data class CaloriesConsumptionItem(
     val amount: String
 )
 
-data class Consumption(
-    val time: String,
-    val foodType: String
-)
+//data class Consumption(
+//    val time: String,
+//    val foodType: String
+//)
 
 data class MessageData(
     val text: String,
@@ -96,11 +96,11 @@ object FakeData {
         CaloriesConsumptionItem("15.30", "250")
     )
 
-    val ConsumptionHistory = listOf(
-        Consumption("08.30", "Breakfast"),
-        Consumption("12.30", "Lunch"),
-        Consumption("15.30", "Dinner")
-    )
+//    val ConsumptionHistory = listOf(
+//        Consumption("08.30", "Breakfast"),
+//        Consumption("12.30", "Lunch"),
+//        Consumption("15.30", "Dinner")
+//    )
 
     val foodItems = listOf(
         FoodItem("Salad", "12.30", 1499, 500, R.drawable.salad),
@@ -116,8 +116,8 @@ object FakeData {
 @Composable
 fun getProfileItems(): List<AccountList> {
     return listOf(
-        AccountList("Profile", R.drawable.update_data, MaterialTheme.colorScheme.primary),
-        AccountList("Settings", R.drawable.lock, MaterialTheme.colorScheme.primary),
-        AccountList("Help", R.drawable.logout, Color(0xFFC93E3E))
+        AccountList("Perbarui Data Anda", R.drawable.update_data, MaterialTheme.colorScheme.primary),
+        AccountList("Ganti Kata Sandi", R.drawable.lock, MaterialTheme.colorScheme.primary),
+        AccountList("Keluar", R.drawable.logout, Color(0xFFC93E3E))
     )
 }

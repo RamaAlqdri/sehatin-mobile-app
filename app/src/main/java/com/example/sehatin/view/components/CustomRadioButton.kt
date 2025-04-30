@@ -39,8 +39,8 @@ fun CustomRadioButton(
     onClick: () -> Unit,
     label: String,
     description: String?=null,
-    defaultWidth: Dp = 270.dp,
-    defaultHeight: Dp = 52.dp,
+    defaultWidth: Dp = 300.dp,
+    defaultHeight: Dp = 70.dp,
     modifier: Modifier = Modifier,
     defaultIconSize: Dp = 24.dp,
     selectedColor: Color = MaterialTheme.colorScheme.primary,
@@ -83,18 +83,19 @@ fun CustomRadioButton(
 
             Column(
 
-                verticalArrangement = Arrangement.spacedBy(-10.dp),
+//                verticalArrangement = Arrangement.spacedBy(0.dp),
                 modifier = Modifier
 //                .background(Color.Transparent)
 //                .fillMaxWidth()
 //                .wrapContentSize(Alignment.TopStart)
+
             ) {
 
                 Text(
 //                    modifier = Modifier.background(color = Color.Gray),
                     text = label,
                     fontWeight = FontWeight.SemiBold,
-                    fontSize = 13.sp,
+                    fontSize = 16.sp,
                     color = textColor
                 )
                 if(description != null){
@@ -102,7 +103,7 @@ fun CustomRadioButton(
 //                        modifier = Modifier.background(color = Color.Gray),
 
                         text = description,
-                        fontSize = 10.sp,
+                        fontSize = 14.sp,
                         color = textColor
                     )
                 }

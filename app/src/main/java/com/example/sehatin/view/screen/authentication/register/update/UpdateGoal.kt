@@ -1,11 +1,10 @@
-package com.example.sehatin.view.screen.authentication.register.personalize
+package com.example.sehatin.view.screen.authentication.register.update
 
 import android.util.Log
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
-import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
@@ -16,7 +15,6 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
-import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
@@ -24,59 +22,62 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
-import com.example.sehatin.view.components.AgeDisplay
 import com.example.sehatin.view.components.CustomButton
-import com.example.sehatin.view.components.CustomDatePicker
 import androidx.compose.runtime.remember
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.res.painterResource
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.example.sehatin.R
 import com.example.sehatin.common.ResultResponse
+import com.example.sehatin.navigation.DetailDestinations
 import com.example.sehatin.navigation.MainDestinations
-import com.example.sehatin.view.components.CustomGenderRadioButton
 import com.example.sehatin.view.components.CustomRadioButton
+import com.example.sehatin.viewmodel.LoginScreenViewModel
 import com.example.sehatin.viewmodel.PersonalizeViewModel
 
-data class RadioOption(val index: Int, val label: String, val desc: String, val level: String)
+
+data class OptionGoal(val index: Int, val label: String, val level: String)
 
 @Composable
-fun InputActivity(
+fun UpdateGoal(
     modifier: Modifier = Modifier,
     navigateToRoute: (String, Boolean) -> Unit,
-    personalizeViewModel: PersonalizeViewModel
+    personalizeViewModel: PersonalizeViewModel,
+    loginScreenViewModel: LoginScreenViewModel
 ) {
-//    val vectorImages = listOf(
-//        R.drawable.ic_male,
-//        R.drawable.ic_female
-//    )
-
-
-    val options = listOf(
-        RadioOption(0, "Tidak banyak bergerak", "Sedikit atau tidak berolahraga", "male"),
-        RadioOption(1, "Aktif ringan", "berolahraga 1-3 hari per minggu", "female"),
-        RadioOption(2, "Cukup aktif", "berolahraga 3-5 hari per minggu", "moderately"),
-        RadioOption(3, "Sangat aktif", "berolahraga 6-7 hari per minggu", "heavy"),
+    val vectorImages = listOf(
+        R.drawable.weight,
+        R.drawable.muscle,
+        R.drawable.healthy,
     )
+    val options = listOf(
+        OptionGoal(0, "Menurunkan berat badan", "weight"),
+        OptionGoal(1, "Membentuk otot", "muscle"),
+        OptionGoal(2, "Tetap sehat", "health"),
+
+        )
     var selectedOption by remember { mutableStateOf(options[0]) }
 
-    LaunchedEffect(selectedOption) {
-        Log.e("selectedOption", selectedOption.label)
-    }
-
     var showCircularProgress by remember { mutableStateOf(false) }
+
+    LaunchedEffect(selectedOption) {
+        Log.e("selectedOption", selectedOption.level)
+    }
 
     val selectionState by personalizeViewModel.personalizeState.collectAsStateWithLifecycle(
         initialValue = ResultResponse.None
     )
 
+
+    val personalizeState by loginScreenViewModel.isPersonalizeFilled()
+        .collectAsStateWithLifecycle(initialValue = false)
+
     LaunchedEffect(selectionState) {
         when (selectionState) {
             is ResultResponse.Success -> {
                 showCircularProgress = false
-                navigateToRoute(MainDestinations.INPUT_GOAL_ROUTE, true)
+                navigateToRoute(MainDestinations.DASHBOARD_ROUTE,true)
                 personalizeViewModel.setPersonalizeState(ResultResponse.None)
-
             }
 
             is ResultResponse.Loading -> {
@@ -86,19 +87,18 @@ fun InputActivity(
             is ResultResponse.Error -> {
                 showCircularProgress = false
                 personalizeViewModel.setPersonalizeState(ResultResponse.None)
-
-
             }
 
             else -> {}
         }
     }
 
+
+
     Box(
         modifier = Modifier
             .fillMaxSize()
     ) {
-
         Column(
             horizontalAlignment = Alignment.CenterHorizontally,
             verticalArrangement = Arrangement.SpaceBetween,
@@ -120,7 +120,7 @@ fun InputActivity(
                     verticalArrangement = Arrangement.spacedBy(16.dp)
                 ) {
                     Text(
-                        text = "6/7",
+                        text = "4/4",
                         textAlign = TextAlign.Center,
                         fontSize = 20.sp,
                         fontWeight = FontWeight.SemiBold,
@@ -129,7 +129,7 @@ fun InputActivity(
                             .fillMaxWidth()
                     )
                     Text(
-                        text = "Seberapa aktif Anda?",
+                        text = "Apa tujuan diet Anda?",
                         textAlign = TextAlign.Center,
                         fontSize = 20.sp,
                         fontWeight = FontWeight.SemiBold,
@@ -138,7 +138,7 @@ fun InputActivity(
                             .fillMaxWidth()
                     )
                     Text(
-                        text = "Kami akan menyesuaikan rencana Anda berdasarkan tingkat aktivitas harian Anda",
+                        text = "Beri tahu kami apa yang ingin Anda capai sehingga kami dapat menyesuaikan rencana untuk Anda",
                         textAlign = TextAlign.Center,
                         fontSize = 16.sp,
                         fontWeight = FontWeight.Normal,
@@ -158,23 +158,24 @@ fun InputActivity(
 
                     options.forEach { option ->
                         CustomRadioButton(
-//                        icon = painterResource(id = vectorImages[option.index]),
+                            icon = painterResource(id = vectorImages[option.index]),
                             selected = (option == selectedOption),
                             onClick = {
                                 selectedOption = option
-                                personalizeViewModel.setActivityLevel(selectedOption.level)
+                                personalizeViewModel.setGoal(option.level)
                             },
-                            defaultIconSize = 70.dp,
+//                        defaultIconSize = 70.dp,
                             label = option.label, // Menggunakan label dari objek option
-                            description = option.desc
+
                         )
                     }
                 }
             }
+
             CustomButton(
                 text = "Selanjutnya",
                 onClick = {
-                    personalizeViewModel.inputActivity()
+                    personalizeViewModel.inputGoal()
                 },
                 modifier = Modifier
                     .padding(bottom = 65.dp)

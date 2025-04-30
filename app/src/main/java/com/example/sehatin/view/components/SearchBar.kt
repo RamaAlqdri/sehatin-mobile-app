@@ -67,10 +67,10 @@ fun SearchBar(
         Box(
             modifier = modifier
                 .weight(1f)
-                .clip(RoundedCornerShape(8.dp))
+                .clip(RoundedCornerShape(12.dp))
                 .background(Color.White)
-                .border(1.dp, Color(0xFFCFCFCF), RoundedCornerShape(8.dp))
-                .padding(horizontal = 16.dp, vertical = 7.dp),
+                .border(1.dp, Color(0xFFCFCFCF), RoundedCornerShape(12.dp))
+                .padding(horizontal = 16.dp, vertical = 12.dp),
             contentAlignment = Alignment.CenterStart
         ) {
             Row(
@@ -110,7 +110,7 @@ fun SearchBar(
                         ) {
                             if (query.isEmpty()) {
                                 Text(
-                                    text = "Search Your Food",
+                                    text = "Cari Makanan",
                                     fontSize = 16.sp,
                                     color = Color(0xFF999999),
                                     textAlign = TextAlign.Center
@@ -126,7 +126,7 @@ fun SearchBar(
         Spacer(modifier = Modifier.width(12.dp))
         Box(
             modifier = Modifier
-                .size(37.dp)
+                .size(46.dp)
                 .clip(RoundedCornerShape(8.dp))
                 .background(MaterialTheme.colorScheme.primary)
                 .clickable(onClick = {

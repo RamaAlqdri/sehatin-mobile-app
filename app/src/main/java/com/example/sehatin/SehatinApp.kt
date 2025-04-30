@@ -37,9 +37,12 @@ import androidx.navigation.navArgument
 import com.example.compose.SehatInTheme
 import com.example.sehatin.common.DetailTest
 import com.example.sehatin.data.resource.Resource
+import com.example.sehatin.di.factory.ConsultationViewModelFactory
 import com.example.sehatin.di.factory.DashboardViewModelFactory
+import com.example.sehatin.di.factory.DietViewModelFactory
 import com.example.sehatin.di.factory.LoginViewModelFactory
 import com.example.sehatin.di.factory.OnBoardingViewModelFactory
+import com.example.sehatin.di.factory.OtpViewModelFactory
 import com.example.sehatin.di.factory.PersonalizeViewModelFactory
 import com.example.sehatin.navigation.DetailDestinations
 import com.example.sehatin.navigation.MainDestinations
@@ -55,6 +58,9 @@ import com.example.sehatin.navigation.spatialExpressiveSpring
 import com.example.sehatin.view.components.HomeSections
 import com.example.sehatin.view.components.SehatInBottomBar
 import com.example.sehatin.view.screen.authentication.forgot.ChangePassword
+import com.example.sehatin.view.screen.authentication.forgot.ChangePasswordAuth
+import com.example.sehatin.view.screen.authentication.forgot.ForgotOtpScreen
+import com.example.sehatin.view.screen.authentication.forgot.ForgotPassword
 import com.example.sehatin.view.screen.authentication.login.LoginScreen
 import com.example.sehatin.viewmodel.LoginScreenViewModel
 import com.example.sehatin.view.screen.authentication.register.OtpScreen
@@ -66,6 +72,10 @@ import com.example.sehatin.view.screen.authentication.register.personalize.Input
 import com.example.sehatin.view.screen.authentication.register.personalize.InputHeight
 import com.example.sehatin.view.screen.authentication.register.personalize.InputName
 import com.example.sehatin.view.screen.authentication.register.personalize.InputWeight
+import com.example.sehatin.view.screen.authentication.register.update.UpdateActivity
+import com.example.sehatin.view.screen.authentication.register.update.UpdateGoal
+import com.example.sehatin.view.screen.authentication.register.update.UpdateHeight
+import com.example.sehatin.view.screen.authentication.register.update.UpdateWeight
 import com.example.sehatin.viewmodel.PersonalizeViewModel
 import com.example.sehatin.view.screen.dashboard.detail.diet.DietScheduleDetail
 import com.example.sehatin.view.screen.dashboard.detail.diet.FoodDetail
@@ -76,7 +86,10 @@ import com.example.sehatin.view.screen.dashboard.detail.home.WaterDetail
 import com.example.sehatin.view.screen.dashboard.home.CheckScreen
 import com.example.sehatin.viewmodel.DashboardViewModel
 import com.example.sehatin.view.screen.onboarding.OnBoardingScreen
+import com.example.sehatin.viewmodel.ConsultationViewModel
+import com.example.sehatin.viewmodel.DietViewModel
 import com.example.sehatin.viewmodel.OnBoardingViewModel
+import com.example.sehatin.viewmodel.OtpScreenViewModel
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.combine
@@ -92,11 +105,13 @@ fun SehatInApp() {
         )
     )
 
-    val loginViewModel: LoginScreenViewModel = viewModel(
-        factory = LoginViewModelFactory.getInstance(
+    val otpViewModel: OtpScreenViewModel = viewModel(
+        factory = OtpViewModelFactory.getInstance(
             Resource.appContext
         )
     )
+
+
 
     val personalizeViewModel: PersonalizeViewModel = viewModel(
         factory = PersonalizeViewModelFactory.getInstance(
@@ -106,6 +121,22 @@ fun SehatInApp() {
 
     val dashboardViewModel: DashboardViewModel = viewModel(
         factory = DashboardViewModelFactory.getInstance(
+            Resource.appContext
+        )
+    )
+    val consultationViewModel: ConsultationViewModel = viewModel(
+        factory = ConsultationViewModelFactory.getInstance(
+            Resource.appContext
+        )
+    )
+
+    val dietViewModel: DietViewModel = viewModel(
+        factory = DietViewModelFactory.getInstance(
+            Resource.appContext
+        )
+    )
+    val loginViewModel: LoginScreenViewModel = viewModel(
+        factory = LoginViewModelFactory.getInstance(
             Resource.appContext
         )
     )
@@ -184,7 +215,8 @@ fun SehatInApp() {
                         route = MainDestinations.LOGIN_ROUTE
                     ) { backStackEntry ->
                         LoginScreen(
-                            navigateToRoute = sehatInNavController::navigateToNonBottomBarRoute
+                            navigateToRoute = sehatInNavController::navigateToNonBottomBarRoute,
+                            loginViewModel = loginViewModel
                         )
                     }
 
@@ -213,13 +245,89 @@ fun SehatInApp() {
                         OtpScreen(
                             email = email,
                             navigateToRoute = sehatInNavController::navigateToNonBottomBarRoute,
+                            otpViewModel = otpViewModel,
+                        )
+                    }
+                    composableWithCompositionLocal(
+                        route = "${MainDestinations.FORGOT_OTP_ROUTE}?" + "email={${QueryKeys.EMAIL}}"
+                    ) { backStackEntry ->
+                        val arguments = requireNotNull(backStackEntry.arguments)
+                        val email = arguments.getString(QueryKeys.EMAIL) ?: "Email tidak ditemukan"
+                        ForgotOtpScreen(
+                            email = email,
+                            navigateToRoute = sehatInNavController::navigateToNonBottomBarRoute,
+                            loginViewModel = loginViewModel,
                         )
                     }
 
                     composableWithCompositionLocal(
                         route = MainDestinations.CHANGE_PASSWORD_ROUTE
                     ) { backStackEntry ->
-                        ChangePassword()
+                        ChangePassword(
+                            loginScreenViewModel = loginViewModel,
+                            navigateToRoute = sehatInNavController::navigateToNonBottomBarRoute
+                        )
+                    }
+
+                    composableWithCompositionLocal(
+                        route = MainDestinations.FORGOT_PASSWORD_ROUTE
+                    ) { backStackEntry ->
+                        ForgotPassword(
+                            onBackClick = sehatInNavController::upPress,
+                            loginScreenViewModel = loginViewModel,
+                            navigateToRoute = sehatInNavController::navigateToNonBottomBarRoute
+                        )
+                    }
+
+                    composableWithCompositionLocal(
+                        route = DetailDestinations.CHANGE_PASSWORD_AUTHED_ROUTE
+                    ) { backStackEntry ->
+                        ChangePasswordAuth(onBackClick = sehatInNavController::upPress,
+                            loginViewModel = loginViewModel,
+                            navigateToRoute = sehatInNavController::navigateToNonBottomBarRoute,
+                        )
+                    }
+
+                    composableWithCompositionLocal(
+                        route = DetailDestinations.UPDATE_HEIGHT_ROUTE
+                    ) { backStackEntry ->
+                        UpdateHeight(
+                            personalizeViewModel = personalizeViewModel,
+                            navigateToRoute = { route ->
+                                sehatInNavController.navigateToNonBottomBarRoute(route)
+                            }
+                        )
+                    }
+                    composableWithCompositionLocal(
+                        route = DetailDestinations.UPDATE_WEIGHT_ROUTE
+                    ) { backStackEntry ->
+                        UpdateWeight(
+                            personalizeViewModel = personalizeViewModel,
+                            navigateToRoute = { route ->
+                                sehatInNavController.navigateToNonBottomBarRoute(route)
+                            }
+                        )
+                    }
+
+                    composableWithCompositionLocal(
+                        route = DetailDestinations.UPDATE_ACTIVITY_ROUTE
+                    ) { backStackEntry ->
+                        UpdateActivity(
+                            personalizeViewModel = personalizeViewModel,
+                            navigateToRoute = { route ->
+                                sehatInNavController.navigateToNonBottomBarRoute(route)
+                            }
+                        )
+                    }
+
+                    composableWithCompositionLocal(
+                        route = DetailDestinations.UPDATE_GOAL_ROUTE
+                    ) { backStackEntry ->
+                        UpdateGoal(
+                            personalizeViewModel = personalizeViewModel,
+                            navigateToRoute = sehatInNavController::navigateToNonBottomBarRoute,
+                            loginScreenViewModel = loginViewModel
+                        )
                     }
 
 
@@ -236,7 +344,16 @@ fun SehatInApp() {
                     composableWithCompositionLocal(
                         route = DetailDestinations.FOOD_RECOMENDATION_DETAIL_ROUTE
                     ) { backStackEntry ->
+                        val scheduleId =
+                            backStackEntry.arguments?.getString(DetailDestinations.SCHEDULE_ID_ARG)
+                                ?: ""
                         FoodRecomendationDetail(
+                            scheduleId = scheduleId,
+                            onBackClick = sehatInNavController::upPress,
+                            dietViewModel = dietViewModel,
+                            navigateToDetail = { route ->
+                                sehatInNavController.navigateToNonBottomBarRoute(route)
+                            }
 
                         )
                     }
@@ -245,8 +362,27 @@ fun SehatInApp() {
                         route = DetailDestinations.FOOD_LIST_DETAIL_ROUTE
                     ) { backStackEntry ->
                         FoodListDetail(
+                            onBackClick = sehatInNavController::upPress,
+                            dietViewModel = dietViewModel,
+                            navigateToDetail = { route ->
+                                sehatInNavController.navigateToNonBottomBarRoute(route)
+                            }
 
                         )
+                    }
+
+                    composableWithCompositionLocal(
+                        route = DetailDestinations.DIET_SCHEDULE_DETAIL_ROUTE
+                    ) { backStackEntry ->
+                        DietScheduleDetail(
+                            onBackClick = sehatInNavController::upPress,
+                            navigateToDetail = { route ->
+                                sehatInNavController.navigateToNonBottomBarRoute(route)
+                            },
+                            dietViewModel = dietViewModel
+                        )
+
+
                     }
 
                     composableWithCompositionLocal(
@@ -269,7 +405,9 @@ fun SehatInApp() {
                     composableWithCompositionLocal(
                         route = DetailDestinations.FOOD_DETAIL_ROUTE
                     ) { backStackEntry ->
-                        val foodId = backStackEntry.arguments?.getString(DetailDestinations.FOOD_ID_ARG) ?: ""
+                        val foodId =
+                            backStackEntry.arguments?.getString(DetailDestinations.FOOD_ID_ARG)
+                                ?: ""
                         FoodDetail(
                             foodId = foodId,
                             onBackClick = sehatInNavController::upPress,
@@ -349,8 +487,12 @@ fun SehatInApp() {
                     ) { backStackEntry ->
                         MainContainer(
                             dashboardViewModel = dashboardViewModel,
+                            dietViewModel = dietViewModel,
                             onSnackSelected = sehatInNavController::navigateToSnackDetail,
-                            sehatInNavController = sehatInNavController
+                            sehatInNavController = sehatInNavController,
+                            consultationViewModel = consultationViewModel,
+                            loginViewModel = loginViewModel,
+                            personalizeViewModel = personalizeViewModel,
                         )
                     }
 
@@ -385,9 +527,14 @@ fun SehatInApp() {
 @Composable
 fun MainContainer(
     dashboardViewModel: DashboardViewModel,
+    personalizeViewModel: PersonalizeViewModel,
+    consultationViewModel: ConsultationViewModel,
+    dietViewModel: DietViewModel,
     modifier: Modifier = Modifier,
+    loginViewModel: LoginScreenViewModel,
     onSnackSelected: (Long, String, NavBackStackEntry) -> Unit,
     sehatInNavController: SehatInNavController // ✅ TAMBAHKAN INI
+
 ) {
     val fleuraScaffoldState = rememberSehatiInScaffoldState()
     val nestedNavController = rememberSehatInNavController()
@@ -435,12 +582,17 @@ fun MainContainer(
         ) {
             addHomeGraph(
                 dashboardViewModel = dashboardViewModel,
+                personalizeViewModel = personalizeViewModel,
+                consultationViewModel = consultationViewModel,
+                dietViewModel = dietViewModel,
+                loginViewModel = loginViewModel,
                 onSnackSelected = onSnackSelected,
                 modifier = Modifier
                     .padding(padding)
                     .consumeWindowInsets(padding),
-                navigateToRoute = nestedNavController::navigateToNonBottomBarRoute,
-                navigateToRootRoute = sehatInNavController::navigateToNonBottomBarRoute // 👈 ini penting!
+//                navigateToRoute = nestedNavController::navigateToNonBottomBarRoute,
+                navigateToRootRoute = sehatInNavController::navigateToNonBottomBarRoute, // 👈 ini penting!
+                navigateToMain = sehatInNavController::navigateWithClear
             )
         }
     }

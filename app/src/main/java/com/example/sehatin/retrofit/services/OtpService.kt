@@ -12,6 +12,7 @@ interface OtpService {
     @POST("api/user/auth/otp/verify")
     suspend fun verifyOtp(@Body request: VerifyOtpRequest): Response<VerifyOtpResponse>
 
+
     @POST("api/user/auth/otp/generate")
     suspend fun generateOtp(@Body request: OtpRequest): Response<OtpResponse>
 }

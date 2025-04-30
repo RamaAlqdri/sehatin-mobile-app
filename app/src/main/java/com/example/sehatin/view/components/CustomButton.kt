@@ -36,15 +36,15 @@ import com.example.compose.primaryLight
 fun CustomButton(
     modifier: Modifier = Modifier, // Modifier default tanpa ukuran
     defaultWidth: Dp = 163.dp, // Ukuran default yang dapat diubah
-    defaultHeight: Dp = 42.dp,
+    defaultHeight: Dp = 54.dp,
     text: String = "",
     isOutlined: Boolean = false,
     backgroundColor: Color = MaterialTheme.colorScheme.primary,
     outlinedColor: Color = MaterialTheme.colorScheme.primary,
     textColor: Color = MaterialTheme.colorScheme.onPrimary,
     shape: RoundedCornerShape = RoundedCornerShape(16.dp),
-    fontSize: TextUnit = 14.sp,
-    fontWeight: FontWeight = FontWeight.SemiBold,
+    fontSize: TextUnit = 16.sp,
+    fontWeight: FontWeight = FontWeight.Bold,
     icon: Painter? = null, // Parameter untuk ikon atau gambar
     iconSpacing: Dp = 8.dp, // Jarak antara ikon dan teks
     borderWidth: Dp = 2.dp,

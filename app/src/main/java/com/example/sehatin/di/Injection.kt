@@ -1,7 +1,9 @@
 package com.example.sehatin.di
 
 import android.content.Context
+import com.example.sehatin.data.repository.ConsultationRepository
 import com.example.sehatin.data.repository.DashboardRepository
+import com.example.sehatin.data.repository.DietRepository
 import com.example.sehatin.data.repository.LoginRepository
 import com.example.sehatin.data.repository.OnBoardingRepository
 import com.example.sehatin.data.repository.OtpRepository
@@ -31,5 +33,13 @@ object Injection {
 
     fun provideDashboardRepository(context: Context): DashboardRepository {
         return DashboardRepository.getInstance(context)
+    }
+
+    fun provideDietRepository(context: Context): DietRepository {
+        return DietRepository.getInstance(context)
+    }
+
+    fun provideConsultationRepository(context: Context): ConsultationRepository {
+        return ConsultationRepository.getInstance(context)
     }
 }

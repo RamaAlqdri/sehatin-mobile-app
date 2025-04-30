@@ -100,12 +100,18 @@ private fun WaterDetail(
         .atZone(ZoneId.systemDefault())
         .toLocalDate() == LocalDate.now()
 
+    LaunchedEffect(Unit) {
+        // Melakukan refresh saat pertama kali halaman dibuka
+        dashboardViewModel.refresh()
+    }
+
     LaunchedEffect(createWaterState) {
         if (createWaterState is ResultResponse.Success) {
             dashboardViewModel.refresh()
             dashboardViewModel.resetCreateWaterState()
         }
     }
+
 
     // ✅ Tanggal yang dipilih disimpan di sini
 //    var selectedDate by remember { mutableStateOf(LocalDate.now()) }
@@ -158,10 +164,10 @@ private fun WaterDetail(
                                 .atZone(ZoneId.systemDefault()) // Use the system's default timezone or UTC as per your needs
                                 .toLocalDate()
                             CalendarSection(
-                                selectedDate = localDate,
-                                onDateSelected = { newDate ->
+                                selectedDate = selectedDate,
+                                onDateSelected = { date ->
                                     // Convert the new LocalDate back to Date if needed
-                                    val date = Date.from(newDate.atStartOfDay(ZoneId.systemDefault()).toInstant())
+
                                     dashboardViewModel.setSelectedDate(date)
                                 }
                             )
@@ -202,12 +208,17 @@ private fun WaterDetail(
 @Composable
 fun CalendarSection(
     modifier: Modifier = Modifier,
-    selectedDate: LocalDate,
-    onDateSelected: (LocalDate) -> Unit
+    selectedDate: Date,
+    onDateSelected: (Date) -> Unit
 ) {
     val today = LocalDate.now()
     val last7Days = (today.minusDays(6)..today).toList()
 
+    val selectedLocalDate = remember(selectedDate) {
+        selectedDate.toInstant()
+            .atZone(ZoneId.of("UTC+8"))
+            .toLocalDate()
+    }
     Column(
         modifier = Modifier
             .fillMaxWidth()
@@ -219,7 +230,10 @@ fun CalendarSection(
         horizontalAlignment = Alignment.CenterHorizontally
     ) {
         Text(
-            text = selectedDate.format(DateTimeFormatter.ofPattern("dd MMMM yyyy")),
+            text = selectedDate.toInstant()
+                .atZone(ZoneId.systemDefault())
+                .toLocalDate()
+                .format(DateTimeFormatter.ofPattern("dd MMMM yyyy")),
             fontSize = 14.sp,
             fontWeight = FontWeight.Bold,
             color = Color.Black,
@@ -233,8 +247,15 @@ fun CalendarSection(
             last7Days.forEach { date ->
                 DateItem(
                     date = date,
-                    isSelected = date == selectedDate,
-                    onClick = { onDateSelected(date) }
+                    isSelected = date == selectedLocalDate,
+                    onClick = { val zoneId = ZoneId.of("UTC+8")
+                        val zonedDateTime = date.atTime(12, 0).atZone(zoneId) // <- set jam 12 siang
+                        val instant = zonedDateTime.toInstant()
+                        Log.e(
+                            "DateItem",
+                            "date: $date, selectedDate: $selectedLocalDate"
+                        )
+                        onDateSelected(Date.from(instant)) }
                 )
             }
         }
@@ -293,7 +314,7 @@ fun WaterConsumptionHistory(
             WaterConsumptionRow(
                 item = WaterConsumptionItem(
                     time = convertToHoursAndMinutes(waterHistoryItem.createdAt) ,
-                    amount = "${waterHistoryItem.calories} mL"
+                    amount = "${waterHistoryItem.water}"
                 )
             )
         }

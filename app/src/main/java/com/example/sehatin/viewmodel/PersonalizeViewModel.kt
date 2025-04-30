@@ -7,6 +7,7 @@ import androidx.compose.runtime.setValue
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.example.sehatin.common.ResultResponse
+import com.example.sehatin.data.model.response.Detail
 import com.example.sehatin.data.model.response.PersonalizeResponse
 import com.example.sehatin.data.repository.PersonalizeRepository
 import kotlinx.coroutines.flow.MutableStateFlow
@@ -72,6 +73,10 @@ class PersonalizeViewModel(
 
     fun setGoal(value: String) {
         goalValue = value
+    }
+
+    suspend fun getUserDetail(): Detail? {
+        return personalizeRepository.getUserDetail()
     }
 
     fun inputName() {

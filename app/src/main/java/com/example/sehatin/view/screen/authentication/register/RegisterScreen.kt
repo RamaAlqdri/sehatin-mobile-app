@@ -264,34 +264,34 @@ fun RegisterScreen(
 
                             ) {
 
-                            Divider(
-                                color = MaterialTheme.colorScheme.primary,
-                                thickness = 1.dp,
-                                modifier = Modifier
-                                    .padding(vertical = 10.dp)
-                            )
-                            Text(
-                                text = "atau",
-                                textAlign = TextAlign.Center,
-                                fontSize = 12.sp,
-                                color = MaterialTheme.colorScheme.primary,
-                                fontWeight = FontWeight.Medium,
-                                modifier = Modifier
-                                    .background(color = MaterialTheme.colorScheme.background)
-                                    .padding(horizontal = 10.dp)
-                            )
+//                            Divider(
+//                                color = MaterialTheme.colorScheme.primary,
+//                                thickness = 1.dp,
+//                                modifier = Modifier
+//                                    .padding(vertical = 10.dp)
+//                            )
+//                            Text(
+//                                text = "atau",
+//                                textAlign = TextAlign.Center,
+//                                fontSize = 12.sp,
+//                                color = MaterialTheme.colorScheme.primary,
+//                                fontWeight = FontWeight.Medium,
+//                                modifier = Modifier
+//                                    .background(color = MaterialTheme.colorScheme.background)
+//                                    .padding(horizontal = 10.dp)
+//                            )
                         }
 
-                        CustomButton(
-                            text = "Lanjutkan dengan Google",
-                            isOutlined = true,
-                            borderWidth = 1.5.dp,
-                            textColor = MaterialTheme.colorScheme.onBackground,
-                            fontWeight = FontWeight.Normal,
-                            icon = painterResource(id = R.drawable.icon_google),
-                            modifier = Modifier.fillMaxWidth(),
-                            onClick = {
-                            })
+//                        CustomButton(
+//                            text = "Lanjutkan dengan Google",
+//                            isOutlined = true,
+//                            borderWidth = 1.5.dp,
+//                            textColor = MaterialTheme.colorScheme.onBackground,
+//                            fontWeight = FontWeight.Normal,
+//                            icon = painterResource(id = R.drawable.icon_google),
+//                            modifier = Modifier.fillMaxWidth(),
+//                            onClick = {
+//                            })
                     }
                     Row(
                         modifier = Modifier
@@ -302,14 +302,14 @@ fun RegisterScreen(
                     ) {
                         Text(
                             text = stringResource(id = R.string.already_have_acc),
-                            fontSize = 12.sp,
+                            fontSize = 14.sp,
                             fontWeight = FontWeight.Medium,
                             color = MaterialTheme.colorScheme.onBackground,
                             letterSpacing = (-0.15).sp
                         )
                         Text(
                             text = " " + stringResource(id = R.string.sign_in),
-                            fontSize = 12.sp,
+                            fontSize = 14.sp,
                             fontWeight = FontWeight.Bold,
                             color = MaterialTheme.colorScheme.onBackground,
                             letterSpacing = (-0.15).sp,

@@ -78,13 +78,10 @@ fun OtpScreen(
     modifier: Modifier = Modifier,
     email: String,
     navigateToRoute: (String, Boolean) -> Unit,
+    otpViewModel: OtpScreenViewModel
 ) {
 
-    val otpViewModel: OtpScreenViewModel = viewModel(
-        factory = OtpViewModelFactory.getInstance(
-            Resource.appContext
-        )
-    )
+
 
     var countdown by remember { mutableIntStateOf(0) }
 

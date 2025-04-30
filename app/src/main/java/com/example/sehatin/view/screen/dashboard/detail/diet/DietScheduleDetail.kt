@@ -11,8 +11,15 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.statusBarsPadding
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.material3.ExperimentalMaterial3Api
+import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
+import androidx.compose.material3.pulltorefresh.PullToRefreshBox
+import androidx.compose.material3.pulltorefresh.PullToRefreshDefaults.Indicator
+import androidx.compose.material3.pulltorefresh.rememberPullToRefreshState
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.getValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
@@ -21,61 +28,128 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.example.compose.back
-import com.example.sehatin.common.FakeData
+import com.example.sehatin.common.ResultResponse
+import com.example.sehatin.data.model.response.ScheduleDataItem
 import com.example.sehatin.navigation.SehatInSurface
 import com.example.sehatin.view.components.CalendarView
 import com.example.sehatin.view.components.CustomTopAppBar
-import com.example.sehatin.view.screen.dashboard.detail.home.CalendarSection
 import com.example.sehatin.view.screen.dashboard.diet.ConsumptionRow
+import com.example.sehatin.viewmodel.DietViewModel
+import java.util.Date
 
 @Composable
 fun DietScheduleDetail(
-    modifier: Modifier = Modifier
+    modifier: Modifier = Modifier,
+    onBackClick: () -> Unit,
+    dietViewModel: DietViewModel,
+    navigateToDetail: (String) -> Unit
 ) {
     DietScheduleDetail(
         modifier = modifier,
-        id = 0
+        onBackClick = onBackClick,
+        id = 0,
+        dietViewModel = dietViewModel,
+        navigateToDetail = navigateToDetail
     )
 }
 
+@OptIn(ExperimentalMaterial3Api::class)
 @Composable
 private fun DietScheduleDetail(
     modifier: Modifier = Modifier,
-    id: Int = 0
+
+    onBackClick: () -> Unit,
+    id: Int = 0,
+    dietViewModel: DietViewModel,
+    navigateToDetail: (String) -> Unit
 ) {
-    SehatInSurface(
-        modifier = modifier.fillMaxSize(),
+
+    val state = rememberPullToRefreshState(
+
+    )
+    val isRefreshing by dietViewModel.isRefreshing.collectAsStateWithLifecycle()
+
+    val scheduleDailyState by dietViewModel.scheduleDailyState.collectAsStateWithLifecycle()
+    val scheduleDailyData = dietViewModel.scheduleDaily.collectAsStateWithLifecycle()
+    val selectedDate by dietViewModel.selectedDate.collectAsStateWithLifecycle()
+
+//    LaunchedEffect(scheduleDailyState) {
+//
+//        if (scheduleDailyState is ResultResponse.Success){
+//            dietViewModel.refresh()
+//            dietViewModel.resetScheduleDailyState()
+//        }
+//    }
+
+    LaunchedEffect(selectedDate){
+        dietViewModel.refresh()
+
+
+    }
+
+    PullToRefreshBox(
+        isRefreshing = isRefreshing,
+        onRefresh = {
+            dietViewModel.refresh()
+        },
+        state = state,
+        indicator = {
+            Indicator(
+                modifier = Modifier.align(Alignment.TopCenter),
+                isRefreshing = isRefreshing,
+                containerColor = MaterialTheme.colorScheme.primaryContainer,
+                color = MaterialTheme.colorScheme.onPrimaryContainer,
+                state = state,
+                threshold = 120.dp
+            )
+        }
     ) {
-        Box(
-            modifier = Modifier
-                .fillMaxSize(),
-            contentAlignment = Alignment.Center
+
+        SehatInSurface(
+            modifier = modifier.fillMaxSize(),
         ) {
-            Column(
+            Box(
                 modifier = Modifier
-                    .fillMaxSize()
-                    .statusBarsPadding()
-                    .background(back),
-                horizontalAlignment = Alignment.CenterHorizontally,
+                    .fillMaxSize(),
+                contentAlignment = Alignment.Center
             ) {
-
-                CustomTopAppBar(
-                    title = "Diet Schedule",
-                    showNavigationIcon = true
-                )
-
-                LazyColumn(
-                    modifier = Modifier.fillMaxSize()
+                Column(
+                    modifier = Modifier
+                        .fillMaxSize()
+                        .statusBarsPadding()
+                        .background(back),
+                    horizontalAlignment = Alignment.CenterHorizontally,
                 ) {
 
-                    item {
-                        CalendarView()
-                    }
+                    CustomTopAppBar(
+                        title = "Jadwal Diet",
+                        showNavigationIcon = true,
+                        onBackClick = onBackClick
 
-                    item {
-                        Spacer(modifier = Modifier.height(16.dp))
-                        DailyScheduleSection()
+                    )
+
+                    LazyColumn(
+                        modifier = Modifier.fillMaxSize()
+                    ) {
+
+                        item {
+                            CalendarView(
+                                selectedDate = selectedDate,
+                                OnDateSelected = { date->
+                                    dietViewModel.setSelectedDate(date)
+                                },
+                            )
+                        }
+
+                        item {
+                            Spacer(modifier = Modifier.height(16.dp))
+                            DailyScheduleSection(
+                                navigateToDetail = navigateToDetail,
+                                scheduleItem = scheduleDailyData?.value?.data,
+                            )
+                        }
                     }
                 }
             }
@@ -86,6 +160,8 @@ private fun DietScheduleDetail(
 @Composable
 fun DailyScheduleSection(
     modifier: Modifier = Modifier,
+    scheduleItem: List<ScheduleDataItem>?,
+    navigateToDetail: (String) -> Unit,
 ) {
     Column(
         modifier = Modifier
@@ -97,14 +173,20 @@ fun DailyScheduleSection(
             .padding(horizontal = 21.dp, vertical = 12.dp),
     ) {
         Text(
-            text = "Daily Schedule",
+            text = "Jadwal Harian",
             fontSize = 14.sp,
             fontWeight = FontWeight.Bold,
             color = Color.Black,
             modifier = Modifier.padding(bottom = 8.dp)
         )
-        FakeData.ConsumptionHistory.forEach { item ->
-            ConsumptionRow(item)
+//        FakeData.ConsumptionHistory.forEach { item ->
+//            ConsumptionRow(item)
+//        }
+        scheduleItem?.forEach { item ->
+            ConsumptionRow(
+                item = item, navigateToDetail = navigateToDetail
+            )
+            Spacer(modifier = Modifier.height(8.dp))
         }
     }
 }

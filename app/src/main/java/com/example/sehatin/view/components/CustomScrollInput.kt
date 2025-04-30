@@ -88,12 +88,13 @@ fun CustomScrollInput(
             when (selectedUnitOption.index) {
                 0 -> {
                     // Jika unit cm: integer + decimal/100
-                    selectedIntPart.toFloat() + (selectedDecimalPart.toFloat() / 100f)
+                    val decimalValue = selectedDecimalPart.toFloat() / 10f
+                    selectedIntPart.toFloat() + decimalValue
                 }
                 1 -> {
                     // Jika unit ft: misalnya integer + decimal/100
-                    // Atau jika decimal mewakili inches, Anda bisa buat logika konversi lain
-                    selectedIntPart.toFloat() + (selectedDecimalPart.toFloat() / 100f)
+                    val decimalValue = selectedDecimalPart.toFloat() / 10f
+                    selectedIntPart.toFloat() + decimalValue
                 }
                 else -> 0f
             }
@@ -152,7 +153,7 @@ fun CustomScrollInput(
                         index = index,
                         isSelected = isSelected,
                         range = commaRange,
-                        defaultWidth = 71.dp,
+//                        defaultWidth = 71.dp,
                         maxValue = commaMax
                     )
                 }
@@ -184,7 +185,7 @@ fun getModifierForUnitSelection(
 ): Modifier {
     return Modifier
         .let {
-            it.size(width = 50.dp, height = 30.dp)
+            it.size(width = 60.dp, height = 40.dp)
         }
         .let {
             if (isSelected) {
@@ -221,7 +222,7 @@ fun radioButtonOption(
         modifier = getModifierForUnitSelection(isSelected = selected).clickable(onClick = onClick)
 
     ) {
-        Text(text = label, fontSize = 12.sp, color = MaterialTheme.colorScheme.onBackground)
+        Text(text = label, fontSize = 16.sp, color = MaterialTheme.colorScheme.onBackground)
     }
 }
 
@@ -266,8 +267,8 @@ fun HeightBoxItem(
     index: Int,
     isSelected: Boolean,
     range: List<Int>,
-    defaultHeight: Dp = 64.dp,
-    defaultWidth: Dp = 84.dp,
+    defaultHeight: Dp = 84.dp,
+    defaultWidth: Dp = 94.dp,
     maxValue: Int
 ) {
 
@@ -285,7 +286,7 @@ fun HeightBoxItem(
                 text = "",
                 fontWeight = FontWeight.SemiBold,
                 color = if (isSelected) Color.Black else Color.Gray,
-                fontSize = if (isSelected) 31.sp else 22.sp,
+                fontSize = if (isSelected) 36.sp else 22.sp,
                 modifier = Modifier.padding(vertical = 4.dp)
             )
         } else {
@@ -293,7 +294,7 @@ fun HeightBoxItem(
                 text = range[index].toString(),
                 fontWeight = FontWeight.SemiBold,
                 color = if (isSelected) Color.Black else Color.Gray,
-                fontSize = if (isSelected) 31.sp else 22.sp,
+                fontSize = if (isSelected) 36.sp else 22.sp,
                 modifier = Modifier.padding(vertical = 4.dp)
             )
         }

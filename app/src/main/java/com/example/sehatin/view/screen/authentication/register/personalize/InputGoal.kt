@@ -106,9 +106,10 @@ fun InputGoal(
                 if (detail.isProfileComplete()) {
                     loginScreenViewModel.setPersonalizeCompleted()
                     navigateToRoute(MainDestinations.DASHBOARD_ROUTE, true)
-                } else {
-                    navigateToRoute(MainDestinations.INPUT_NAME_ROUTE, true)
                 }
+//                else {
+//                    navigateToRoute(MainDestinations.INPUT_NAME_ROUTE, true)
+//                }
             }
             is ResultResponse.Loading -> {
                 showCircularProgress = true
@@ -179,7 +180,7 @@ fun InputGoal(
                 Column(
                     verticalArrangement = Arrangement.spacedBy(18.dp),
                     modifier = Modifier
-                        .padding(top = 20.dp)
+                        .padding(top = 100.dp)
 
                 ) {
 

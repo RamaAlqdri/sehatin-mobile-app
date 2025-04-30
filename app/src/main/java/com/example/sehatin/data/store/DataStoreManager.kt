@@ -2,6 +2,7 @@ package com.example.sehatin.data.store
 
 
 import android.content.Context
+import android.util.Log
 import androidx.datastore.preferences.core.booleanPreferencesKey
 import androidx.datastore.preferences.core.edit
 import androidx.datastore.preferences.core.stringPreferencesKey
@@ -40,8 +41,11 @@ class DataStoreManager(private val context: Context) {
         }
     }
 
+
+
     val userToken: Flow<String?> = context.dataStore.data
         .map { preferences -> preferences[USER_TOKEN_KEY] }
+
 
     suspend fun setPersonalizedFilled(filled: Boolean) {
         context.dataStore.edit { preferences ->
@@ -76,6 +80,25 @@ class DataStoreManager(private val context: Context) {
             preferences.clear()
         }
     }
+
+    suspend fun clearUserToken() {
+        context.dataStore.edit { preferences ->
+            preferences.remove(USER_TOKEN_KEY)
+        }
+    }
+    suspend fun logOut() {
+
+
+
+        context.dataStore.edit { preferences ->
+            preferences.remove(USER_LOGGED_IN_KEY)
+            preferences.remove(USER_TOKEN_KEY)
+            preferences.remove(USER_DATA_KEY)
+//            preferences.remove(USER_DATA_KEY)
+        }
+
+    }
+
 
     companion object {
         private val ONBOARDING_COMPLETED_KEY = booleanPreferencesKey("onboarding_completed")

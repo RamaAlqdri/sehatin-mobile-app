@@ -1,0 +1,260 @@
+package com.example.sehatin.data.repository
+
+import android.content.Context
+import android.util.Log
+import com.example.sehatin.common.ResultResponse
+import com.example.sehatin.data.model.response.CreateWaterHistoryResponse
+import com.example.sehatin.data.model.response.DietResponse
+import com.example.sehatin.data.model.response.DietResponse.FoodFilterResponse
+import com.example.sehatin.data.model.response.DietResponse.UpdateScheduleResponse
+import com.example.sehatin.data.model.response.FoodDetailResponse
+import com.example.sehatin.data.model.response.ScheduleADayResponse
+import com.example.sehatin.data.model.response.ScheduleClosestResponse
+import com.example.sehatin.data.model.response.WaterADayResponse
+import com.example.sehatin.data.model.response.WaterHistoryRequest
+import com.example.sehatin.data.store.DataStoreManager
+import com.example.sehatin.retrofit.api.ApiConfig
+import com.example.sehatin.utils.formatDateToISO8601
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.flow.Flow
+import kotlinx.coroutines.flow.flow
+import kotlinx.coroutines.flow.flowOn
+import java.util.Date
+import kotlin.concurrent.Volatile
+
+class DietRepository private constructor(
+    context: Context
+) {
+    private val dataStoreManager = DataStoreManager(context)
+    private val dietService = ApiConfig.getDietService(context)
+
+
+    fun setCompleteSchedule(
+        scheduleId: String
+    ): Flow<ResultResponse<UpdateScheduleResponse>> = flow {
+        emit(ResultResponse.Loading)
+        try {
+            val response = dietService.setCompletedSchedule(scheduleId)
+            if (response.isSuccessful) {
+                response.body()?.let {
+                    emit(ResultResponse.Success(it))
+                } ?: emit(ResultResponse.Error("Empty response body"))
+            } else {
+                emit(
+                    ResultResponse.Error(
+                        "Error: ${
+                            response.errorBody()?.string() ?: "Unknown error"
+                        }"
+                    )
+                )
+            }
+        } catch (e: Exception) {
+            emit(ResultResponse.Error(e.localizedMessage ?: "Network error"))
+        }
+    }.flowOn(Dispatchers.IO)
+
+    fun updateFoodSchedule(
+        scheduleId: String,
+        food_id: String
+    ): Flow<ResultResponse<UpdateScheduleResponse>> = flow {
+        emit(ResultResponse.Loading)
+        try {
+            val response =
+                dietService.updateFoodSchedule(scheduleId, DietResponse.FoodScheduleUpdate(food_id))
+            if (response.isSuccessful) {
+                response.body()?.let {
+                    emit(ResultResponse.Success(it))
+                } ?: emit(ResultResponse.Error("Empty response body"))
+            } else {
+                emit(
+                    ResultResponse.Error(
+                        "Error: ${
+                            response.errorBody()?.string() ?: "Unknown error"
+                        }"
+                    )
+                )
+            }
+        } catch (e: Exception) {
+            emit(ResultResponse.Error(e.localizedMessage ?: "Network error"))
+        }
+    }.flowOn(Dispatchers.IO)
+
+    fun createWaterHistory(
+        water: Double
+    ): Flow<ResultResponse<CreateWaterHistoryResponse>> = flow {
+        emit(ResultResponse.Loading)
+        try {
+            val response = dietService.postWaterHistory(WaterHistoryRequest(water))
+            if (response.isSuccessful) {
+                response.body()?.let {
+                    emit(ResultResponse.Success(it))
+                } ?: emit(ResultResponse.Error("Empty response body"))
+            } else {
+                emit(
+                    ResultResponse.Error(
+                        "Error: ${
+                            response.errorBody()?.string() ?: "Unknown error"
+                        }"
+                    )
+                )
+            }
+        } catch (e: Exception) {
+            emit(ResultResponse.Error(e.localizedMessage ?: "Network error"))
+        }
+    }.flowOn(Dispatchers.IO)
+
+    fun getWaterADay(date: Date): Flow<ResultResponse<WaterADayResponse>> = flow {
+        emit(ResultResponse.Loading)
+        try {
+            val formattedDate = formatDateToISO8601(date) // Format date to ISO 8601
+            val response = dietService.getWaterADay(formattedDate)
+            if (response.isSuccessful) {
+                response.body()?.let {
+                    emit(ResultResponse.Success(it))
+                } ?: emit(ResultResponse.Error("Empty response body"))
+            } else {
+                emit(
+                    ResultResponse.Error(
+                        "Error: ${
+                            response.errorBody()?.string() ?: "Unknown error"
+                        }"
+                    )
+                )
+            }
+        } catch (e: Exception) {
+            emit(ResultResponse.Error(e.localizedMessage ?: "Network error"))
+        }
+    }.flowOn(Dispatchers.IO)
+
+    fun getFoodRecommendation(): Flow<ResultResponse<FoodFilterResponse>> = flow {
+        emit(ResultResponse.Loading)
+        try {
+            val response = dietService.getFoodRecommendation()
+            if (response.isSuccessful) {
+                response.body()?.let {
+                    emit(ResultResponse.Success(it))
+                } ?: emit(ResultResponse.Error("Empty response body"))
+            } else {
+                emit(
+                    ResultResponse.Error(
+                        "Error: ${
+                            response.errorBody()?.string() ?: "Unknown error"
+                        }"
+                    )
+                )
+            }
+        } catch (e: Exception) {
+            emit(ResultResponse.Error(e.localizedMessage ?: "Network error"))
+        }
+    }.flowOn(Dispatchers.IO)
+
+    fun getFoodDetail(id: String): Flow<ResultResponse<FoodDetailResponse>> = flow {
+        emit(ResultResponse.Loading)
+        try {
+            val response = dietService.getFoodDetail(id)
+            if (response.isSuccessful) {
+                response.body()?.let {
+                    emit(ResultResponse.Success(it))
+                } ?: emit(ResultResponse.Error("Empty response body"))
+            } else {
+                emit(
+                    ResultResponse.Error(
+                        "Error: ${
+                            response.errorBody()?.string() ?: "Unknown error"
+                        }"
+                    )
+                )
+            }
+        } catch (e: Exception) {
+            emit(ResultResponse.Error(e.localizedMessage ?: "Network error"))
+        }
+    }.flowOn(Dispatchers.IO)
+
+
+    fun getFoodFilter(
+        name: String,
+        limit: Int
+    ): Flow<ResultResponse<FoodFilterResponse>> = flow {
+        emit(ResultResponse.Loading)
+        try {
+            val response = dietService.getFoodFilter(name, limit)
+            if (response.isSuccessful) {
+                response.body()?.let {
+                    emit(ResultResponse.Success(it))
+                } ?: emit(ResultResponse.Error("Empty response body"))
+            } else {
+                emit(
+                    ResultResponse.Error(
+                        "Error: ${
+                            response.errorBody()?.string() ?: "Unknown error"
+                        }"
+                    )
+                )
+            }
+        } catch (e: Exception) {
+            emit(ResultResponse.Error(e.localizedMessage ?: "Network error"))
+        }
+    }.flowOn(Dispatchers.IO)
+
+    fun getScheduleADay(date: Date): Flow<ResultResponse<ScheduleADayResponse>> = flow {
+        emit(ResultResponse.Loading)
+        try {
+            val formattedDate = formatDateToISO8601(date) // Format date to ISO 8601
+            val response = dietService.getScheduleADay(formattedDate)
+            if (response.isSuccessful) {
+                response.body()?.let {
+                    emit(ResultResponse.Success(it))
+                } ?: emit(ResultResponse.Error("Empty response body"))
+            } else {
+                emit(
+                    ResultResponse.Error(
+                        "Error: ${
+                            response.errorBody()?.string() ?: "Unknown error"
+                        }"
+                    )
+                )
+            }
+        } catch (e: Exception) {
+            emit(ResultResponse.Error(e.localizedMessage ?: "Network error"))
+        }
+    }.flowOn(Dispatchers.IO)
+
+    fun getScheduleClosest(date: Date): Flow<ResultResponse<ScheduleClosestResponse>> = flow {
+        emit(ResultResponse.Loading)
+        try {
+            val formattedDate = formatDateToISO8601(date) // Format date to ISO 8601
+            val response = dietService.getSchedultClosest(formattedDate)
+//            Log.e("DietRepository", "getScheduleClosest in Repository: $formattedDate")
+            if (response.isSuccessful) {
+                response.body()?.let {
+                    emit(ResultResponse.Success(it))
+                } ?: emit(ResultResponse.Error("Empty response body"))
+            } else {
+                emit(
+                    ResultResponse.Error(
+                        "Error: ${
+                            response.errorBody()?.string() ?: "Unknown error"
+                        }"
+                    )
+                )
+            }
+        } catch (e: Exception) {
+            emit(ResultResponse.Error(e.localizedMessage ?: "Network error"))
+        }
+    }.flowOn(Dispatchers.IO)
+
+    companion object {
+        @Volatile
+        private var INSTANCE: DietRepository? = null
+
+        @JvmStatic
+        fun getInstance(
+            context: Context
+        ): DietRepository =
+            INSTANCE ?: synchronized(this) {
+                INSTANCE ?: DietRepository(context).also {
+                    INSTANCE = it
+                }
+            }
+    }
+}

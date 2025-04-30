@@ -20,15 +20,21 @@ fun parseDate(dateString: String): Date? {
     dateFormat.timeZone = TimeZone.getTimeZone("UTC")
     return dateFormat.parse(truncatedDateString)
 }
-fun convertToHoursAndMinutes(utcTimestamp: String): String {
-    val inputFormat = SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss.SSS'Z'")
-    inputFormat.timeZone = TimeZone.getTimeZone("UTC") // Input is in UTC
+fun convertToHoursAndMinutes(utcTimestamp: String?): String {
+    if (utcTimestamp.isNullOrBlank()) return "-" // Handle null atau empty string
 
-    val outputFormat = SimpleDateFormat("HH:mm") // Output format for hours and minutes
-    outputFormat.timeZone = TimeZone.getTimeZone("Asia/Jakarta") // Adjust to local time zone
+    return try {
+        val inputFormat = SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss.SSS'Z'", Locale.getDefault())
+        inputFormat.timeZone = TimeZone.getTimeZone("UTC") // Input is in UTC
 
-    val date: Date = inputFormat.parse(utcTimestamp) // Parse the input timestamp
-    return outputFormat.format(date) // Format to hours and minutes
+        val outputFormat = SimpleDateFormat("HH:mm", Locale.getDefault()) // Output format
+        outputFormat.timeZone = TimeZone.getTimeZone("Asia/Makassar") // Convert to local time
+
+        val date: Date = inputFormat.parse(utcTimestamp) ?: return "-"
+        outputFormat.format(date) // Format to hours and minutes
+    } catch (e: Exception) {
+        "-" // Return fallback string if parsing fails
+    }
 }
 
 fun getSevenDaysFormattedDates(): List<String> {

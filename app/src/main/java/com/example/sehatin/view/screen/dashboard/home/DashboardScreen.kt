@@ -16,6 +16,7 @@ import androidx.compose.foundation.layout.fillMaxHeight
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
+import androidx.compose.foundation.layout.offset
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.statusBarsPadding
@@ -93,6 +94,7 @@ fun DashboardScreen(
     val state = rememberPullToRefreshState(
 
     )
+
 
 
     var profile by remember { mutableStateOf<Detail?>(null) }
@@ -225,21 +227,28 @@ fun DashboardScreen(
                                 modifier = Modifier.fillMaxWidth(),
                                 verticalAlignment = Alignment.CenterVertically
                             ) {
+                                val genderIcon = when (profile?.gender.toString().lowercase()) {
+                                    "male" -> R.drawable.ic_male
+                                    "female" -> R.drawable.ic_female
+                                    else -> R.drawable.ic_male // default/fallback
+                                }
                                 Box(
                                     modifier = Modifier
                                         .clip(CircleShape)
                                         .background(
-                                            color = Color(0x2370A44C),
-                                        )
+                                            color = MaterialTheme.colorScheme.primary.copy(alpha=0.2f),
+                                        ), // Warna latar belakang lingkaran
+                                    contentAlignment = Alignment.Center
                                 ) {
                                     Image(
-                                        painter = painterResource(id = vectorImages[0]),
+                                        painter = painterResource(id = genderIcon),
                                         contentDescription = null,
 
                                         contentScale = ContentScale.Crop,
                                         modifier = Modifier
-                                            .size(40.dp)
+                                            .size(50.dp)
                                             .clip(RoundedCornerShape(50.dp))
+                                            .offset(y = 5.dp)
                                     )
                                 }
                                 Spacer(modifier = Modifier.width(15.dp))
@@ -250,13 +259,13 @@ fun DashboardScreen(
                                     Text(
                                         text = "Halo, ${profile?.name}",
                                         fontWeight = FontWeight.SemiBold,
-                                        fontSize = 15.sp,
+                                        fontSize = 16.sp,
                                         color = MaterialTheme.colorScheme.onBackground,
                                     )
                                     Text(
                                         text = "${formattedCurrentDate()}",
                                         fontWeight = FontWeight.SemiBold,
-                                        fontSize = 10.sp,
+                                        fontSize = 12.sp,
                                         color = MaterialTheme.colorScheme.onBackground.copy(alpha = 0.5f)
                                     )
                                 }
@@ -474,7 +483,7 @@ fun DashboardScreen(
                                                     ),
                                                     fontSize = 12.sp,
                                                     fontWeight = FontWeight.SemiBold,
-                                                    text = " ml"
+                                                    text = " mL"
                                                 )
                                             }
                                         }

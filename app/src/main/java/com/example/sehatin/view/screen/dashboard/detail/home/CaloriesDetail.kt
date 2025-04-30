@@ -151,14 +151,12 @@ private fun CaloriesDetail(
 
                         item {
                             Spacer(modifier = Modifier.height(14.dp))
-                            val localDate = selectedDate.toInstant()
-                                .atZone(ZoneId.systemDefault()) // Use the system's default timezone or UTC as per your needs
-                                .toLocalDate()
+
                             CalendarSection(
-                                selectedDate = localDate,
-                                onDateSelected = { newDate ->
+                                selectedDate = selectedDate,
+                                onDateSelected = { date ->
                                     // Convert the new LocalDate back to Date if needed
-                                    val date = Date.from(newDate.atStartOfDay(ZoneId.systemDefault()).toInstant())
+
                                     dashboardViewModel.setSelectedDate(date)
                                 }
                             )

@@ -220,11 +220,9 @@ class DashboardViewModel(
     private fun getWaterADay(forceRefresh: Boolean = false) {
         viewModelScope.launch {
             try {
-                val currentDate = LocalDateTime.now()
-                val formatter = DateTimeFormatter.ISO_INSTANT
-//                val formattedDate = currentDate.format(formatter)
-                val date = Date.from(currentDate.atZone(ZoneId.of("UTC")).toInstant())
-
+                val zoneId = ZoneId.of("UTC+8")
+                val currentDate = LocalDateTime.now(zoneId)
+                val date = Date.from(currentDate.atZone(zoneId).toInstant())
 
                 val currentTime = System.currentTimeMillis()
                 val shouldRefresh = _waterADayState.value is ResultResponse.None ||
@@ -260,10 +258,9 @@ class DashboardViewModel(
     private fun getCaloriesADay(forceRefresh: Boolean = false) {
         viewModelScope.launch {
             try {
-                val currentDate = LocalDateTime.now()
-                val formatter = DateTimeFormatter.ISO_INSTANT
-                val formattedDate = currentDate.atZone(ZoneId.of("UTC")).format(formatter)
-                val date = Date.from(currentDate.atZone(ZoneId.of("UTC")).toInstant())
+                val zoneId = ZoneId.of("UTC+8")
+                val currentDate = LocalDateTime.now(zoneId)
+                val date = Date.from(currentDate.atZone(zoneId).toInstant())
 
 
 //                Log.e("RESULT", "getCaloriesADay: $formattedDate")
@@ -448,10 +445,9 @@ class DashboardViewModel(
     private fun getScheduleADay(forceRefresh: Boolean = false) {
         viewModelScope.launch {
             try {
-                val currentDate = LocalDateTime.now()
-                val formatter = DateTimeFormatter.ISO_INSTANT
-                val formattedDate = currentDate.atZone(ZoneId.of("UTC")).format(formatter)
-                val date = Date.from(currentDate.atZone(ZoneId.of("UTC")).toInstant())
+                val zoneId = ZoneId.of("UTC+8")
+                val currentDate = LocalDateTime.now(zoneId)
+                val date = Date.from(currentDate.atZone(zoneId).toInstant())
 
 
                 val currentTime = System.currentTimeMillis()

@@ -3,7 +3,9 @@ package com.example.sehatin.retrofit.api
 import android.content.Context
 import com.example.sehatin.BuildConfig
 import com.example.sehatin.retrofit.AuthInterceptor
+import com.example.sehatin.retrofit.services.ConsultationService
 import com.example.sehatin.retrofit.services.DashboardService
+import com.example.sehatin.retrofit.services.DietService
 import com.example.sehatin.retrofit.services.LoginService
 import com.example.sehatin.retrofit.services.OtpService
 import com.example.sehatin.retrofit.services.PersonalizeService
@@ -60,6 +62,14 @@ object ApiConfig {
 
     fun getDashboardService(context: Context): DashboardService {
         return provideRetrofit(context).create(DashboardService::class.java)
+    }
+
+    fun getDietService(context: Context): DietService {
+        return provideRetrofit(context).create(DietService::class.java)
+    }
+
+    fun getConsultationService(context: Context): ConsultationService {
+        return provideRetrofit(context).create(ConsultationService::class.java)
     }
 
 

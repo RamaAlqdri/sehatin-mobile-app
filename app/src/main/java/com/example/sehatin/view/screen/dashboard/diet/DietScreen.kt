@@ -1,5 +1,6 @@
 package com.example.sehatin.view.screen.dashboard.diet
 
+import android.util.Log
 import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.Canvas
 import androidx.compose.foundation.background
@@ -18,14 +19,19 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.statusBarsPadding
 import androidx.compose.foundation.layout.width
+import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.Button
 import androidx.compose.material3.ButtonDefaults
+import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.OutlinedButton
 import androidx.compose.material3.Text
+import androidx.compose.material3.pulltorefresh.PullToRefreshBox
+import androidx.compose.material3.pulltorefresh.PullToRefreshDefaults.Indicator
+import androidx.compose.material3.pulltorefresh.rememberPullToRefreshState
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
@@ -47,6 +53,7 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.withStyle
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.example.compose.back
 import com.example.compose.backGlass
 import com.example.compose.backValue
@@ -55,85 +62,159 @@ import com.example.compose.textColor
 import com.example.compose.waterGlass
 import com.example.sehatin.R
 import com.example.sehatin.common.CaloriesConsumptionItem
-import com.example.sehatin.common.Consumption
 import com.example.sehatin.common.FakeData
+import com.example.sehatin.common.ResultResponse
+import com.example.sehatin.data.model.response.FoodItem
+import com.example.sehatin.data.model.response.ScheduleADayResponse
+import com.example.sehatin.data.model.response.ScheduleClosestResponse
+import com.example.sehatin.data.model.response.ScheduleDataItem
+import com.example.sehatin.navigation.DetailDestinations
 import com.example.sehatin.navigation.SehatInSurface
+import com.example.sehatin.utils.convertToHoursAndMinutes
 import com.example.sehatin.view.components.CalendarView
 import com.example.sehatin.view.components.CustomTopAppBar
 import com.example.sehatin.view.components.FoodItemCard
 import com.example.sehatin.view.components.WaterDialog
+import com.example.sehatin.viewmodel.DietViewModel
 
+@OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun DietScreen(
-    modifier: Modifier = Modifier
+    modifier: Modifier = Modifier, dietViewModel: DietViewModel, navigateToDetail: (String) -> Unit
 ) {
     // CAll API Here
     DietScreen(
         modifier = modifier,
-        id = 1
+        id = 1,
+        dietViewModel = dietViewModel,
+        navigateToDetail = navigateToDetail
     )
 }
 
+@OptIn(ExperimentalMaterial3Api::class)
 @Composable
 private fun DietScreen(
     modifier: Modifier = Modifier,
-    id: Int = 0
+    id: Int = 0,
+    dietViewModel: DietViewModel,
+    navigateToDetail: (String) -> Unit
 ) {
 
     var currentWater by remember { mutableIntStateOf(1500) }
     val maxWaterValue by remember { mutableIntStateOf(3000) }
     var selectedValue by remember { mutableIntStateOf(100) }
 
-    SehatInSurface(
-        modifier = modifier.fillMaxSize(),
-    ) {
-        Box(
-            modifier = Modifier
-                .fillMaxSize(),
-            contentAlignment = Alignment.Center
+    val state = rememberPullToRefreshState()
+    val isRefreshing by dietViewModel.isRefreshing.collectAsStateWithLifecycle()
+
+    val waterToday by dietViewModel.waterADay.collectAsStateWithLifecycle(initialValue = null)
+    val scheduleToday by dietViewModel.scheduleToday.collectAsStateWithLifecycle(initialValue = null)
+    val scheduleTomorrow by dietViewModel.scheduleTomorrow.collectAsStateWithLifecycle(initialValue = null)
+    val scheduleClosest by dietViewModel.scheduleClosest.collectAsStateWithLifecycle(initialValue = null)
+
+
+    val completedScheduleState by dietViewModel.completedScheduleState.collectAsStateWithLifecycle()
+    val createWaterState by dietViewModel.createWaterState.collectAsStateWithLifecycle()
+
+    Log.e(
+        "TAG", "scheduleClose: ${scheduleClosest}"
+    )
+    Log.e(
+        "TAG", "scheduleClose: ${waterToday}"
+    )
+    LaunchedEffect(Unit) {
+        // Melakukan refresh saat pertama kali halaman dibuka
+        dietViewModel.refresh()
+    }
+
+    LaunchedEffect(createWaterState) {
+        if (createWaterState is ResultResponse.Success) {
+            dietViewModel.refresh()
+            dietViewModel.resetCreateWaterState()
+        }
+
+
+    }
+
+    LaunchedEffect(completedScheduleState){
+        if (completedScheduleState is ResultResponse.Success) {
+            dietViewModel.refresh()
+            dietViewModel.resetCompletedScheduleState()
+        }
+    }
+
+    PullToRefreshBox(isRefreshing = isRefreshing, onRefresh = {
+        dietViewModel.refresh()
+    }, state = state, indicator = {
+        Indicator(
+            modifier = Modifier.align(Alignment.TopCenter),
+            isRefreshing = isRefreshing,
+            containerColor = MaterialTheme.colorScheme.primaryContainer,
+            color = MaterialTheme.colorScheme.onPrimaryContainer,
+            state = state,
+            threshold = 120.dp
+        )
+    }) {
+
+        SehatInSurface(
+            modifier = modifier.fillMaxSize(),
         ) {
-            Column(
-                modifier = Modifier
-                    .fillMaxSize()
-                    .statusBarsPadding()
-                    .background(back),
-                horizontalAlignment = Alignment.CenterHorizontally,
+            Box(
+                modifier = Modifier.fillMaxSize(), contentAlignment = Alignment.Center
             ) {
-
-                LazyColumn(
-                    modifier = Modifier.fillMaxSize()
+                Column(
+                    modifier = Modifier
+                        .fillMaxSize()
+                        .statusBarsPadding()
+                        .background(back),
+                    horizontalAlignment = Alignment.CenterHorizontally,
                 ) {
-                    item {
-                        TabSection()
-                    }
 
-                    item {
-                        Spacer(modifier = Modifier.height(14.dp))
-                        WaterDropSection(
-                            onAdd = {
-                                currentWater += selectedValue
-                            },
-                            onMinus = {
-                                currentWater -= selectedValue
-                            },
-                            currentWater = currentWater,
-                            maxWaterValue = maxWaterValue,
-                            selectedValue = selectedValue
-                        )
-                    }
+                    LazyColumn(
+                        modifier = Modifier.fillMaxSize()
+                    ) {
+                        item {
+                            TabSection(navigateToDetail = navigateToDetail)
+                        }
 
-                    item {
-                        Spacer(modifier = Modifier.height(16.dp))
-                        UpcomingScheduleSection()
-                    }
+                        item {
+                            Spacer(modifier = Modifier.height(14.dp))
+                            WaterDropSection(
+                                onAdd = {
+//                                currentWater += selectedValue
+                                    dietViewModel.createWaterHistory(selectedValue.toDouble())
+                                },
+                                onMinus = {
+//                                    currentWater -= selectedValue
+                                    dietViewModel.createWaterHistory(-selectedValue.toDouble())
+                                },
+                                currentWater = waterToday?.data?.water?.toInt() ?: 0,
+                                maxWaterValue = waterToday?.data?.target?.toInt() ?: 0,
+                                selectedValue = selectedValue,
+                                navigateToDetail = navigateToDetail
+                            )
+                        }
 
-                    item {
-                        Spacer(modifier = Modifier.height(16.dp))
-                        ConsumptionHistory()
-                    }
+                        item {
+                            Spacer(modifier = Modifier.height(16.dp))
+                            UpcomingScheduleSection(
+                                data = scheduleClosest,
+                                navigateToDetail = navigateToDetail,
+                                dietViewModel = dietViewModel
+                            )
+                        }
 
-                    item {
-                        Spacer(modifier = Modifier.height(100.dp))
+                        item {
+                            Spacer(modifier = Modifier.height(16.dp))
+                            ConsumptionHistory(
+                                dataToday = scheduleToday,
+                                dataTomorrow = scheduleTomorrow, navigateToDetail = navigateToDetail
+                            )
+                        }
+
+                        item {
+                            Spacer(modifier = Modifier.height(100.dp))
+                        }
                     }
                 }
             }
@@ -143,12 +224,14 @@ private fun DietScreen(
 
 @Composable
 private fun TabSection(
-    modifier: Modifier = Modifier
+    modifier: Modifier = Modifier,
+    navigateToDetail: (String) -> Unit
 ) {
     Row(
         modifier = Modifier
             .fillMaxWidth()
             .padding(horizontal = 21.dp)
+
     ) {
         Row(
             modifier = Modifier
@@ -156,7 +239,11 @@ private fun TabSection(
                 .shadow(elevation = 2.5.dp, RoundedCornerShape(10.dp))
                 .clip(RoundedCornerShape(10.dp))
                 .background(Color.White)
-                .padding(12.dp),
+                .padding(16.dp)
+                .clickable {
+                    navigateToDetail(DetailDestinations.FOOD_LIST_DETAIL_ROUTE)
+                },
+
             verticalAlignment = Alignment.CenterVertically
         ) {
             Icon(
@@ -167,7 +254,7 @@ private fun TabSection(
             )
             Spacer(modifier = Modifier.width(8.dp))
             Text(
-                text = "Food Menus",
+                text = "Menu Makanan",
                 color = textColor,
                 fontSize = 12.sp,
                 fontWeight = FontWeight.Bold
@@ -181,7 +268,10 @@ private fun TabSection(
                 .shadow(elevation = 2.5.dp, RoundedCornerShape(10.dp))
                 .clip(RoundedCornerShape(10.dp))
                 .background(Color.White)
-                .padding(12.dp),
+                .padding(16.dp)
+                .clickable {
+                    navigateToDetail(DetailDestinations.DIET_SCHEDULE_DETAIL_ROUTE)
+                },
             verticalAlignment = Alignment.CenterVertically
         ) {
             Icon(
@@ -192,7 +282,7 @@ private fun TabSection(
             )
             Spacer(modifier = Modifier.width(8.dp))
             Text(
-                text = "Diet Schedule",
+                text = "Jadwal Diet",
                 color = textColor,
                 fontSize = 12.sp,
                 fontWeight = FontWeight.Bold
@@ -207,7 +297,8 @@ private fun WaterDropSection(
     onMinus: () -> Unit,
     currentWater: Int,
     maxWaterValue: Int,
-    selectedValue: Int
+    selectedValue: Int,
+    navigateToDetail: (String) -> Unit
 ) {
 
     val waterValue = buildAnnotatedString {
@@ -220,7 +311,7 @@ private fun WaterDropSection(
                 fontWeight = FontWeight.Bold
             )
         ) {
-            append("/$maxWaterValue ml")
+            append("/$maxWaterValue mL")
         }
     }
 
@@ -230,7 +321,10 @@ private fun WaterDropSection(
             .shadow(elevation = 2.5.dp, RoundedCornerShape(16.dp))
             .clip(RoundedCornerShape(16.dp))
             .background(MaterialTheme.colorScheme.primary)
-            .padding(26.dp),
+            .padding(26.dp)
+            .clickable {
+                navigateToDetail(DetailDestinations.WATER_DETAIL_ROUTE)
+            },
         verticalArrangement = Arrangement.Center,
         horizontalAlignment = Alignment.CenterHorizontally
     ) {
@@ -243,25 +337,21 @@ private fun WaterDropSection(
                 modifier = Modifier
                     .size(50.dp)
                     .background(
-                        Color(0x40FFFFFF),
-                        shape = RoundedCornerShape(8.dp)
+                        Color(0x40FFFFFF), shape = RoundedCornerShape(8.dp)
                     )
                     .border(1.dp, color = Color.Unspecified, shape = RoundedCornerShape(8.dp))
                     .clickable(
                         enabled = currentWater - selectedValue > 0,
-                        onClick =
-                            onMinus,
+                        onClick = onMinus,
                         indication = null,
-                        interactionSource = remember { MutableInteractionSource() }
-                    ),
+                        interactionSource = remember { MutableInteractionSource() }),
                 contentAlignment = Alignment.Center
             ) {
                 Icon(
                     imageVector = ImageVector.vectorResource(id = R.drawable.minus_icon),
                     contentDescription = null,
                     tint = Color.White,
-                    modifier = Modifier
-                        .size(30.dp)
+                    modifier = Modifier.size(30.dp)
                 )
             }
             Spacer(modifier = Modifier.width(70.dp))
@@ -278,15 +368,13 @@ private fun WaterDropSection(
                 modifier = Modifier
                     .size(50.dp)
                     .background(
-                        Color(0x40FFFFFF),
-                        shape = RoundedCornerShape(8.dp)
+                        Color(0x40FFFFFF), shape = RoundedCornerShape(8.dp)
                     )
                     .border(1.dp, color = Color.Unspecified, shape = RoundedCornerShape(8.dp))
                     .clickable(
                         onClick = onAdd,
                         indication = null,
-                        interactionSource = remember { MutableInteractionSource() }
-                    ),
+                        interactionSource = remember { MutableInteractionSource() }),
                 contentAlignment = Alignment.Center
             ) {
                 Icon(
@@ -304,16 +392,21 @@ private fun WaterDropSection(
         Spacer(modifier = Modifier.height(16.dp))
 
         Text(
-            text = waterValue,
-            fontSize = 18.sp
+            text = waterValue, fontSize = 18.sp
         )
     }
 }
 
 @Composable
 private fun UpcomingScheduleSection(
-    modifier: Modifier = Modifier
+    modifier: Modifier = Modifier,
+    data: ScheduleClosestResponse? = null,
+    navigateToDetail: (String) -> Unit,
+    dietViewModel: DietViewModel
 ) {
+    Log.e(
+        "TAG", "UpcomingScheduleSection: ${data}"
+    )
     Column(
         modifier = Modifier
             .fillMaxWidth()
@@ -324,7 +417,7 @@ private fun UpcomingScheduleSection(
             .padding(horizontal = 16.dp, vertical = 12.dp),
     ) {
         Text(
-            text = "Upcoming Schedule",
+            text = "Jadwal Terdekat",
             fontSize = 16.sp,
             fontWeight = FontWeight.Bold,
             color = textColor,
@@ -333,18 +426,32 @@ private fun UpcomingScheduleSection(
         Spacer(modifier = Modifier.height(16.dp))
 
         FoodItemCard(
-            food = FakeData.foodItems[0],
+            imageUrl = data?.data?.food?.image ?: "",
+            title = data?.data?.food?.name ?: "",
+            time = convertToHoursAndMinutes(data?.data?.scheduledAt ?: ""),
+            calories = data?.data?.food?.calories ?: 0.0,
+            protein = data?.data?.food?.protein ?: 0.0,
             isTimeVisible = true,
+            isCompleted = data?.data?.isCompleted?: false,
             isBorderVisible = true,
-            backgroundColor = ter
+            onClick = {
+                Log.d("Debug", "Meal clicked: ${data?.data?.food?.name}")
+                val foodId = data?.data?.food?.id.toString()
+                navigateToDetail(DetailDestinations.foodDetailRouteWithId(foodId))
+            },
+//            backgroundColor = ter
         )
 
         Spacer(modifier = Modifier.height(16.dp))
 
-        ActionButtons(
-            onEatClick = { },
-            onChangeMenuClick = { }
-        )
+        if(data?.data?.isCompleted==false) {
+            ActionButtons(onEatClick = { dietViewModel.setCompletedSchedule() }, onChangeMenuClick = {
+                val scheduleId = data?.data?.id.toString()
+                navigateToDetail(DetailDestinations.foodRecomendationRouteWithId(scheduleId))
+
+            })
+        }
+
     }
 
 }
@@ -352,12 +459,10 @@ private fun UpcomingScheduleSection(
 
 @Composable
 fun ActionButtons(
-    onEatClick: () -> Unit,
-    onChangeMenuClick: () -> Unit
+    onEatClick: () -> Unit, onChangeMenuClick: () -> Unit
 ) {
     Row(
-        modifier = Modifier.fillMaxWidth(),
-        horizontalArrangement = Arrangement.SpaceEvenly
+        modifier = Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.SpaceEvenly
     ) {
         Button(
             onClick = onEatClick,
@@ -365,9 +470,9 @@ fun ActionButtons(
             shape = RoundedCornerShape(12.dp),
             modifier = Modifier
                 .weight(1f)
-                .height(40.dp)
+                .height(48.dp)
         ) {
-            Text(text = "Eat", fontSize = 14.sp, color = Color.White)
+            Text(text = "Makan", fontSize = 14.sp, color = Color.White)
         }
 
         Spacer(modifier = Modifier.width(16.dp))
@@ -378,9 +483,9 @@ fun ActionButtons(
             shape = RoundedCornerShape(12.dp),
             modifier = Modifier
                 .weight(1f)
-                .height(40.dp)
+                .height(48.dp)
         ) {
-            Text(text = "Change Menu", fontSize = 12.sp, color = MaterialTheme.colorScheme.primary)
+            Text(text = "Ganti Menu", fontSize = 12.sp, color = MaterialTheme.colorScheme.primary)
         }
     }
 }
@@ -388,6 +493,9 @@ fun ActionButtons(
 @Composable
 fun ConsumptionHistory(
     modifier: Modifier = Modifier,
+    dataToday: ScheduleADayResponse? = null,
+    dataTomorrow: ScheduleADayResponse? = null,
+    navigateToDetail: (String) -> Unit,
 ) {
     Column(
         modifier = Modifier
@@ -399,32 +507,41 @@ fun ConsumptionHistory(
             .padding(horizontal = 21.dp, vertical = 12.dp),
     ) {
         Text(
-            text = "Today's Schedule",
+            text = "Jadwal Hari Ini",
             fontSize = 14.sp,
             fontWeight = FontWeight.Bold,
             color = Color.Black,
-            modifier = Modifier.padding(bottom = 8.dp)
+            modifier = Modifier.padding(vertical = 16.dp)
         )
-        FakeData.ConsumptionHistory.forEach { item ->
-            ConsumptionRow(item)
+
+        dataToday?.data?.forEach { meal ->
+            ConsumptionRow(meal, navigateToDetail = navigateToDetail)
         }
+
+//        Spacer(modifier = Modifier.height(4.dp))
+
         Text(
-            text = "Tomorrow's Schedule",
+            text = "Jadwal Besok",
             fontSize = 14.sp,
             fontWeight = FontWeight.Bold,
             color = Color.Black,
-            modifier = Modifier.padding(bottom = 8.dp)
+            modifier = Modifier.padding(vertical = 16.dp)
         )
-        FakeData.ConsumptionHistory.forEach { item ->
-            ConsumptionRow(item)
+
+        dataTomorrow?.data?.forEach { meal ->
+            ConsumptionRow(
+                meal, navigateToDetail = navigateToDetail
+            )
         }
     }
 }
 
 @Composable
 fun ConsumptionRow(
-    item : Consumption
-) {
+    item: ScheduleDataItem,
+    navigateToDetail: (String) -> Unit,
+
+    ) {
     Row(
         modifier = Modifier
             .fillMaxWidth()
@@ -441,7 +558,7 @@ fun ConsumptionRow(
             contentAlignment = Alignment.Center
         ) {
             Text(
-                text = item.time,
+                text = convertToHoursAndMinutes(item.scheduledAt),
                 fontSize = 14.sp,
                 fontWeight = FontWeight.Bold,
                 color = MaterialTheme.colorScheme.primary
@@ -455,12 +572,15 @@ fun ConsumptionRow(
                 .fillMaxWidth()
                 .height(50.dp)
                 .background(Color(0xFFF3F3F3), RoundedCornerShape(10.dp))
-                .padding(14.dp),
+                .padding(14.dp)
+                .clickable {
+                    val foodId = item.food.id.toString()
+                    navigateToDetail(DetailDestinations.foodDetailRouteWithId(foodId))
+                },
             contentAlignment = Alignment.TopStart
         ) {
-
             Text(
-                text = item.foodType,
+                text = item.food.name,
                 fontSize = 14.sp,
                 fontWeight = FontWeight.Bold,
                 color = MaterialTheme.colorScheme.primary

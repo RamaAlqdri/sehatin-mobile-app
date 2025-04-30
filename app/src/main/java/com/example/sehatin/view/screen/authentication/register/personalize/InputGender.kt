@@ -145,7 +145,7 @@ fun InputGender(
                 Row(
                     horizontalArrangement = Arrangement.spacedBy(18.dp),
                     modifier = Modifier
-                        .padding(top = 50.dp)
+                        .padding(top = 70.dp)
 
                 ) {
 

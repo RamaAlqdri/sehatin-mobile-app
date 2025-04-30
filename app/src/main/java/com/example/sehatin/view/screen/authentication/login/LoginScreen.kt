@@ -70,15 +70,13 @@ fun setPassword(value: String) {
 fun LoginScreen(
     modifier: Modifier = Modifier,
     navigateToRoute: (String, Boolean) -> Unit,
+    loginViewModel: LoginScreenViewModel
 ) {
 
-    val loginViewModel: LoginScreenViewModel = viewModel(
-        factory = LoginViewModelFactory.getInstance(
-            Resource.appContext
-        )
-    )
+
 
     val loginState by loginViewModel.loginState.collectAsStateWithLifecycle(initialValue = ResultResponse.None)
+
 
     val userState by loginViewModel.userState.collectAsStateWithLifecycle(initialValue = ResultResponse.None)
 
@@ -112,6 +110,7 @@ fun LoginScreen(
 //                print("doksaodk")
 
                 loginViewModel.getUser()
+//                loginViewModel.resetEmailAndPassword()
 
 //                navigateToRoute("${MainDestinations.DASHBOARD_ROUTE}?", true)
             }
@@ -147,13 +146,16 @@ fun LoginScreen(
                     navigateToRoute(MainDestinations.INPUT_NAME_ROUTE, true)
                 }
             }
+
             is ResultResponse.Loading -> {
                 showCircularProgress = true
             }
+
             is ResultResponse.Error -> {
                 showCircularProgress = false
                 Log.e("LoginScreen", "Get user error: ${(userState as ResultResponse.Error).error}")
             }
+
             else -> {}
         }
     }
@@ -283,16 +285,6 @@ fun LoginScreen(
                         isPassword = true,
                         errorMessage = loginViewModel.passwordError
                     )
-                    Text(
-                        text = "Lupa kata sandi?",
-                        modifier = Modifier
-                            .padding(bottom = 10.dp)
-                            .fillMaxWidth(),
-                        fontSize = 12.sp,
-                        fontWeight = FontWeight.Medium,
-                        color = MaterialTheme.colorScheme.onBackground,
-                        textAlign = TextAlign.End
-                    )
                     CustomButton(
                         text = "Masuk",
 //                isOutlined = true,
@@ -300,9 +292,23 @@ fun LoginScreen(
                         modifier = Modifier.fillMaxWidth(),
                         onClick = {
                             focusManager.clearFocus()
-                            Log.e("RegisterScreen", "Register button clicked")
+//                            Log.e("RegisterScreen", "Register button clicked")
                             loginViewModel.loginUser()
                         })
+                    Text(
+                        text = "Lupa kata sandi?",
+                        modifier = Modifier
+                            .padding(top = 10.dp)
+                            .fillMaxWidth()
+                            .clickable {
+                                navigateToRoute(MainDestinations.FORGOT_PASSWORD_ROUTE, true)
+                            },
+                        fontSize = 14.sp,
+                        fontWeight = FontWeight.Medium,
+                        color = MaterialTheme.colorScheme.onBackground,
+                        textAlign = TextAlign.End
+                    )
+
                     Box(
                         modifier = Modifier
                             .padding(vertical = 10.dp),
@@ -310,33 +316,33 @@ fun LoginScreen(
 
                         ) {
 
-                        Divider(
-                            color = MaterialTheme.colorScheme.primary,
-                            thickness = 1.dp,
-                            modifier = Modifier
-                                .padding(vertical = 10.dp)
-                        )
-                        Text(
-                            text = "atau",
-                            textAlign = TextAlign.Center,
-                            fontSize = 12.sp,
-                            color = MaterialTheme.colorScheme.primary,
-                            fontWeight = FontWeight.Medium,
-                            modifier = Modifier
-                                .background(color = MaterialTheme.colorScheme.background)
-                                .padding(horizontal = 10.dp)
-                        )
+//                        Divider(
+//                            color = MaterialTheme.colorScheme.primary,
+//                            thickness = 1.dp,
+//                            modifier = Modifier
+//                                .padding(vertical = 10.dp)
+//                        )
+//                        Text(
+//                            text = "atau",
+//                            textAlign = TextAlign.Center,
+//                            fontSize = 14.sp,
+//                            color = MaterialTheme.colorScheme.primary,
+//                            fontWeight = FontWeight.Medium,
+//                            modifier = Modifier
+//                                .background(color = MaterialTheme.colorScheme.background)
+//                                .padding(horizontal = 10.dp)
+//                        )
                     }
-                    CustomButton(
-                        text = "Lanjutkan dengan Google",
-                        isOutlined = true,
-                        borderWidth = 1.5.dp,
-                        textColor = MaterialTheme.colorScheme.onBackground,
-                        fontWeight = FontWeight.Normal,
-                        icon = painterResource(id = R.drawable.icon_google),
-                        modifier = Modifier.fillMaxWidth(),
-                        onClick = {
-                        })
+//                    CustomButton(
+//                        text = "Lanjutkan dengan Google",
+//                        isOutlined = true,
+//                        borderWidth = 1.5.dp,
+//                        textColor = MaterialTheme.colorScheme.onBackground,
+//                        fontWeight = FontWeight.Normal,
+//                        icon = painterResource(id = R.drawable.icon_google),
+//                        modifier = Modifier.fillMaxWidth(),
+//                        onClick = {
+//                        })
                 }
                 Row(
                     modifier = Modifier
@@ -347,14 +353,14 @@ fun LoginScreen(
                 ) {
                     Text(
                         text = stringResource(id = R.string.dont_have_acc),
-                        fontSize = 12.sp,
+                        fontSize = 14.sp,
                         fontWeight = FontWeight.Medium,
                         color = MaterialTheme.colorScheme.onBackground,
                         letterSpacing = (-0.15).sp
                     )
                     Text(
                         text = " " + stringResource(id = R.string.sign_up),
-                        fontSize = 12.sp,
+                        fontSize = 14.sp,
                         fontWeight = FontWeight.Bold,
                         color = MaterialTheme.colorScheme.onBackground,
                         letterSpacing = (-0.15).sp,

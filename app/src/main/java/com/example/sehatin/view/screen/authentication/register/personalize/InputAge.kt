@@ -137,7 +137,7 @@ fun InputAge(
                 Column(
                     verticalArrangement = Arrangement.spacedBy(18.dp),
                     modifier = Modifier
-                        .padding(top = 50.dp)
+                        .padding(top = 60.dp)
 
                 ) {
 

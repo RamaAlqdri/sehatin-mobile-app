@@ -23,6 +23,10 @@ import com.example.sehatin.view.screen.dashboard.diet.DietScreen
 import com.example.sehatin.view.screen.dashboard.home.DashboardScreen
 import com.example.sehatin.viewmodel.DashboardViewModel
 import com.example.sehatin.view.screen.dashboard.profile.ProfileScreen
+import com.example.sehatin.viewmodel.ConsultationViewModel
+import com.example.sehatin.viewmodel.DietViewModel
+import com.example.sehatin.viewmodel.LoginScreenViewModel
+import com.example.sehatin.viewmodel.PersonalizeViewModel
 
 fun <T> spatialExpressiveSpring() = spring<T>(
     dampingRatio = 0.8f,
@@ -82,9 +86,13 @@ fun NavGraphBuilder.composableWithCompositionLocal(
 
 fun NavGraphBuilder.addHomeGraph(
     dashboardViewModel: DashboardViewModel,
+    personalizeViewModel: PersonalizeViewModel,
+    dietViewModel: DietViewModel,
+    loginViewModel: LoginScreenViewModel,
+    consultationViewModel: ConsultationViewModel,
     onSnackSelected: (Long, String, NavBackStackEntry) -> Unit,
     modifier: Modifier = Modifier,
-    navigateToRoute: (String) -> Unit,
+    navigateToMain: (String,Boolean)-> Unit,
     navigateToRootRoute: (String) -> Unit // <--- Tambahkan ini
 ) {
     composable(HomeSections.Dashboard.route) { from ->
@@ -107,16 +115,26 @@ fun NavGraphBuilder.addHomeGraph(
     }
     composable(HomeSections.Consultation.route) { from ->
         ConsultationScreen(
-            modifier = modifier
+            modifier = modifier,
+            consultationViewModel = consultationViewModel,
         )
     }
     composable(HomeSections.Diet.route) { from ->
         DietScreen(
-
+            dietViewModel = dietViewModel,
+            navigateToDetail = { route -> // 👈 Tambahkan ini}
+                navigateToRootRoute(route) // 👈 Ini akan mengarah ke root NavController
+            },
         )
     }
     composable(HomeSections.Profile.route) {
         ProfileScreen(
+            loginViewModel = loginViewModel,
+            personalizeViewModel = personalizeViewModel,
+            navigateToRoute = { route -> // 👈 Tambahkan ini}
+                navigateToRootRoute(route) // 👈 Ini akan mengarah ke root NavController
+            },
+            navigateToMain = navigateToMain
 
         )
     }

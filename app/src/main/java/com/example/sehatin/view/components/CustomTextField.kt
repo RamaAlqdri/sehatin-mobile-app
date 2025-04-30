@@ -31,6 +31,8 @@ import androidx.compose.ui.graphics.SolidColor
 import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.TextStyle
+import androidx.compose.ui.text.font.Font
+import androidx.compose.ui.text.font.FontFamily
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.input.ImeAction
 import androidx.compose.ui.text.input.KeyboardType
@@ -68,7 +70,7 @@ fun CustomTextField(
     ) {
         Box(
             modifier = Modifier
-                .height(40.dp)
+                .height(54.dp)
                 .fillMaxWidth()
                 .border(
                     width = borderWidth,
@@ -81,7 +83,7 @@ fun CustomTextField(
             if (value.isEmpty()) {
                 Text(
                     text = placeholder,
-                    fontSize = 14.sp,
+                    fontSize = 16.sp,
                     fontWeight = FontWeight.Normal,
                     color = MaterialTheme.colorScheme.secondary,
                     modifier = Modifier.padding(start = 21.dp)
@@ -95,11 +97,12 @@ fun CustomTextField(
                         onChange(it)
                 },
                 singleLine = true,
-                textStyle = TextStyle(
-                    color = MaterialTheme.colorScheme.onBackground,
+                textStyle = MaterialTheme.typography.bodyMedium.copy(
                     fontWeight = FontWeight.Normal,
-                    fontSize = 14.sp,
+                    fontSize = 16.sp,
+                    color = MaterialTheme.colorScheme.onBackground,
                     textAlign = TextAlign.Start
+
                 ),
                 cursorBrush = SolidColor(MaterialTheme.colorScheme.primary),
                 keyboardOptions = KeyboardOptions(
@@ -158,7 +161,7 @@ fun CustomTextField(
                 color = MaterialTheme.colorScheme.error,
                 modifier = Modifier
                     .fillMaxWidth()
-                    .padding(horizontal = 20.dp),
+                    .padding(horizontal = 20.dp, vertical = 6.dp),
                 textAlign = TextAlign.Start
             )
         } else {
