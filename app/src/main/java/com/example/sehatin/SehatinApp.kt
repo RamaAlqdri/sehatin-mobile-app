@@ -82,6 +82,7 @@ import com.example.sehatin.view.screen.dashboard.detail.diet.FoodDetail
 import com.example.sehatin.view.screen.dashboard.detail.diet.FoodListDetail
 import com.example.sehatin.view.screen.dashboard.detail.diet.FoodRecomendationDetail
 import com.example.sehatin.view.screen.dashboard.detail.home.CaloriesDetail
+import com.example.sehatin.view.screen.dashboard.detail.home.Statistic
 import com.example.sehatin.view.screen.dashboard.detail.home.WaterDetail
 import com.example.sehatin.view.screen.dashboard.home.CheckScreen
 import com.example.sehatin.viewmodel.DashboardViewModel
@@ -342,6 +343,15 @@ fun SehatInApp() {
                     }
 
                     composableWithCompositionLocal(
+                        route = DetailDestinations.STATISTIC_DETAIL_ROUTE
+                    ) { backStackEntry ->
+                        Statistic(
+                            onBackClick = sehatInNavController::upPress,
+                            dashboardViewModel = dashboardViewModel
+                        )
+                    }
+
+                    composableWithCompositionLocal(
                         route = DetailDestinations.FOOD_RECOMENDATION_DETAIL_ROUTE
                     ) { backStackEntry ->
                         val scheduleId =
@@ -411,7 +421,9 @@ fun SehatInApp() {
                         FoodDetail(
                             foodId = foodId,
                             onBackClick = sehatInNavController::upPress,
-                            dashboardViewModel = dashboardViewModel
+                            dashboardViewModel = dashboardViewModel,
+                            dietViewModel = dietViewModel,
+                            navigateToRoute = sehatInNavController::navigateToBottomBarRoute,
                         )
                     }
 

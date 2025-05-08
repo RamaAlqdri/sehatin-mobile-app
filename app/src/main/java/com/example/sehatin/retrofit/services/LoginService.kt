@@ -16,6 +16,10 @@ interface LoginService {
     @POST("api/user/auth/login")
     suspend fun login(@Body request: LoginRequest): Response<LoginResponse>
 
+    @GET("api/user/auth/google/redirect")
+    suspend fun loginGoogle(): Response<LoginResponse>
+
+
     @GET("api/user/profile")
     suspend fun getUser(): Response<GetUserResponse>
 

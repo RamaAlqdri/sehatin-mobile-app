@@ -60,6 +60,7 @@ android {
 }
 
 dependencies {
+    implementation(libs.mpandroidchart)
     implementation(libs.androidx.core.ktx) //
     implementation(libs.androidx.lifecycle.runtime.ktx) //
     implementation(libs.androidx.activity.compose) //
@@ -78,11 +79,17 @@ dependencies {
     debugImplementation(libs.androidx.ui.test.manifest)
     implementation (libs.androidx.lifecycle.runtime.compose)
     implementation (libs.foundation)
-
+    implementation(libs.shimmer)
+    implementation(libs.google.auth)
+    implementation(libs.androidx.core)
     implementation(libs.androidx.lifecycle.viewmodel.compose)
     implementation(libs.androidx.navigation.compose)
     implementation(libs.ui.tooling)
     implementation(libs.androidx.animation)
+
+
+    implementation(libs.core.ktx)
+    implementation(libs.work.runtime.ktx)
 
     implementation(libs.androidx.core.splashscreen)
 
@@ -99,6 +106,8 @@ dependencies {
     implementation(libs.androidx.datastore.preferences)
     implementation(libs.androidx.datastore.preferences.rxjava2)
     implementation(libs.androidx.datastore.preferences.rxjava3)
+
+//    implementation(libs.kmp.date.time.picker)
 
     implementation(libs.retrofit)
     implementation(libs.converter.gson)

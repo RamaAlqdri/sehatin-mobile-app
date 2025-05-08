@@ -3,6 +3,7 @@ package com.example.sehatin.view.screen.dashboard.profile
 import android.util.Log
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
+import androidx.compose.foundation.border
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
@@ -192,6 +193,8 @@ private fun BodySection(
         R.drawable.update_data,
         R.drawable.lock,
         R.drawable.logout,
+        R.drawable.weight_icon,
+        R.drawable.height_icon,
     )
 
     Column(
@@ -212,8 +215,71 @@ private fun BodySection(
                 Row(
                     modifier = modifier
                         .fillMaxWidth()
+                        .border(
+                            width = 1.dp,
+                            color = MaterialTheme.colorScheme.primary.copy(alpha = 0.2f),
+                            shape = RoundedCornerShape(10.dp)
+                        )
                         .clip(RoundedCornerShape(10.dp))
-                        .background(Color(0xFFF3F3F3))
+//                        .background(Color(0xFFF3F3F3))
+                        .padding(vertical = 15.dp, horizontal = 15.dp)
+                        .clickable { navigateToRoute(DetailDestinations.UPDATE_HEIGHT_ROUTE) },
+                    verticalAlignment = Alignment.CenterVertically
+                ) {
+                    Icon(
+                        painter = painterResource(id = vectorImages[3]),
+                        contentDescription = null,
+                        tint = MaterialTheme.colorScheme.primary,
+                        modifier = Modifier.size(24.dp)
+                    )
+                    Spacer(modifier = Modifier.size(10.dp))
+                    Text(
+                        text = "Perbarui Berat Badan",
+                        fontWeight = FontWeight.Bold,
+                        fontSize = 14.sp,
+                        color = MaterialTheme.colorScheme.primary
+                    )
+                }
+                Spacer(modifier = Modifier.height(13.dp))
+                Row(
+                    modifier = modifier
+                        .fillMaxWidth()
+                        .border(
+                            width = 1.dp,
+                            color = MaterialTheme.colorScheme.primary.copy(alpha = 0.2f),
+                            shape = RoundedCornerShape(10.dp)
+                        )
+                        .clip(RoundedCornerShape(10.dp))
+//                        .background(Color(0xFFF3F3F3))
+                        .padding(vertical = 15.dp, horizontal = 15.dp)
+                        .clickable { navigateToRoute(DetailDestinations.UPDATE_HEIGHT_ROUTE) },
+                    verticalAlignment = Alignment.CenterVertically
+                ) {
+                    Icon(
+                        painter = painterResource(id = vectorImages[4]),
+                        contentDescription = null,
+                        tint = MaterialTheme.colorScheme.primary,
+                        modifier = Modifier.size(24.dp)
+                    )
+                    Spacer(modifier = Modifier.size(10.dp))
+                    Text(
+                        text = "Perbarui Tinggi Badan",
+                        fontWeight = FontWeight.Bold,
+                        fontSize = 14.sp,
+                        color = MaterialTheme.colorScheme.primary
+                    )
+                }
+                Spacer(modifier = Modifier.height(13.dp))
+                Row(
+                    modifier = modifier
+                        .fillMaxWidth()
+                        .border(
+                            width = 1.dp,
+                            color = MaterialTheme.colorScheme.primary.copy(alpha = 0.2f),
+                            shape = RoundedCornerShape(10.dp)
+                        )
+                        .clip(RoundedCornerShape(10.dp))
+//                        .background(Color(0xFFF3F3F3))
                         .padding(vertical = 15.dp, horizontal = 15.dp)
                         .clickable { navigateToRoute(DetailDestinations.UPDATE_HEIGHT_ROUTE) },
                     verticalAlignment = Alignment.CenterVertically
@@ -236,8 +302,13 @@ private fun BodySection(
                 Row(
                     modifier = modifier
                         .fillMaxWidth()
+                        .border(
+                            width = 1.dp,
+                            color = MaterialTheme.colorScheme.primary.copy(alpha = 0.2f),
+                            shape = RoundedCornerShape(10.dp)
+                        )
                         .clip(RoundedCornerShape(10.dp))
-                        .background(Color(0xFFF3F3F3))
+//                        .background(Color(0xFFF3F3F3))
                         .padding(vertical = 15.dp, horizontal = 15.dp)
                         .clickable { navigateToRoute(DetailDestinations.CHANGE_PASSWORD_AUTHED_ROUTE) },
                     verticalAlignment = Alignment.CenterVertically
@@ -260,8 +331,13 @@ private fun BodySection(
                 Row(
                     modifier = modifier
                         .fillMaxWidth()
+                        .border(
+                            width = 1.dp,
+                            color = MaterialTheme.colorScheme.error.copy(alpha = 0.2f),
+                            shape = RoundedCornerShape(10.dp)
+                        )
                         .clip(RoundedCornerShape(10.dp))
-                        .background(Color(0xFFF3F3F3))
+//                        .background(Color(0xFFF3F3F3))
                         .padding(vertical = 15.dp, horizontal = 15.dp)
                         .clickable {
                             loginViewModel.logout()

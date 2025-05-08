@@ -53,8 +53,8 @@ fun InputActivity(
 
 
     val options = listOf(
-        RadioOption(0, "Tidak banyak bergerak", "Sedikit atau tidak berolahraga", "male"),
-        RadioOption(1, "Aktif ringan", "berolahraga 1-3 hari per minggu", "female"),
+        RadioOption(0, "Tidak banyak bergerak", "Sedikit atau tidak berolahraga", "sedentary"),
+        RadioOption(1, "Aktif ringan", "berolahraga 1-3 hari per minggu", "light"),
         RadioOption(2, "Cukup aktif", "berolahraga 3-5 hari per minggu", "moderately"),
         RadioOption(3, "Sangat aktif", "berolahraga 6-7 hari per minggu", "heavy"),
     )

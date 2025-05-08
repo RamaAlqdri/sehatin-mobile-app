@@ -8,6 +8,7 @@ import androidx.datastore.preferences.core.edit
 import androidx.datastore.preferences.core.stringPreferencesKey
 import androidx.datastore.preferences.preferencesDataStore
 import com.example.sehatin.data.model.response.Detail
+import com.example.sehatin.data.model.response.ScheduleDataItem
 import com.google.gson.Gson
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.map
@@ -99,6 +100,28 @@ class DataStoreManager(private val context: Context) {
 
     }
 
+    suspend fun saveTodayScheduleList(schedule: List<ScheduleDataItem>) {
+        val json = Gson().toJson(schedule)
+        context.dataStore.edit { preferences ->
+            preferences[SCHEDULE_LIST_KEY] = json
+        }
+    }
+
+    suspend fun getTodayScheduleList(): List<ScheduleDataItem> {
+        val prefs = context.dataStore.data.first()
+        val json = prefs[SCHEDULE_LIST_KEY] ?: return emptyList()
+        return Gson().fromJson(json, Array<ScheduleDataItem>::class.java).toList()
+    }
+//    suspend fun getSavedSchedules(): List<ScheduleDataItem> {
+//        val json = context.dataStore.data.first()[stringPreferencesKey("today_schedule_list")]
+//        return if (json != null) {
+//            Gson().fromJson(json, Array<ScheduleDataItem>::class.java).toList()
+//        } else {
+//            emptyList()
+//        }
+//    }
+
+
 
     companion object {
         private val ONBOARDING_COMPLETED_KEY = booleanPreferencesKey("onboarding_completed")
@@ -106,5 +129,6 @@ class DataStoreManager(private val context: Context) {
         private val USER_TOKEN_KEY = stringPreferencesKey("user_token")
         private val USER_DATA_KEY = stringPreferencesKey("user_data")
         private val PERSONALIZED_KEY = booleanPreferencesKey("personalized_filled")
+        private val SCHEDULE_LIST_KEY = stringPreferencesKey("today_schedule_list")
     }
 }

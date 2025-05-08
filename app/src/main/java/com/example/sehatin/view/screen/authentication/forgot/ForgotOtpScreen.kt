@@ -21,6 +21,7 @@ import androidx.compose.foundation.layout.fillMaxHeight
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
+import androidx.compose.foundation.layout.imePadding
 import androidx.compose.foundation.layout.offset
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
@@ -59,6 +60,7 @@ import com.example.sehatin.navigation.MainDestinations
 import com.example.sehatin.view.components.BackgroundCurve
 import com.example.sehatin.view.components.CustomButton
 import com.example.sehatin.view.components.CustomTextField
+import com.example.sehatin.view.components.DynamicDialog
 import com.example.sehatin.viewmodel.LoginScreenViewModel
 import com.example.sehatin.viewmodel.OtpScreenViewModel
 import kotlinx.coroutines.delay
@@ -95,13 +97,24 @@ fun ForgotOtpScreen(
 
     var showInvalidOtpMessage by remember { mutableStateOf(false) }
 
+    var showDialog by remember { mutableStateOf(false) }
+    var dialogTitle by remember { mutableStateOf("") }
+    var dialogMessage by remember { mutableStateOf("") }
+    var isDialogError by remember { mutableStateOf(false) }
+    var isDialogSuccess by remember { mutableStateOf(false) }
+
     LaunchedEffect(forgotState) {
         when (forgotState) {
             is ResultResponse.Success -> {
                 showCircularProgress = false
-                Log.e(
-                    "OtpScreen",
-                    "Otp Sukses: ${(forgotState as ResultResponse.Success).data}"
+
+                showDialog = true
+                dialogTitle = "Berhasil"
+                dialogMessage = "Verifikasi OTP Berhasil"
+                isDialogSuccess = true
+                isDialogError = false
+                delay(
+                    2000L
                 )
                 navigateToRoute(MainDestinations.CHANGE_PASSWORD_ROUTE, true)
             }
@@ -112,10 +125,11 @@ fun ForgotOtpScreen(
 
             is ResultResponse.Error -> {
                 showCircularProgress = false
-                Log.e(
-                    "RegisterScreen",
-                    "Registration error: ${(forgotState as ResultResponse.Error).error}"
-                )
+                showDialog = true
+                dialogTitle = "Gagal"
+                dialogMessage = "Gagal Verifikasi OTP"
+                isDialogError = true
+                isDialogSuccess = false
 
                 showInvalidOtpMessage = true
                 // Display error message to the user
@@ -163,7 +177,7 @@ fun ForgotOtpScreen(
                 if (countdown > 0) {
                     append("$countdown")
                 } else {
-                    append("Resend")
+                    append("Kirim Ulang")
                 }
             }
         }
@@ -173,6 +187,7 @@ fun ForgotOtpScreen(
             modifier = Modifier
 //            .background(color = Color.Black)
                 .fillMaxSize()
+                .imePadding()
         ) {
             Column(
                 horizontalAlignment = Alignment.CenterHorizontally,
@@ -268,10 +283,10 @@ fun ForgotOtpScreen(
 //                Spacer(modifier = Modifier.height(8.dp))
                     Text(
                         text = stringResource(id = R.string.otp_desc),
-                        fontSize = 12.sp,
+                        fontSize = 16.sp,
                         fontWeight = FontWeight.Medium,
                         color = MaterialTheme.colorScheme.secondary,
-                        lineHeight = 20.sp,
+                        lineHeight = 24.sp,
                         textAlign = TextAlign.Center,
                         modifier = Modifier
                             .width(290.dp)
@@ -288,7 +303,7 @@ fun ForgotOtpScreen(
                         isError = false,
                         isPassword = true,
                         keyboardType = KeyboardType.NumberPassword,
-                        errorMessage = "Otp is invalid"
+                        errorMessage = "Kode Otp tidak valid"
                     )
 
                     Row(
@@ -306,7 +321,7 @@ fun ForgotOtpScreen(
                             color = MaterialTheme.colorScheme.onBackground
                         )
                         Text(
-                            text = if (countdown > 0) "$countdown" else "Resend",
+                            text = if (countdown > 0) "$countdown" else "Kirim Ulang",
                             fontSize = 12.sp,
                             fontWeight = FontWeight.Bold,
                             letterSpacing = (-0.15).sp,
@@ -361,6 +376,17 @@ fun ForgotOtpScreen(
                 }
 
             }
+        }
+        if (showDialog) {
+            DynamicDialog(
+                title = dialogTitle,
+                message = dialogMessage,
+                onDismiss = { showDialog = false },
+                isError = isDialogError,
+                isSuccess = isDialogSuccess,
+//                isWarning = isDialogWarning,
+//                dismissText = "Batal"
+            )
         }
         if (showCircularProgress) {
             Box(

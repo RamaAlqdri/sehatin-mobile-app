@@ -3,6 +3,7 @@ package com.example.sehatin.view.screen.dashboard.consultation
 import android.graphics.Rect
 import android.util.Log
 import android.view.ViewTreeObserver
+import androidx.compose.animation.animateContentSize
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.interaction.MutableInteractionSource
@@ -21,6 +22,7 @@ import androidx.compose.foundation.layout.widthIn
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.lazy.rememberLazyListState
+import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Icon
@@ -96,13 +98,13 @@ private fun ConsultationScreen(
     val isRefreshing by consultationViewModel.isRefreshing.collectAsStateWithLifecycle()
 
     val userMessages by consultationViewModel.userMessage.collectAsStateWithLifecycle()
+    val message by consultationViewModel.message.collectAsStateWithLifecycle()
+    val isBotTyping by consultationViewModel.isBotTyping.collectAsStateWithLifecycle()  // <-- Collect the typing state
 
 
-    Log.e("ConsultationScreen", "userMessages: $userMessages")
 
 //    val messages = remember { mutableStateListOf<MessageData>() }
 //    var textState by remember { mutableStateOf(TextFieldValue("")) }
-    val message by consultationViewModel.message.collectAsStateWithLifecycle()
 
     val coroutineScope = rememberCoroutineScope()
     val listState = rememberLazyListState()
@@ -124,16 +126,33 @@ private fun ConsultationScreen(
             consultationViewModel.refresh()
             delay(300) // kasih waktu agar data baru masuk
 
+//            coroutineScope.launch {
+//                listState.animateScrollToItem(userMessages?.data?.size?.minus(1) ?: 0)
+//            }
             coroutineScope.launch {
-                listState.animateScrollToItem(userMessages?.data?.size?.minus(1) ?: 0)
+                // Add check here to make sure the list is not empty
+                userMessages?.data?.let {
+                    if (it.isNotEmpty()) {
+                        listState.animateScrollToItem(it.size - 1)
+                    }
+                }
             }
         }
     }
 
     LaunchedEffect(userMessages?.data?.size) {
+//        coroutineScope.launch {
+//            delay(300)
+//            listState.animateScrollToItem(userMessages?.data?.size?.minus(1) ?: 0)
+//        }
         coroutineScope.launch {
             delay(300)
-            listState.animateScrollToItem(userMessages?.data?.size?.minus(1) ?: 0)
+            // Add check here to make sure the list is not empty
+            userMessages?.data?.let {
+                if (it.isNotEmpty()) {
+                    listState.animateScrollToItem(it.size - 1)
+                }
+            }
         }
     }
 
@@ -145,8 +164,16 @@ private fun ConsultationScreen(
             val keypadHeight = screenHeight - rect.bottom
             if (keypadHeight > screenHeight * 0.15) {
                 if (isLastItemVisible()) {
+//                    coroutineScope.launch {
+//                        listState.animateScrollToItem(userMessages?.data?.size?.minus(1) ?: 0)
+//                    }
                     coroutineScope.launch {
-                        listState.animateScrollToItem(userMessages?.data?.size?.minus(1) ?: 0)
+                        // Add check here to make sure the list is not empty
+                        userMessages?.data?.let {
+                            if (it.isNotEmpty()) {
+                                listState.animateScrollToItem(it.size - 1)
+                            }
+                        }
                     }
                 }
             }
@@ -217,7 +244,16 @@ private fun ConsultationScreen(
                         reverseLayout = false
                     ) {
                         items(userMessages?.data ?: emptyList()) { message ->
-                            ChatBubble(message)
+//                            ChatBubble(message)
+                            ChatBubble(message = message, isBotTyping = isBotTyping)
+                        }
+                        if (isBotTyping) {
+                            item {
+                                ChatBubble(message = MessageItem(sender = "bot", content = "",
+                                    id = "", createdAt = ""
+
+                                    ), isBotTyping = true)
+                            }
                         }
                     }
 
@@ -248,37 +284,54 @@ private fun ConsultationScreen(
 }
 
 @Composable
-fun ChatBubble(message: MessageItem) {
+fun ChatBubble(message: MessageItem, isBotTyping: Boolean = false) {
     Box(
         modifier = Modifier
             .fillMaxWidth()
             .padding(horizontal = 21.dp, vertical = 8.dp),
         contentAlignment = if (message.sender == "user") Alignment.CenterEnd else Alignment.CenterStart
     ) {
-        Text(
-            text = message.content,
-            fontSize = 14.sp,
-            color = if (message.sender == "user") Color.White else textColor,
-            modifier = Modifier
-                .widthIn(max = (0.8f * LocalConfiguration.current.screenWidthDp).dp)
-                .background(
-                    if (message.sender == "user") MaterialTheme.colorScheme.primary else Color.White,
-                    shape = if (message.sender == "user") RoundedCornerShape(
-                        topStart = 16.dp,
-                        topEnd = 0.dp,
-                        bottomStart = 16.dp,
-                        bottomEnd = 16.dp
-                    ) else RoundedCornerShape(
-                        topStart = 0.dp,
-                        topEnd = 16.dp,
-                        bottomStart = 16.dp,
-                        bottomEnd = 16.dp
+        if (isBotTyping) {
+            // Show a typing indicator when the bot is typing
+            Row(verticalAlignment = Alignment.CenterVertically) {
+                repeat(3) {
+                    Spacer(modifier = Modifier.width(4.dp))
+                    Box(
+                        modifier = Modifier
+                            .size(8.dp)
+                            .clip(CircleShape)
+                            .background(MaterialTheme.colorScheme.primary)
+                            .animateContentSize()
                     )
-                )
-                .padding(12.dp)
-        )
+                }
+            }
+        } else {
+            Text(
+                text = message.content,
+                fontSize = 14.sp,
+                color = if (message.sender == "user") Color.White else textColor,
+                modifier = Modifier
+                    .widthIn(max = (0.8f * LocalConfiguration.current.screenWidthDp).dp)
+                    .background(
+                        if (message.sender == "user") MaterialTheme.colorScheme.primary else Color.White,
+                        shape = if (message.sender == "user") RoundedCornerShape(
+                            topStart = 16.dp,
+                            topEnd = 0.dp,
+                            bottomStart = 16.dp,
+                            bottomEnd = 16.dp
+                        ) else RoundedCornerShape(
+                            topStart = 0.dp,
+                            topEnd = 16.dp,
+                            bottomStart = 16.dp,
+                            bottomEnd = 16.dp
+                        )
+                    )
+                    .padding(12.dp)
+            )
+        }
     }
 }
+
 
 @Composable
 fun ChatInputField(

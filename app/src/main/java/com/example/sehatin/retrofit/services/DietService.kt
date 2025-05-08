@@ -2,6 +2,9 @@ package com.example.sehatin.retrofit.services
 
 import com.example.sehatin.data.model.response.CreateWaterHistoryResponse
 import com.example.sehatin.data.model.response.DietResponse
+import com.example.sehatin.data.model.response.DietResponse.CreateFoodHistoryRequest
+import com.example.sehatin.data.model.response.DietResponse.CreateFoodHistoryResponse
+import com.example.sehatin.data.model.response.DietResponse.DeleteFoodHistoryRequest
 import com.example.sehatin.data.model.response.DietResponse.FoodFilterResponse
 import com.example.sehatin.data.model.response.DietResponse.FoodScheduleUpdate
 import com.example.sehatin.data.model.response.DietResponse.UpdateScheduleResponse
@@ -12,6 +15,7 @@ import com.example.sehatin.data.model.response.WaterADayResponse
 import com.example.sehatin.data.model.response.WaterHistoryRequest
 import retrofit2.Response
 import retrofit2.http.Body
+import retrofit2.http.DELETE
 import retrofit2.http.GET
 import retrofit2.http.POST
 import retrofit2.http.PUT
@@ -52,5 +56,30 @@ interface DietService {
     @GET("api/food/recommendation")
     suspend fun getFoodRecommendation(
     ): Response<FoodFilterResponse>
+
+    @POST("api/food/history")
+    suspend fun addFoodHistory(
+        @Body request: CreateFoodHistoryRequest
+    ): Response<CreateFoodHistoryResponse>
+
+    @DELETE("api/food/history")
+    suspend fun deleteFoodHistory(
+        @Query("food_id") food_id: String,
+        @Query("meal_type") meal_type: String,
+        @Query("date") date: String
+    ): Response<CreateFoodHistoryResponse>
+
+    @GET("api/food/history")
+    suspend fun getFoodHistory(
+        @Query("food_id") food_id: String,
+        @Query("meal_type") meal_type: String,
+        @Query("date") date: String
+    ): Response<DietResponse.FetchFoodHistoryResponse>
+
+    @GET("api/food/historys")
+    suspend fun getManyFoodHistory(
+        @Query("meal_type") meal_type: String,
+        @Query("date") date: String
+    ): Response<DietResponse.FetchManyFoodHistoryResponse>
 
 }

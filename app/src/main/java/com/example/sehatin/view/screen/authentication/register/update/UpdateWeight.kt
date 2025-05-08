@@ -135,7 +135,6 @@ fun UpdateWeight(
                         secondUnitMax = 440,
                         unitOptions = listOf(
                             Option(0, "kg"),
-                            Option(1, "lbs")
                         ),
                         onValueChanged = { value ->
                             selectedFloatValue = value

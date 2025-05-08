@@ -198,6 +198,8 @@ private fun ItemListSection(
             title = item.name,
             calories = item.calories,
             protein = item.protein,
+            serving_amount = item.serving_amount,
+            serving_unit = item.serving_unit,
             isTimeVisible = false,
             isBorderVisible = false,
             backgroundColor = Color(0xFFF3F3F3),

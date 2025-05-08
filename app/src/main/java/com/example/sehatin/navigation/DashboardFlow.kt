@@ -121,6 +121,7 @@ fun NavGraphBuilder.addHomeGraph(
     }
     composable(HomeSections.Diet.route) { from ->
         DietScreen(
+            dashboardViewModel = dashboardViewModel,
             dietViewModel = dietViewModel,
             navigateToDetail = { route -> // 👈 Tambahkan ini}
                 navigateToRootRoute(route) // 👈 Ini akan mengarah ke root NavController

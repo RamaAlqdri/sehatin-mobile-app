@@ -12,6 +12,7 @@ import androidx.navigation.compose.rememberNavController
 
 object MainDestinations {
     const val DASHBOARD_ROUTE = "dashboard"
+    const val DIET_ROUTE = "diet"
     const val ONBOARDING_ROUTE = "onboarding"
     const val WELCOME_ROUTE = "welcome"
     const val CHANGE_PASSWORD_ROUTE = "changePassword"
@@ -49,6 +50,7 @@ object DetailDestinations {
     const val UPDATE_WEIGHT_ROUTE = "updateWeight"
     const val UPDATE_ACTIVITY_ROUTE = "updateActivity"
     const val UPDATE_GOAL_ROUTE = "updateGoal"
+    const val STATISTIC_DETAIL_ROUTE = "statistic"
 
 
 

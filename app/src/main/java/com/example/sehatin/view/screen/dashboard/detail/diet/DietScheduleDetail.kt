@@ -124,7 +124,7 @@ private fun DietScheduleDetail(
                 ) {
 
                     CustomTopAppBar(
-                        title = "Jadwal Diet",
+                        title = "Kalender",
                         showNavigationIcon = true,
                         onBackClick = onBackClick
 
@@ -173,7 +173,7 @@ fun DailyScheduleSection(
             .padding(horizontal = 21.dp, vertical = 12.dp),
     ) {
         Text(
-            text = "Jadwal Harian",
+            text = "Saran Makanan",
             fontSize = 14.sp,
             fontWeight = FontWeight.Bold,
             color = Color.Black,

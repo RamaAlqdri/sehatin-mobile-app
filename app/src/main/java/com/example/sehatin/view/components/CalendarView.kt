@@ -113,7 +113,7 @@ fun CalendarView(
                     text = currentYearMonth.month.getDisplayName(TextStyle.FULL, Locale("id")),
                     fontSize = 18.sp,
                     fontWeight = FontWeight.Bold,
-                    color = Color(0xFF4CAF50)
+                    color = MaterialTheme.colorScheme.primary
                 )
             }
 
@@ -237,8 +237,8 @@ fun DateItem(
 ) {
     val backgroundColor = when {
         isSelected -> MaterialTheme.colorScheme.primary
-        isToday -> Color(0xFFFFEB3B)
-        else -> ter
+        isToday -> ter
+        else -> Color.White
     }
 
     val textColor =
@@ -252,6 +252,11 @@ fun DateItem(
             .padding(4.dp)
             .size(40.dp)
             .background(backgroundColor, shape = RoundedCornerShape(8.dp))
+            .border(
+                1.dp,
+                color = if (isSelected) Color.White else ter,
+                shape = RoundedCornerShape(8.dp)
+            )
             .clickable { onClick() },
         horizontalAlignment = Alignment.CenterHorizontally,
         verticalArrangement = Arrangement.Center
@@ -262,13 +267,13 @@ fun DateItem(
             fontWeight = FontWeight.Bold,
             color = textColor,
         )
-        if (isOtherMonth == false) {
-            Icon(
-                painter = painterResource(id = R.drawable.date_sep),
-                contentDescription = "Selected Date",
-                tint = if (isSelected) Color.White else MaterialTheme.colorScheme.primary,
-            )
-        }
+//        if (isOtherMonth == false) {
+//            Icon(
+//                painter = painterResource(id = R.drawable.date_sep),
+//                contentDescription = "Selected Date",
+//                tint = if (isSelected) Color.White else MaterialTheme.colorScheme.primary,
+//            )
+//        }
     }
 }
 

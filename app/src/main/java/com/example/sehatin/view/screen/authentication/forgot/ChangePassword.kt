@@ -11,6 +11,7 @@ import androidx.compose.runtime.getValue
 import androidx.compose.foundation.layout.fillMaxHeight
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.imePadding
 import androidx.compose.foundation.layout.offset
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
@@ -101,7 +102,7 @@ fun ChangePassword(
             horizontalAlignment = Alignment.CenterHorizontally,
             modifier = Modifier
 //            .background(color = Color.Black)
-                .fillMaxSize()
+                .fillMaxSize().imePadding()
         ) {
             Column(
                 horizontalAlignment = Alignment.CenterHorizontally,
@@ -216,7 +217,7 @@ fun ChangePassword(
                         onChange = loginScreenViewModel::setNewPassword,
                         isError = false,
                         isPassword = true,
-                        errorMessage = "Password is invalid"
+                        errorMessage = "Kata sandi tidak valid"
                     )
                     CustomTextField(
 
@@ -225,7 +226,7 @@ fun ChangePassword(
                         onChange = loginScreenViewModel::setConfirmPassword,
                         isError = false,
                         isPassword = true,
-                        errorMessage = "Password is invalid"
+                        errorMessage = "Kata sandi tidak valid"
                     )
 //                Row(
 //                    modifier = Modifier

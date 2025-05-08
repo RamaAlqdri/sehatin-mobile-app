@@ -13,6 +13,7 @@ import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxHeight
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.imePadding
 import androidx.compose.foundation.layout.offset
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
@@ -102,7 +103,7 @@ fun ChangePasswordAuth(
         }
     }
 
-    Box(modifier = modifier.fillMaxSize()) {
+    Box(modifier = modifier.fillMaxSize().imePadding()) {
 
         // ✅ Background dan ilustrasi di luar layout utama
         BackgroundCurve(containerHeight = 0.40f, curveHeightRatio = 0.75f)
@@ -220,7 +221,7 @@ fun ChangePasswordAuth(
                     onChange = loginViewModel::setOldPassword,
                     isError = false,
                     isPassword = true,
-                    errorMessage = "Password is invalid"
+                    errorMessage = "Kata sandi tidak valid"
                 )
 
                 CustomTextField(
@@ -229,7 +230,7 @@ fun ChangePasswordAuth(
                     onChange = loginViewModel::setNewPassword,
                     isError = false,
                     isPassword = true,
-                    errorMessage = "Password is invalid"
+                    errorMessage = "Kata sandi tidak valid"
                 )
 
                 CustomTextField(
@@ -238,7 +239,7 @@ fun ChangePasswordAuth(
                     onChange = loginViewModel::setConfirmPassword,
                     isError = false,
                     isPassword = true,
-                    errorMessage = "Password is invalid"
+                    errorMessage = "Kata sandi tidak valid"
                 )
 
                 CustomButton(

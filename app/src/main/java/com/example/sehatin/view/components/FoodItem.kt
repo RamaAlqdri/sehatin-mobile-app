@@ -33,6 +33,7 @@ import com.example.compose.ter
 import com.example.compose.waterGlass
 import com.example.sehatin.common.FoodItem
 import com.example.sehatin.R
+import com.example.sehatin.utils.capitalizeWords
 
 @Composable
 fun FoodItemCard(
@@ -40,6 +41,8 @@ fun FoodItemCard(
     imageUrl: String,
     title: String = "", time: String = "", calories: Double = 0.0,
     protein: Double = 0.0,
+    serving_amount: Double = 0.0,
+    serving_unit: String = "",
     isTimeVisible: Boolean = false,
     isBorderVisible: Boolean = false,
     isCompleted: Boolean = false,
@@ -48,7 +51,7 @@ fun FoodItemCard(
 ) {
     val textColor = if (isCompleted) Color(0xFF9B9CAC) else MaterialTheme.colorScheme.primary // Abu-abu medium
     val iconColor = if (isCompleted) Color(0xFF9B9CAC) else MaterialTheme.colorScheme.primary // Abu-abu terang
-    val borderColor = if (isBorderVisible) (if (isCompleted) Color(0xFF9B9CAC) else MaterialTheme.colorScheme.primary) else Color.Transparent
+    val borderColor = if (isBorderVisible) (if (isCompleted) Color(0xFF9B9CAC) else MaterialTheme.colorScheme.primary.copy(alpha = 0.3f)) else Color.Transparent
     val bgColor = if (isCompleted) Color(0xFFEF2F2F2) else backgroundColor // abu-abu background
 
     val grayscaleMatrix = ColorMatrix().apply { setToSaturation(0f) }
@@ -61,12 +64,20 @@ fun FoodItemCard(
         }
     }
 
+//    val weightValue = buildAnnotatedString {
+//        withStyle(style = SpanStyle(color = textColor, fontWeight = FontWeight.Bold)) {
+//            append("$protein")
+//        }
+//        withStyle(style = SpanStyle(color = textColor, fontWeight = FontWeight.Normal)) {
+//            append(" gram")
+//        }
+//    }
     val weightValue = buildAnnotatedString {
         withStyle(style = SpanStyle(color = textColor, fontWeight = FontWeight.Bold)) {
-            append("$protein")
+            append("${serving_amount.toInt()}")
         }
         withStyle(style = SpanStyle(color = textColor, fontWeight = FontWeight.Normal)) {
-            append(" gram")
+            append(" ${serving_unit.capitalizeWords()}")
         }
     }
 
@@ -140,7 +151,7 @@ fun FoodItemCard(
                     Spacer(modifier = Modifier.width(9.dp))
 
                     Icon(
-                        painter = painterResource(id = R.drawable.chicken),
+                        painter = painterResource(id = R.drawable.menu_icon),
                         contentDescription = "Weight",
                         tint = iconColor,
                         modifier = Modifier.size(12.dp)

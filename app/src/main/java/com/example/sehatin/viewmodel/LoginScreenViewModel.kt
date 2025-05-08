@@ -98,12 +98,12 @@ class LoginScreenViewModel(
         val confirmPassword = confirmPasswordValue.trim()
         return when {
             confirmPassword.isBlank() -> {
-                confirmPasswordError = "Please fill password field"
+                confirmPasswordError = "Tolong masukkan kata sandi"
                 false
             }
 
             confirmPassword != newPasswordValue -> {
-                confirmPasswordError = "Passwords do not match"
+                confirmPasswordError = "Kata sandi tidak cocok"
                 false
             }
 
@@ -136,22 +136,22 @@ class LoginScreenViewModel(
 
         return when {
             newPassword.isBlank() -> {
-                newPasswordError = "Please fill password field"
+                newPasswordError = "Tolong masukkan kata sandi"
                 false
             }
 
             newPassword.length < 6 -> {
-                newPasswordError = "Password must be at least 6 characters long"
+                newPasswordError = "Kata sandi minimal harus terdiri dari 6 karakter"
                 false
             }
 
             !containsLetter -> {
-                newPasswordError = "Password must contain at least one letter"
+                newPasswordError = "Kata sandi harus terdiri dari setidaknya satu huruf"
                 false
             }
 
             !containsDigit -> {
-                newPasswordError = "Password must contain at least one digit"
+                newPasswordError = "Kata sandi harus terdiri dari setidaknya satu digit"
                 false
             }
 
@@ -173,11 +173,11 @@ class LoginScreenViewModel(
                             _resetPasswordState.value = result
                         }
                 } catch (e: Exception) {
-                    _resetPasswordState.value = ResultResponse.Error("Reset password failed: ${e.message}")
+                    _resetPasswordState.value = ResultResponse.Error("Reset kata sandi gagal: ${e.message}")
                 }
             }
         } else {
-            _resetPasswordState.value = ResultResponse.Error("Please correct the errors above.")
+            _resetPasswordState.value = ResultResponse.Error("Harap perbaiki kesalahan di atas.")
         }
     }
 
@@ -191,11 +191,11 @@ class LoginScreenViewModel(
                             _changePasswordState.value = result
                         }
                 } catch (e: Exception) {
-                    _changePasswordState.value = ResultResponse.Error("Change password failed: ${e.message}")
+                    _changePasswordState.value = ResultResponse.Error("Ganti kata sandi gagal: ${e.message}")
                 }
             }
         } else {
-            _changePasswordState.value = ResultResponse.Error("Please correct the errors above.")
+            _changePasswordState.value = ResultResponse.Error("Harap perbaiki kesalahan di atas.")
         }
     }
 
@@ -211,11 +211,25 @@ class LoginScreenViewModel(
 
 //                    resetEmailAndPassword()
                 } catch (e: Exception) {
-                    _loginState.value = ResultResponse.Error("Registration failed: ${e.message}")
+                    _loginState.value = ResultResponse.Error("Pendaftaran gagal: ${e.message}")
                 }
             }
         } else {
-            _loginState.value = ResultResponse.Error("Please correct the errors above.")
+            _loginState.value = ResultResponse.Error("Harap perbaiki kesalahan di atas.")
+        }
+    }
+
+    fun loginGoogle() {
+        viewModelScope.launch {
+            try {
+                _loginState.value = ResultResponse.Loading
+                loginRepository.googleLogin()
+                    .collect { result ->
+                        _loginState.value = result
+                    }
+            } catch (e: Exception) {
+                _loginState.value = ResultResponse.Error("Login gagal: ${e.message}")
+            }
         }
     }
 
@@ -228,7 +242,7 @@ class LoginScreenViewModel(
                         _forgotState.value = result
                     }
             } catch (e: Exception) {
-                _loginState.value = ResultResponse.Error("Otp verification failed: ${e.message}")
+                _loginState.value = ResultResponse.Error("Verifikasi OTP gagal: ${e.message}")
             }
         }
     }
@@ -242,7 +256,7 @@ class LoginScreenViewModel(
                         _userState.value = result
                     }
             } catch (e: Exception) {
-                _userState.value = ResultResponse.Error("Failed to get user: ${e.message}")
+                _userState.value = ResultResponse.Error("Gagal mendapatkan pengguna: ${e.message}")
             }
         }
     }
@@ -264,10 +278,10 @@ class LoginScreenViewModel(
     private fun validateEmail(): Boolean {
         val email = emailValue.trim()
         return if (email.isBlank()) {
-            emailError = "Email is required"
+            emailError = "Email diperlukan"
             false
         } else if (!Patterns.EMAIL_ADDRESS.matcher(email).matches()) {
-            emailError = "Invalid email address"
+            emailError = "Alamat email tidak valid"
             false
         } else {
             emailError = ""
@@ -282,22 +296,22 @@ class LoginScreenViewModel(
 
         return when {
             password.isBlank() -> {
-                passwordError = "Please fill password field"
+                passwordError = "Harap isi kolom kata sandi"
                 false
             }
 
             password.length < 6 -> {
-                passwordError = "Password must be at least 6 characters long"
+                passwordError = "Kata sandi minimal harus terdiri dari 6 karakter"
                 false
             }
 
             !containsLetter -> {
-                passwordError = "Password must contain at least one letter"
+                passwordError = "Kata sandi harus terdiri dari setidaknya satu huruf"
                 false
             }
 
             !containsDigit -> {
-                passwordError = "Password must contain at least one digit"
+                passwordError = "Kata sandi harus terdiri dari setidaknya satu digit angka"
                 false
             }
 
@@ -363,7 +377,7 @@ class LoginScreenViewModel(
                         _reqOtpState.value = result
                     }
             } catch (e: Exception) {
-                _reqOtpState.value = ResultResponse.Error("Failed to generate OTP: ${e.message}")
+                _reqOtpState.value = ResultResponse.Error("Gagal mengirim OTP: ${e.message}")
             }
         }
     }
@@ -371,10 +385,10 @@ class LoginScreenViewModel(
     private fun validateOtp(): Boolean {
         val otp = otpValue.trim()
         return if (otp.isBlank()) {
-            otpError = "Otp is required"
+            otpError = "Diperlukan OTP"
             false
         } else if (otp.length != 6) {
-            otpError = "Invalid Otp"
+            otpError = "OTP tidak valid"
             false
         } else {
             otpError = ""

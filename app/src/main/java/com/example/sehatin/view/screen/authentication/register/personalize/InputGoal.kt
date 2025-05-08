@@ -107,9 +107,9 @@ fun InputGoal(
                     loginScreenViewModel.setPersonalizeCompleted()
                     navigateToRoute(MainDestinations.DASHBOARD_ROUTE, true)
                 }
-//                else {
-//                    navigateToRoute(MainDestinations.INPUT_NAME_ROUTE, true)
-//                }
+                else {
+                    navigateToRoute(MainDestinations.INPUT_NAME_ROUTE, true)
+                }
             }
             is ResultResponse.Loading -> {
                 showCircularProgress = true
@@ -121,6 +121,7 @@ fun InputGoal(
             else -> {}
         }
     }
+
 
 
 

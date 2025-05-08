@@ -3,12 +3,13 @@ package com.example.sehatin.view.screen.dashboard.detail.diet
 import SearchBar
 import android.util.Log
 import androidx.compose.foundation.background
+import androidx.compose.foundation.border
 import androidx.compose.foundation.clickable
-import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.foundation.interaction.MutableInteractionSource
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
@@ -36,8 +37,11 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.draw.shadow
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.graphics.graphicsLayer
+import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.platform.LocalFocusManager
 import androidx.compose.ui.res.painterResource
+import androidx.compose.ui.res.vectorResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
@@ -45,15 +49,11 @@ import androidx.compose.ui.unit.sp
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.example.compose.back
 import com.example.sehatin.R
-import com.example.sehatin.common.FakeData
-import com.example.sehatin.common.FoodItem
-import com.example.sehatin.common.ResultResponse
 import com.example.sehatin.navigation.DetailDestinations
 import com.example.sehatin.navigation.SehatInSurface
-import com.example.sehatin.view.components.CustomTopAppBar
+import com.example.sehatin.view.components.DropdownWithDialog
 import com.example.sehatin.view.components.FoodItemCard
 import com.example.sehatin.viewmodel.DietViewModel
-import kotlin.unaryMinus
 
 @Composable
 fun FoodListDetail(
@@ -109,6 +109,8 @@ private fun FoodListDetail(
 
     val foodData by dietViewModel.foodFilter.collectAsStateWithLifecycle()
 
+    val foodCategoryOptions = dietViewModel.foodCategoryOptions
+
 
 //    LaunchedEffect(foodFilterState) {
 //        if (foodFilterState is ResultResponse.Success) {
@@ -156,11 +158,64 @@ private fun FoodListDetail(
                         .background(back),
                     horizontalAlignment = Alignment.CenterHorizontally,
                 ) {
-                    CustomTopAppBar(
-                        title = "Daftar Makanan",
-                        showNavigationIcon = true,
-                        onBackClick = onBackClick // 👈 Ini penting!
-                    )
+//                    CustomTopAppBar(
+//                        title = "Daftar Makanan",
+//                        showNavigationIcon = true,
+//                        onBackClick = onBackClick // 👈 Ini penting!
+//                    )
+                    Row(
+                        modifier = Modifier
+                            .fillMaxWidth()
+                            .padding(horizontal = 21.dp), // Menambahkan sedikit padding agar lebih rapi
+                        horizontalArrangement = Arrangement.SpaceBetween, // Agar elemen-elemen berada di kiri dan kanan
+                        verticalAlignment = Alignment.CenterVertically
+                    ) {
+                        val categories = listOf("Sarapan", "Makan Siang", "Makan Malam", "Camilan/Lainnya")
+                        var selectedCategory by remember { mutableStateOf(categories.first()) } // Default value set to the first option
+
+                        // Box untuk tombol kembali
+                        Box(
+                            modifier = Modifier
+                                .size(40.dp)
+                                .shadow(
+                                    elevation = 2.5.dp,
+                                    shape = RoundedCornerShape(8.dp),
+                                )
+                                .background(
+                                    Color.White,
+                                    shape = RoundedCornerShape(8.dp)
+                                )
+                                .border(
+                                    1.dp,
+                                    color = Color.Unspecified,
+                                    shape = RoundedCornerShape(8.dp)
+                                )
+                                .clickable(
+                                    onClick = { onBackClick() },
+                                    indication = null,
+                                    interactionSource = remember { MutableInteractionSource() }
+                                ),
+                            contentAlignment = Alignment.Center
+                        ) {
+                            Icon(
+                                imageVector = ImageVector.vectorResource(id = R.drawable.back_arrow),
+                                contentDescription = null,
+                                tint = MaterialTheme.colorScheme.primary,
+                                modifier = Modifier
+                                    .size(20.dp)
+                                    .graphicsLayer(rotationZ = 180f) // Rotasi 180 derajat untuk tampilan arrow balik
+                            )
+                        }
+                        // Dropdown with dialog
+                        DropdownWithDialog(
+                            options = foodCategoryOptions,
+                            selectedOption = dietViewModel.selectedFoodOption,
+                            onOptionSelected = dietViewModel::setSelectedFoodOption
+
+                        )
+
+
+                    }
                     Spacer(modifier = Modifier.height(14.dp))
                     SearchBar(
                         query = foodName,
@@ -189,11 +244,13 @@ private fun FoodListDetail(
                                         title = item.name,
                                         calories = item.calories,
                                         protein = item.protein,
+                                        serving_amount = item.serving_amount,
+                                        serving_unit = item.serving_unit,
 
 
                                         isTimeVisible = false,
-                                        isBorderVisible = false,
-                                        backgroundColor = Color(0xFFF3F3F3),
+                                        isBorderVisible = true,
+//                                        backgroundColor = Color(0xFFF3F3F3),
                                         onClick = {
                                             Log.d("Debug", "Meal clicked: ${item.name}")
 //                            navigateToDetail(

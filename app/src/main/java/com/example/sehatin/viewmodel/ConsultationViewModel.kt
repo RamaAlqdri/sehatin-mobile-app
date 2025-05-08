@@ -32,6 +32,9 @@ class ConsultationViewModel(
 ) : ViewModel() {
 
 
+
+
+
     private val _message = MutableStateFlow(TextFieldValue(""))
     val message = _message.asStateFlow()
 
@@ -55,6 +58,10 @@ class ConsultationViewModel(
     private val _userMessage = MutableStateFlow<GetMessageResponse?>(null)
     val userMessage = _userMessage.asStateFlow()
 
+    private val _isBotTyping = MutableStateFlow(false)  // <-- New state for bot typing
+    val isBotTyping: StateFlow<Boolean> = _isBotTyping.asStateFlow()
+
+
     private val _isRefreshing = MutableStateFlow(false)
     val isRefreshing: StateFlow<Boolean> = _isRefreshing
 
@@ -77,9 +84,11 @@ class ConsultationViewModel(
         viewModelScope.launch {
             try {
                 _sendMessageState.value = ResultResponse.Loading
+                _isBotTyping.value = true  // Set bot typing indicator on
                 consultationRepository.sendMessage(message.value.text)
                     .collect { result ->
                         _sendMessageState.value = result
+                        _isBotTyping.value = false
                     }
             } catch (e: Exception) {
                 Log.e("ConsultationViewModel", "Error sending message: ${e.message}")

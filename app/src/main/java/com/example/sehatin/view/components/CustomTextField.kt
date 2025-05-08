@@ -1,15 +1,26 @@
 package com.example.sehatin.view.components
 
+import androidx.compose.animation.AnimatedVisibility
+import androidx.compose.animation.animateColorAsState
+import androidx.compose.animation.core.animateDpAsState
+import androidx.compose.animation.core.animateFloatAsState
+import androidx.compose.animation.core.tween
+import androidx.compose.animation.expandVertically
+import androidx.compose.animation.fadeIn
+import androidx.compose.animation.fadeOut
+import androidx.compose.animation.shrinkVertically
 import androidx.compose.foundation.background
 import androidx.compose.foundation.border
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.interaction.MutableInteractionSource
+import androidx.compose.foundation.interaction.collectIsFocusedAsState
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
+import androidx.compose.foundation.layout.offset
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.shape.RoundedCornerShape
@@ -45,8 +56,6 @@ import androidx.compose.ui.unit.sp
 import com.example.sehatin.R
 
 
-
-
 @Composable
 fun CustomTextField(
     value: String,
@@ -63,6 +72,35 @@ fun CustomTextField(
 ) {
     var showPassword by rememberSaveable { mutableStateOf(false) }
 
+
+
+// Floating placeholder
+//    val isFocusedOrFilled = value.isNotEmpty()
+
+
+//    val animatedBorderColor by animateColorAsState(
+//        targetValue = if (isError) MaterialTheme.colorScheme.error else MaterialTheme.colorScheme.primary,
+//        animationSpec = tween(durationMillis = 300)
+//    )
+
+//    val placeholderFontSize by animateFloatAsState(
+//        targetValue = if (isFocusedOrFilled) 12f else 16f,
+//        animationSpec = tween(durationMillis = 10)
+//    )
+
+//    val placeholderOffsetY by animateFloatAsState(
+//        targetValue = if (isFocusedOrFilled) (-14f) else 0f,
+//        animationSpec = tween(durationMillis = 50)
+//    )
+
+    val interactionSource = remember { MutableInteractionSource() }
+    val isFocused by interactionSource.collectIsFocusedAsState()
+
+    val animatedBorderWidth by animateDpAsState(
+        targetValue = if (isFocused) 2.dp else borderWidth,
+        animationSpec = tween(durationMillis = 100)
+    )
+
     Column(
         horizontalAlignment = Alignment.Start,
         modifier = Modifier
@@ -73,12 +111,13 @@ fun CustomTextField(
                 .height(54.dp)
                 .fillMaxWidth()
                 .border(
-                    width = borderWidth,
+                    width = animatedBorderWidth,
                     color = if (isError) MaterialTheme.colorScheme.error else MaterialTheme.colorScheme.primary,
+//                    color = animatedBorderColor,
                     shape = RoundedCornerShape(16.dp)
                 )
 //                .background(MaterialTheme.colorScheme.background, RoundedCornerShape(20.dp)),
-            ,contentAlignment = Alignment.CenterStart
+            , contentAlignment = Alignment.CenterStart
         ) {
             if (value.isEmpty()) {
                 Text(
@@ -86,12 +125,15 @@ fun CustomTextField(
                     fontSize = 16.sp,
                     fontWeight = FontWeight.Normal,
                     color = MaterialTheme.colorScheme.secondary,
-                    modifier = Modifier.padding(start = 21.dp)
+                    modifier = Modifier
+                        .padding(start = 21.dp)
+//                        .offset(y = placeholderOffsetY.dp)
                 )
             }
 
             BasicTextField(
                 value = value,
+                interactionSource = interactionSource,
                 onValueChange = {
                     if (!it.contains("\n"))
                         onChange(it)
@@ -155,15 +197,21 @@ fun CustomTextField(
         }
 
         if (isError) {
-            Text(
-                text = errorMessage,
-                style = MaterialTheme.typography.labelSmall,
-                color = MaterialTheme.colorScheme.error,
-                modifier = Modifier
-                    .fillMaxWidth()
-                    .padding(horizontal = 20.dp, vertical = 6.dp),
-                textAlign = TextAlign.Start
-            )
+            AnimatedVisibility(
+                visible = isError,
+                enter = fadeIn(tween(300)) + expandVertically(expandFrom = Alignment.Top, animationSpec = tween(300)),
+                exit = fadeOut(tween(200)) + shrinkVertically(shrinkTowards = Alignment.Top, animationSpec = tween(200))
+            ) {
+                Text(
+                    text = errorMessage,
+                    fontSize = 14.sp,
+                    color = MaterialTheme.colorScheme.error,
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .padding(horizontal = 20.dp, vertical = 6.dp),
+                    textAlign = TextAlign.Start
+                )
+            }
         } else {
             Spacer(modifier = Modifier.height(16.dp)) // Menambahkan spacer tetap saat tidak ada error
         }

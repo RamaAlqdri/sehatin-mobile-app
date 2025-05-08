@@ -2,6 +2,7 @@ package com.example.sehatin.view.components
 
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
+import androidx.compose.foundation.border
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
@@ -23,23 +24,30 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import coil.compose.AsyncImage
 import com.example.compose.sec
 import com.example.sehatin.R
+import com.example.sehatin.utils.capitalizeWords
 
 @Composable
 fun MealCard(
     imageUrl: String,
-    title: String, time: String, calories: Double,
+    title: String, time: String, calories: Double, serving_amount: Double, serving_unit: String,
     onClick: () -> Unit = {}
 ) {
     Row(
         modifier = Modifier
             .fillMaxWidth()
             .padding(vertical = 8.dp)
-            .background(color = sec, shape = RoundedCornerShape(16.dp))
+            .background(color = Color.Unspecified, shape = RoundedCornerShape(16.dp))
+            .border(
+                width = 1.dp,
+                color = MaterialTheme.colorScheme.primary.copy(alpha=0.3f),
+                shape = RoundedCornerShape(16.dp)
+            )
             .padding(16.dp)
             .clickable(
                 onClick =
@@ -65,7 +73,7 @@ fun MealCard(
         Spacer(modifier = Modifier.width(16.dp))
         Column {
             Text(
-                text = title,
+                text = title.capitalizeWords(),
                 color = MaterialTheme.colorScheme.primary,
                 fontWeight = FontWeight.Bold
             )
@@ -84,7 +92,7 @@ fun MealCard(
                     fontWeight = FontWeight.Bold,
                     fontSize = 12.sp
                 )
-                Spacer(modifier = Modifier.width(16.dp))
+                Spacer(modifier = Modifier.width(6.dp))
                 Icon(
                     painter = painterResource(id = R.drawable.calories), // Replace with your fire icon
                     contentDescription = "Calories",
@@ -98,6 +106,35 @@ fun MealCard(
                     fontWeight = FontWeight.Bold,
                     fontSize = 12.sp
                 )
+                Spacer(modifier = Modifier.width(6.dp))
+
+                Icon(
+                    painter = painterResource(id = R.drawable.menu_icon),
+                    contentDescription = "Serving",
+                    tint = MaterialTheme.colorScheme.primary,
+                    modifier = Modifier.size(12.dp)
+                )
+                Spacer(modifier = Modifier.width(4.dp))
+                Text(
+                    text = "${serving_amount.toInt()} ${serving_unit.capitalizeWords()}",
+//                    overflow = TextOverflow.,
+                    maxLines = 1,
+                    fontSize = 12.sp,
+                    color = MaterialTheme.colorScheme.primary
+                )
+//                Spacer(modifier = Modifier.width(4.dp))
+//                Text(
+//                    text = "$serving_amount ",
+//                    color = MaterialTheme.colorScheme.primary,
+//                    fontWeight = FontWeight.Bold,
+//                    fontSize = 12.sp
+//                )
+//                Text(
+//                    text = "$serving_unit",
+//                    color = MaterialTheme.colorScheme.primary,
+//                    fontWeight = FontWeight.Bold,
+//                    fontSize = 12.sp
+//                )
             }
         }
     }

@@ -1,5 +1,7 @@
 package com.example.sehatin.view.screen.authentication.login
 
+import android.content.Intent
+import android.net.Uri
 import android.util.Log
 import androidx.compose.animation.AnimatedVisibility
 import androidx.compose.animation.core.tween
@@ -7,6 +9,8 @@ import androidx.compose.animation.fadeIn
 import androidx.compose.animation.fadeOut
 import androidx.compose.animation.scaleIn
 import androidx.compose.animation.scaleOut
+import androidx.compose.animation.slideInVertically
+import androidx.compose.animation.slideOutVertically
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
@@ -20,6 +24,7 @@ import androidx.compose.foundation.layout.fillMaxHeight
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
+import androidx.compose.foundation.layout.imePadding
 import androidx.compose.foundation.layout.offset
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
@@ -39,6 +44,7 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.painter.Painter
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.platform.LocalFocusManager
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
@@ -48,6 +54,7 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.lifecycle.viewmodel.compose.viewModel
+import com.example.sehatin.BuildConfig
 import com.example.sehatin.R
 import com.example.sehatin.common.ResultResponse
 import com.example.sehatin.data.resource.Resource
@@ -57,6 +64,7 @@ import com.example.sehatin.navigation.MainDestinations
 import com.example.sehatin.view.components.BackgroundCurve
 import com.example.sehatin.view.components.CustomButton
 import com.example.sehatin.view.components.CustomTextField
+import com.example.sehatin.view.components.DynamicDialog
 import com.example.sehatin.viewmodel.LoginScreenViewModel
 import com.example.sehatin.viewmodel.OnBoardingViewModel
 import kotlinx.coroutines.delay
@@ -72,7 +80,6 @@ fun LoginScreen(
     navigateToRoute: (String, Boolean) -> Unit,
     loginViewModel: LoginScreenViewModel
 ) {
-
 
 
     val loginState by loginViewModel.loginState.collectAsStateWithLifecycle(initialValue = ResultResponse.None)
@@ -92,6 +99,20 @@ fun LoginScreen(
 
     var showInvalidMessage by remember { mutableStateOf(false) }
 
+
+//    var showDialog by remember { mutableStateOf(true) }
+//    var dialogTitle by remember { mutableStateOf("Login Berhasil") }
+//    var dialogMessage by remember { mutableStateOf("Anda Berhasil Melakukan Login Hoho hehe hehe aohieinfs") }
+//    var isDialogError by remember { mutableStateOf(true) }
+//    var isDialogSuccess by remember { mutableStateOf(false) }
+//    var isDialogWarning by remember { mutableStateOf(false) }
+
+    var showDialog by remember { mutableStateOf(false) }
+    var dialogTitle by remember { mutableStateOf("") }
+    var dialogMessage by remember { mutableStateOf("") }
+    var isDialogError by remember { mutableStateOf(false) }
+    var isDialogSuccess by remember { mutableStateOf(false) }
+
     LaunchedEffect(showInvalidMessage) {
         if (showInvalidMessage) {
             delay(5000L)
@@ -99,20 +120,21 @@ fun LoginScreen(
         }
     }
 
+    LaunchedEffect(Unit) {
+        loginViewModel.resetLoginState()
+        loginViewModel.resetUserState()
+//        loginViewModel.resetPersonalizeState()
+    }
+
     LaunchedEffect(loginState) {
         when (loginState) {
             is ResultResponse.Success -> {
-                Log.e(
-                    "LoginScreen",
-                    "Login successful: ${(loginState as ResultResponse.Success).data}"
-                )
-
-//                print("doksaodk")
-
                 loginViewModel.getUser()
-//                loginViewModel.resetEmailAndPassword()
-
-//                navigateToRoute("${MainDestinations.DASHBOARD_ROUTE}?", true)
+                showDialog = true
+                dialogTitle = "Berhasil"
+                dialogMessage = "Login berhasil, memuat data pengguna..."
+                isDialogSuccess = true
+                isDialogError = false
             }
 
             is ResultResponse.Loading -> {
@@ -121,11 +143,11 @@ fun LoginScreen(
 
             is ResultResponse.Error -> {
                 showCircularProgress = false
-                showInvalidMessage = true
-                Log.e(
-                    "LoginScreen",
-                    "Login error: ${(loginState as ResultResponse.Error).error}"
-                )
+                showDialog = true
+                dialogTitle = "Login Gagal"
+                dialogMessage = "Email atau kata sandi salah"
+                isDialogError = true
+                isDialogSuccess = false
             }
 
             else -> {}
@@ -169,6 +191,7 @@ fun LoginScreen(
             modifier = Modifier
 //            .background(color = Color.Black)
                 .fillMaxSize()
+                .imePadding()
                 .clickable(
                     onClick = {
                         focusManager.clearFocus()
@@ -301,7 +324,7 @@ fun LoginScreen(
                             .padding(top = 10.dp)
                             .fillMaxWidth()
                             .clickable {
-                                navigateToRoute(MainDestinations.FORGOT_PASSWORD_ROUTE, true)
+                                navigateToRoute(MainDestinations.FORGOT_PASSWORD_ROUTE, false)
                             },
                         fontSize = 14.sp,
                         fontWeight = FontWeight.Medium,
@@ -333,6 +356,8 @@ fun LoginScreen(
 //                                .padding(horizontal = 10.dp)
 //                        )
                     }
+//                    val context = LocalContext.current
+//
 //                    CustomButton(
 //                        text = "Lanjutkan dengan Google",
 //                        isOutlined = true,
@@ -342,6 +367,10 @@ fun LoginScreen(
 //                        icon = painterResource(id = R.drawable.icon_google),
 //                        modifier = Modifier.fillMaxWidth(),
 //                        onClick = {
+//                            val loginUrl = "${BuildConfig.BASE_URL}api/user/auth/google/login"
+//                            val intent = Intent(Intent.ACTION_VIEW, Uri.parse(loginUrl))
+//                            context.startActivity(intent)
+//
 //                        })
                 }
                 Row(
@@ -377,19 +406,45 @@ fun LoginScreen(
             } else {
                 AnimatedVisibility(
                     visible = showInvalidMessage,
-                    enter = fadeIn() + scaleIn(initialScale = 0.8f),
-                    exit = fadeOut(animationSpec = tween(durationMillis = 500)) + scaleOut(
-                        targetScale = 0.8f
+                    enter = slideInVertically(
+                        initialOffsetY = { fullHeight -> fullHeight / 4 },
+                        animationSpec = tween(durationMillis = 400)
+                    ) + fadeIn(animationSpec = tween(400)) + scaleIn(
+                        initialScale = 0.9f,
+                        animationSpec = tween(400)
+                    ),
+                    exit = slideOutVertically(
+                        targetOffsetY = { fullHeight -> fullHeight / 4 },
+                        animationSpec = tween(durationMillis = 400)
+                    ) + fadeOut(animationSpec = tween(400)) + scaleOut(
+                        targetScale = 0.9f,
+                        animationSpec = tween(400)
                     )
                 ) {
                     Text(
                         text = "Email atau Kata sandi salah!",
-                        color = Color.Red,
-                        fontSize = 16.sp,
-                        modifier = Modifier.padding(top = 10.dp)
+                        color = Color.White,
+                        fontSize = 14.sp,
+                        modifier = Modifier
+                            .padding(horizontal = 16.dp, vertical = 8.dp)
+                            .background(color = Color.Red.copy(alpha = 0.85f), shape = CircleShape)
+                            .padding(horizontal = 16.dp, vertical = 8.dp)
                     )
                 }
             }
+        }
+
+
+        if (showDialog) {
+            DynamicDialog(
+                title = dialogTitle,
+                message = dialogMessage,
+                onDismiss = { showDialog = false },
+                isError = isDialogError,
+                isSuccess = isDialogSuccess,
+//                isWarning = isDialogWarning,
+//                dismissText = "Batal"
+            )
         }
         if (showCircularProgress) {
             Box(

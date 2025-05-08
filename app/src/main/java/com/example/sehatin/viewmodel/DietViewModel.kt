@@ -1,6 +1,10 @@
 package com.example.sehatin.viewmodel
 
 import android.util.Log
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
+import androidx.compose.runtime.setValue
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.example.sehatin.common.ResultResponse
@@ -13,18 +17,90 @@ import com.example.sehatin.data.model.response.ScheduleClosestResponse
 import com.example.sehatin.data.model.response.WaterADayResponse
 import com.example.sehatin.data.repository.DietRepository
 import com.example.sehatin.utils.getTodayUtcDate
+import com.example.sehatin.view.screen.authentication.register.personalize.RadioOption
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.launch
 import java.time.LocalDateTime
+import androidx.compose.runtime.remember
+import com.example.sehatin.data.model.response.DietResponse.CreateFoodHistoryResponse
+import com.example.sehatin.data.model.response.DietResponse.FetchFoodHistoryResponse
+import com.example.sehatin.data.model.response.DietResponse.FetchManyFoodHistoryResponse
+import java.time.LocalDate
 import java.time.ZoneId
 import java.time.format.DateTimeFormatter
 import java.util.Date
 
+data class RadioOptionFoodCategory(val index: Int, val label: String, val type: String)
+
+
 class DietViewModel(
     private val dietRepository: DietRepository
 ) : ViewModel() {
+
+
+    val foodCategoryOptions = listOf(
+        RadioOptionFoodCategory(0, "Sarapan", "breakfast"),
+        RadioOptionFoodCategory(1, "Makan Siang", "lunch"),
+        RadioOptionFoodCategory(2, "Makan Malam", "dinner"),
+        RadioOptionFoodCategory(3, "Camilan/Lainnya", "other"),
+    )
+    private val _selectedFoodOption = MutableStateFlow(foodCategoryOptions[0])
+    val selectedFoodOption: StateFlow<RadioOptionFoodCategory> = _selectedFoodOption.asStateFlow()
+
+    fun setSelectedFoodOption(option: RadioOptionFoodCategory) {
+        _selectedFoodOption.value = option
+    }
+
+    private val _createFoodHistoryState =
+        MutableStateFlow<ResultResponse<CreateFoodHistoryResponse>>(ResultResponse.Loading)
+    val createFoodHistoryState: StateFlow<ResultResponse<CreateFoodHistoryResponse>> =
+        _createFoodHistoryState
+
+    fun resetCreateFoodHistoryState() {
+        _createFoodHistoryState.value = ResultResponse.None
+    }
+    fun resetDeleteFoodHistoryState() {
+        _deleteFoodHistoryState.value = ResultResponse.None
+    }
+    private val _deleteFoodHistoryState =
+        MutableStateFlow<ResultResponse<CreateFoodHistoryResponse>>(ResultResponse.Loading)
+    val deleteFoodHistoryState: StateFlow<ResultResponse<CreateFoodHistoryResponse>> =
+        _deleteFoodHistoryState
+
+    private val _foodHistoryState =
+        MutableStateFlow<ResultResponse<FetchFoodHistoryResponse>>(ResultResponse.None)
+    val foodHistoryState: StateFlow<ResultResponse<FetchFoodHistoryResponse>> =
+        _foodHistoryState
+
+    private val _foodHistory = MutableStateFlow<FetchFoodHistoryResponse?>(null)
+    val foodHistory = _foodHistory.asStateFlow()
+
+
+    private val _manyFoodHistoryState =
+        MutableStateFlow<ResultResponse<FetchManyFoodHistoryResponse>>(ResultResponse.None)
+    val manyFoodHistoryState: StateFlow<ResultResponse<FetchManyFoodHistoryResponse>> =
+        _manyFoodHistoryState
+
+    private val _breakfastFoodHistory = MutableStateFlow<FetchManyFoodHistoryResponse?>(null)
+    val breakfastFoodHistory = _breakfastFoodHistory.asStateFlow()
+
+    private val _lunchFoodHistory = MutableStateFlow<FetchManyFoodHistoryResponse?>(null)
+    val lunchFoodHistory = _lunchFoodHistory.asStateFlow()
+
+    private val _dinnerFoodHistory = MutableStateFlow<FetchManyFoodHistoryResponse?>(null)
+    val dinnerFoodHistory = _dinnerFoodHistory.asStateFlow()
+
+    private val _otherFoodHistory = MutableStateFlow<FetchManyFoodHistoryResponse?>(null)
+    val otherFoodHistory = _otherFoodHistory.asStateFlow()
+
+    private val _foodId = MutableStateFlow<String>("")
+    val foodId = _foodId.asStateFlow()
+
+    fun setFoodId(id: String) {
+        _foodId.value = id
+    }
 
     //    SEPARATOR
     private val _waterADayState =
@@ -72,7 +148,8 @@ class DietViewModel(
 
     private val _foodRecommendationState =
         MutableStateFlow<ResultResponse<FoodFilterResponse>>(ResultResponse.None)
-    val foodRecommendationState: StateFlow<ResultResponse<FoodFilterResponse>> = _foodRecommendationState
+    val foodRecommendationState: StateFlow<ResultResponse<FoodFilterResponse>> =
+        _foodRecommendationState
 
     private val _foodRecommendation = MutableStateFlow<FoodFilterResponse?>(null)
     val foodRecommendation = _foodRecommendation.asStateFlow()
@@ -125,6 +202,10 @@ class DietViewModel(
     private val foodRecommendationCacheValidityPeriod = 5 * 60 * 1000L
 
 
+    private var lastFoodHistoryFetchTime = 0L
+    private val foodHistoryCacheValidityPeriod = 5 * 60 * 1000L
+
+
     private val _foodName = MutableStateFlow<String>("")
     val foodName = _foodName.asStateFlow()
 
@@ -151,7 +232,7 @@ class DietViewModel(
                 getFoodFilter(forceRefresh = true)
             }
 
-            selectedDate.collect {date ->
+            selectedDate.collect { date ->
                 getScheduleDaily(forceRefresh = true)
 //                refresh()
             }
@@ -166,6 +247,10 @@ class DietViewModel(
         getScheduleClosest(forceRefresh = false)
         getFoodRecommendation(forceRefresh = false)
         getScheduleDaily(forceRefresh = false)
+        getBreakfastFoodHistory(forceRefresh = false)
+        getLunchFoodHistory(forceRefresh = false)
+        getDinnerFoodHistory(forceRefresh = false)
+        getOtherFoodHistory(forceRefresh = false)
 
     }
 
@@ -186,6 +271,254 @@ class DietViewModel(
         viewModelScope.launch {
             dietRepository.createWaterHistory(water).collect {
                 _createWaterState.value = it
+            }
+        }
+    }
+
+    fun createFoodHistory(
+        food_id: String,
+        serving_amount: Double
+    ) {
+        val today = LocalDate.now()
+        val zoneId = ZoneId.of("UTC+8")
+        val zonedDateTime = today.atTime(12, 0).atZone(zoneId)
+        val instant = zonedDateTime.toInstant()
+        val date = Date.from(instant)
+
+
+        viewModelScope.launch {
+            dietRepository.addFoodHistory(food_id, selectedFoodOption.value.type, serving_amount, date.toString())
+                .collect {
+                    _createFoodHistoryState.value = it
+                }
+        }
+    }
+
+    fun deleteFoodHistory(
+        food_id: String,
+    ) {
+        val today = LocalDate.now()
+        val zoneId = ZoneId.of("UTC+8")
+        val zonedDateTime = today.atTime(12, 0).atZone(zoneId)
+        val instant = zonedDateTime.toInstant()
+        val date = Date.from(instant)
+
+
+        viewModelScope.launch {
+            dietRepository.deleteFoodHistory(
+                food_id,
+                selectedFoodOption.value.type,
+                date.toString()
+            ).collect {
+                _deleteFoodHistoryState.value = it
+            }
+        }
+    }
+
+    fun getOneFoodHistory(foodId: String) {
+        viewModelScope.launch {
+            try {
+                val today = LocalDate.now()
+                val zoneId = ZoneId.of("UTC+8")
+                val zonedDateTime = today.atTime(12, 0).atZone(zoneId)
+                val instant = zonedDateTime.toInstant()
+                val date = Date.from(instant)
+
+
+                _foodHistoryState.value = ResultResponse.Loading
+
+                dietRepository.getOneFoodHistory(
+                    foodId.toString(), selectedFoodOption.value.type,
+                    date.toString()
+                )
+                    .collect { result ->
+                        _foodHistoryState.value = result
+                        if (result is ResultResponse.Success) {
+                            _foodHistory.value = result.data
+                        }
+                    }
+            } catch (e: Exception) {
+                _foodHistoryState.value =
+                    ResultResponse.Error(e.localizedMessage ?: "Network error")
+            }
+        }
+    }
+
+    private fun getBreakfastFoodHistory(forceRefresh: Boolean = false) {
+        viewModelScope.launch {
+            try {
+//                val zoneId = ZoneId.of("UTC+8")
+//                val currentDate = LocalDateTime.now(zoneId)
+//                val formatter = DateTimeFormatter.ISO_INSTANT
+//                val formattedDate = currentDate.atZone(zoneId).format(formatter)
+//                val date = Date.from(currentDate.atZone(zoneId).toInstant())
+
+                val today = LocalDate.now()
+                val zoneId = ZoneId.of("UTC+8")
+                val zonedDateTime = today.atTime(12, 0).atZone(zoneId)
+                val instant = zonedDateTime.toInstant()
+                val date = Date.from(instant)
+
+                val currentTime = System.currentTimeMillis()
+                val shouldRefresh = _manyFoodHistoryState.value is ResultResponse.None ||
+                        forceRefresh ||
+                        (currentTime - lastFoodHistoryFetchTime > foodHistoryCacheValidityPeriod)
+
+                if (shouldRefresh) {
+                    _manyFoodHistoryState.value = ResultResponse.Loading
+                    _isRefreshing.value = true
+
+                    dietRepository.getManyFoodHistory(
+                        foodCategoryOptions.get(0).type,
+                        date.toString()
+                    )
+                        .collect { result ->
+                            _manyFoodHistoryState.value = result
+                            if (result !is ResultResponse.Loading) {
+                                _isRefreshing.value = false
+                                if (result is ResultResponse.Success) {
+                                    _breakfastFoodHistory.value = result.data
+                                    lastScheduleFetchTime = System.currentTimeMillis()
+                                }
+                            }
+                        }
+                } else {
+                    _isRefreshing.value = false
+                }
+            } catch (e: Exception) {
+                _manyFoodHistoryState.value =
+                    ResultResponse.Error(e.localizedMessage ?: "Network error")
+                _isRefreshing.value = false
+            }
+        }
+    }
+
+    private fun getLunchFoodHistory(forceRefresh: Boolean = false) {
+        viewModelScope.launch {
+            try {
+                val today = LocalDate.now()
+                val zoneId = ZoneId.of("UTC+8")
+                val zonedDateTime = today.atTime(12, 0).atZone(zoneId)
+                val instant = zonedDateTime.toInstant()
+                val date = Date.from(instant)
+
+
+                val currentTime = System.currentTimeMillis()
+                val shouldRefresh = _manyFoodHistoryState.value is ResultResponse.None ||
+                        forceRefresh ||
+                        (currentTime - lastFoodHistoryFetchTime > foodHistoryCacheValidityPeriod)
+
+                if (shouldRefresh) {
+                    _manyFoodHistoryState.value = ResultResponse.Loading
+                    _isRefreshing.value = true
+
+                    dietRepository.getManyFoodHistory(
+                        foodCategoryOptions.get(1).type,
+                        date.toString()
+                    )
+                        .collect { result ->
+                            _manyFoodHistoryState.value = result
+                            if (result !is ResultResponse.Loading) {
+                                _isRefreshing.value = false
+                                if (result is ResultResponse.Success) {
+                                    _lunchFoodHistory.value = result.data
+                                    lastScheduleFetchTime = System.currentTimeMillis()
+                                }
+                            }
+                        }
+                } else {
+                    _isRefreshing.value = false
+                }
+            } catch (e: Exception) {
+                _manyFoodHistoryState.value =
+                    ResultResponse.Error(e.localizedMessage ?: "Network error")
+                _isRefreshing.value = false
+            }
+        }
+    }
+
+    private fun getDinnerFoodHistory(forceRefresh: Boolean = false) {
+        viewModelScope.launch {
+            try {
+                val today = LocalDate.now()
+                val zoneId = ZoneId.of("UTC+8")
+                val zonedDateTime = today.atTime(12, 0).atZone(zoneId)
+                val instant = zonedDateTime.toInstant()
+                val date = Date.from(instant)
+
+                val currentTime = System.currentTimeMillis()
+                val shouldRefresh = _manyFoodHistoryState.value is ResultResponse.None ||
+                        forceRefresh ||
+                        (currentTime - lastFoodHistoryFetchTime > foodHistoryCacheValidityPeriod)
+
+                if (shouldRefresh) {
+                    _manyFoodHistoryState.value = ResultResponse.Loading
+                    _isRefreshing.value = true
+
+                    dietRepository.getManyFoodHistory(
+                        foodCategoryOptions.get(2).type,
+                        date.toString()
+                    )
+                        .collect { result ->
+                            _manyFoodHistoryState.value = result
+                            if (result !is ResultResponse.Loading) {
+                                _isRefreshing.value = false
+                                if (result is ResultResponse.Success) {
+                                    _dinnerFoodHistory.value = result.data
+                                    lastScheduleFetchTime = System.currentTimeMillis()
+                                }
+                            }
+                        }
+                } else {
+                    _isRefreshing.value = false
+                }
+            } catch (e: Exception) {
+                _manyFoodHistoryState.value =
+                    ResultResponse.Error(e.localizedMessage ?: "Network error")
+                _isRefreshing.value = false
+            }
+        }
+    }
+
+    private fun getOtherFoodHistory(forceRefresh: Boolean = false) {
+        viewModelScope.launch {
+            try {
+                val today = LocalDate.now()
+                val zoneId = ZoneId.of("UTC+8")
+                val zonedDateTime = today.atTime(12, 0).atZone(zoneId)
+                val instant = zonedDateTime.toInstant()
+                val date = Date.from(instant)
+
+                val currentTime = System.currentTimeMillis()
+                val shouldRefresh = _manyFoodHistoryState.value is ResultResponse.None ||
+                        forceRefresh ||
+                        (currentTime - lastFoodHistoryFetchTime > foodHistoryCacheValidityPeriod)
+
+                if (shouldRefresh) {
+                    _manyFoodHistoryState.value = ResultResponse.Loading
+                    _isRefreshing.value = true
+
+                    dietRepository.getManyFoodHistory(
+                        foodCategoryOptions.get(3).type,
+                        date.toString()
+                    )
+                        .collect { result ->
+                            _manyFoodHistoryState.value = result
+                            if (result !is ResultResponse.Loading) {
+                                _isRefreshing.value = false
+                                if (result is ResultResponse.Success) {
+                                    _otherFoodHistory.value = result.data
+                                    lastScheduleFetchTime = System.currentTimeMillis()
+                                }
+                            }
+                        }
+                } else {
+                    _isRefreshing.value = false
+                }
+            } catch (e: Exception) {
+                _manyFoodHistoryState.value =
+                    ResultResponse.Error(e.localizedMessage ?: "Network error")
+                _isRefreshing.value = false
             }
         }
     }
@@ -213,7 +546,6 @@ class DietViewModel(
             }
         }
     }
-
 
 
     private fun getScheduleDaily(forceRefresh: Boolean = false) {
@@ -294,11 +626,11 @@ class DietViewModel(
     private fun getWaterADay(forceRefresh: Boolean = false) {
         viewModelScope.launch {
             try {
-                val currentDate = LocalDateTime.now()
-                val formatter = DateTimeFormatter.ISO_INSTANT
-//                val formattedDate = currentDate.format(formatter)
-                val date = Date.from(currentDate.atZone(ZoneId.of("UTC")).toInstant())
-
+                val today = LocalDate.now()
+                val zoneId = ZoneId.of("UTC+8")
+                val zonedDateTime = today.atTime(12, 0).atZone(zoneId)
+                val instant = zonedDateTime.toInstant()
+                val date = Date.from(instant)
 
                 val currentTime = System.currentTimeMillis()
                 val shouldRefresh = _waterADayState.value is ResultResponse.None ||
@@ -389,12 +721,11 @@ class DietViewModel(
     private fun getScheduleToday(forceRefresh: Boolean = false) {
         viewModelScope.launch {
             try {
+                val today = LocalDate.now()
                 val zoneId = ZoneId.of("UTC+8")
-                val currentDate = LocalDateTime.now(zoneId)
-                val formatter = DateTimeFormatter.ISO_INSTANT
-                val formattedDate = currentDate.atZone(zoneId).format(formatter)
-                val date = Date.from(currentDate.atZone(zoneId).toInstant())
-
+                val zonedDateTime = today.atTime(12, 0).atZone(zoneId)
+                val instant = zonedDateTime.toInstant()
+                val date = Date.from(instant)
 
                 val currentTime = System.currentTimeMillis()
                 val shouldRefresh = _scheduleTodayState.value is ResultResponse.None ||
@@ -430,11 +761,11 @@ class DietViewModel(
     private fun getScheduleClosest(forceRefresh: Boolean = false) {
         viewModelScope.launch {
             try {
+                val today = LocalDate.now()
                 val zoneId = ZoneId.of("UTC+8")
-                val currentDate = LocalDateTime.now(zoneId)
-                val formatter = DateTimeFormatter.ISO_INSTANT
-                val formattedDate = currentDate.atZone(zoneId).format(formatter)
-                val date = Date.from(currentDate.atZone(zoneId).toInstant())
+                val zonedDateTime = today.atTime(12, 0).atZone(zoneId)
+                val instant = zonedDateTime.toInstant()
+                val date = Date.from(instant)
 
                 val currentTime = System.currentTimeMillis()
                 val shouldRefresh = _scheduleClosestState.value is ResultResponse.None ||
@@ -480,6 +811,8 @@ class DietViewModel(
                 val formattedDate = tomorrowDate.atZone(zoneId).format(formatter)
                 val date = Date.from(tomorrowDate.atZone(zoneId).toInstant())
 
+
+
                 val currentTime = System.currentTimeMillis()
                 val shouldRefresh = _scheduleTomorrowState.value is ResultResponse.None ||
                         forceRefresh ||
@@ -520,6 +853,11 @@ class DietViewModel(
         getFoodFilter(forceRefresh = true)
         getFoodRecommendation(forceRefresh = true)
         getScheduleDaily(forceRefresh = true)
+
+        getBreakfastFoodHistory(forceRefresh = true)
+        getLunchFoodHistory(forceRefresh = true)
+        getDinnerFoodHistory(forceRefresh = true)
+        getOtherFoodHistory(forceRefresh = true)
 
 
     }

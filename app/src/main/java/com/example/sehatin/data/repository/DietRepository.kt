@@ -29,6 +29,121 @@ class DietRepository private constructor(
     private val dietService = ApiConfig.getDietService(context)
 
 
+
+    fun addFoodHistory(
+        food_id: String,
+        meal_type: String,
+        serving_amount: Double,
+        date: String,
+    ): Flow<ResultResponse<DietResponse.CreateFoodHistoryResponse>> = flow {
+        emit(ResultResponse.Loading)
+        try {
+            val response = dietService.addFoodHistory(
+                DietResponse.CreateFoodHistoryRequest(
+                    food_id,
+                    meal_type,
+                    serving_amount,
+                    date
+                )
+            )
+            if (response.isSuccessful) {
+                response.body()?.let {
+                    emit(ResultResponse.Success(it))
+                } ?: emit(ResultResponse.Error("Empty response body"))
+            } else {
+                emit(
+                    ResultResponse.Error(
+                        "Error: ${
+                            response.errorBody()?.string() ?: "Unknown error"
+                        }"
+                    )
+                )
+            }
+        } catch (e: Exception) {
+            emit(ResultResponse.Error(e.localizedMessage ?: "Network error"))
+        }
+    }.flowOn(Dispatchers.IO)
+
+    fun deleteFoodHistory(
+        food_id: String,
+        meal_type: String,
+        date: String
+    ): Flow<ResultResponse<DietResponse.CreateFoodHistoryResponse>> = flow {
+        emit(ResultResponse.Loading)
+        try {
+            val response = dietService.deleteFoodHistory(
+                food_id, meal_type, date
+            )
+            if (response.isSuccessful) {
+                response.body()?.let {
+                    emit(ResultResponse.Success(it))
+                } ?: emit(ResultResponse.Error("Empty response body"))
+            } else {
+                emit(
+                    ResultResponse.Error(
+                        "Error: ${
+                            response.errorBody()?.string() ?: "Unknown error"
+                        }"
+                    )
+                )
+            }
+        } catch (e: Exception) {
+            emit(ResultResponse.Error(e.localizedMessage ?: "Network error"))
+        }
+    }.flowOn(Dispatchers.IO)
+
+    fun getOneFoodHistory(
+        food_id: String,
+        meal_type: String,
+        date: String
+    ): Flow<ResultResponse<DietResponse.FetchFoodHistoryResponse>> = flow {
+        emit(ResultResponse.Loading)
+        try {
+            val response = dietService.getFoodHistory(food_id, meal_type, date)
+            if (response.isSuccessful) {
+                response.body()?.let {
+                    emit(ResultResponse.Success(it))
+                } ?: emit(ResultResponse.Error("Empty response body"))
+            } else {
+                emit(
+                    ResultResponse.Error(
+                        "Error: ${
+                            response.errorBody()?.string() ?: "Unknown error"
+                        }"
+                    )
+                )
+            }
+        } catch (e: Exception) {
+            emit(ResultResponse.Error(e.localizedMessage ?: "Network error"))
+        }
+    }.flowOn(Dispatchers.IO)
+
+    fun getManyFoodHistory(
+        meal_type: String,
+        date: String
+    ): Flow<ResultResponse<DietResponse.FetchManyFoodHistoryResponse>> = flow {
+        emit(ResultResponse.Loading)
+        try {
+            val response = dietService.getManyFoodHistory( meal_type, date)
+            if (response.isSuccessful) {
+                response.body()?.let {
+                    emit(ResultResponse.Success(it))
+                } ?: emit(ResultResponse.Error("Empty response body"))
+            } else {
+                emit(
+                    ResultResponse.Error(
+                        "Error: ${
+                            response.errorBody()?.string() ?: "Unknown error"
+                        }"
+                    )
+                )
+            }
+        } catch (e: Exception) {
+            emit(ResultResponse.Error(e.localizedMessage ?: "Network error"))
+        }
+    }.flowOn(Dispatchers.IO)
+
+
     fun setCompleteSchedule(
         scheduleId: String
     ): Flow<ResultResponse<UpdateScheduleResponse>> = flow {

@@ -27,8 +27,7 @@ fun CustomScrollInput(
     secondUnitMax: Int = 10,  // contoh range ft
     commaMax: Int = 99,       // contoh range bagian koma
     unitOptions: List<Option> = listOf(
-        Option(0, "cm"),
-        Option(1, "ft")
+        Option(0, "cm")
     ),
     // Callback untuk mengirim nilai Float yang sudah digabung
     onValueChanged: (Float) -> Unit

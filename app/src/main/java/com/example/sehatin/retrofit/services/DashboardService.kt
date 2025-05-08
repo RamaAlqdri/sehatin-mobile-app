@@ -5,6 +5,7 @@ import com.example.sehatin.data.model.response.CaloriesADayResponse
 import com.example.sehatin.data.model.response.CaloriesHistoryResponse
 import com.example.sehatin.data.model.response.CreateWaterHistoryResponse
 import com.example.sehatin.data.model.response.DietProgressResponse
+import com.example.sehatin.data.model.response.DietResponse
 import com.example.sehatin.data.model.response.FoodDetailResponse
 import com.example.sehatin.data.model.response.GetUserResponse
 import com.example.sehatin.data.model.response.LoginRequest
@@ -13,6 +14,7 @@ import com.example.sehatin.data.model.response.ScheduleADayResponse
 import com.example.sehatin.data.model.response.WaterADayResponse
 import com.example.sehatin.data.model.response.WaterHistoryRequest
 import com.example.sehatin.data.model.response.WaterHistoryResponse
+import com.example.sehatin.data.model.response.WeightResponse
 import retrofit2.Response
 import retrofit2.http.Body
 import retrofit2.http.GET
@@ -43,6 +45,19 @@ interface DashboardService {
 
     @GET("api/food/detail")
     suspend fun getFoodDetail(@Query("foodId") id: String): Response<FoodDetailResponse>
+
+    @GET("api/user/weight/history")
+    suspend fun getWeightHistory(): Response<WeightResponse>
+
+    @GET("api/food/history/summary")
+    suspend fun getSummary(
+        @Query("mode") mode: String,
+        @Query("date") date: String,
+        @Query("start_date") start_date: String? = null,
+        @Query("end_date") end_date: String? = null,
+
+    ): Response<DietResponse.FetchSummaryResponse>
+
 
 }
 

@@ -29,7 +29,7 @@ interface PersonalizeService {
     @PUT("api/user/height")
     suspend fun inputHeight(@Body height: HeightRequest): Response<PersonalizeResponse>
 
-    @PUT("api/user/weight")
+    @POST("api/user/weight")
     suspend fun inputWeight(@Body weight: WeightRequest): Response<PersonalizeResponse>
 
     @PUT("api/user/activity")

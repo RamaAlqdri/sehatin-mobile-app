@@ -133,8 +133,7 @@ fun InputWeight(
                         firstUnitMax = 220,
                         secondUnitMax = 440,
                         unitOptions = listOf(
-                            Option(0, "kg"),
-                            Option(1, "lbs")
+                            Option(0, "kg")
                         ),
                         onValueChanged = { value ->
                             selectedFloatValue = value

@@ -33,6 +33,24 @@ data class DietProgressResponse(
     @field:SerializedName("timestamp") val timestamp: String
 )
 
+data class WeightResponse(
+
+    @field:SerializedName("data") val data: List<WeightHistoryItem>,
+
+    @field:SerializedName("message") val message: String,
+
+    @field:SerializedName("statusCode") val statusCode: Int,
+
+    @field:SerializedName("timestamp") val timestamp: String
+)
+
+data class WeightHistoryItem(
+    @field:SerializedName("id") val id: String,
+    @field:SerializedName("weight") val weight: Double,
+    @field:SerializedName("createdAt") val createdAt: String,
+)
+
+
 data class CaloriesADayResponse(
 
     @field:SerializedName("data") val data: CaloriesItem,
@@ -76,7 +94,7 @@ data class CaloriesHistoryItem(
     @field:SerializedName("id") val id: String,
     @field:SerializedName("calories") val calories: Double,
     @field:SerializedName("createdAt") val createdAt: String,
-    )
+)
 
 data class WaterADayResponse(
 
@@ -99,6 +117,7 @@ data class ScheduleADayResponse(
 
     @field:SerializedName("timestamp") val timestamp: String
 )
+
 data class ScheduleClosestResponse(
     @field:SerializedName("data") val data: ScheduleDataItem,
 
@@ -159,12 +178,14 @@ data class FoodItem(
     @field:SerializedName("protein") val protein: Double,
 
     @field:SerializedName("fat") val fat: Double,
+    @field:SerializedName("serving_amount") val serving_amount: Double,
+    @field:SerializedName("serving_unit") val serving_unit: String,
 
     @field:SerializedName("carb") val carb: Double,
 
     @field:SerializedName("fiber") val fiber: Double,
 
-    @field:SerializedName("image") val image: String
+    @field:SerializedName("image") val image: String,
 )
 
 data class ProgressItem(
