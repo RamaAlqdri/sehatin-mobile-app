@@ -36,9 +36,9 @@ import com.example.sehatin.viewmodel.PersonalizeViewModel
 
 
 @Composable
-fun UpdateWeight(
+fun UpdateWeightOnly(
     modifier: Modifier = Modifier,
-    navigateToRoute: (String) -> Unit,
+    navigateToRoute: (String,Boolean) -> Unit,
     personalizeViewModel: PersonalizeViewModel
 ) {
     var selectedFloatValue by remember { mutableFloatStateOf(0f) }
@@ -53,7 +53,7 @@ fun UpdateWeight(
         when (selectionState) {
             is ResultResponse.Success -> {
                 showCircularProgress = false
-                navigateToRoute(DetailDestinations.UPDATE_ACTIVITY_ROUTE )
+                navigateToRoute(MainDestinations.DASHBOARD_ROUTE,true)
                 personalizeViewModel.setPersonalizeState(ResultResponse.None)
 
             }
@@ -95,15 +95,6 @@ fun UpdateWeight(
                 Column(
                     verticalArrangement = Arrangement.spacedBy(16.dp)
                 ) {
-                    Text(
-                        text = "2/4",
-                        textAlign = TextAlign.Center,
-                        fontSize = 20.sp,
-                        fontWeight = FontWeight.SemiBold,
-                        color = MaterialTheme.colorScheme.primary,
-                        modifier = Modifier
-                            .fillMaxWidth()
-                    )
                     Text(
                         text = "Perbarui berat badan Anda",
                         textAlign = TextAlign.Center,

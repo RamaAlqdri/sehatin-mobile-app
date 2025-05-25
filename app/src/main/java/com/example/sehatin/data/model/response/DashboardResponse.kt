@@ -190,6 +190,7 @@ data class FoodItem(
 
 data class ProgressItem(
     @field:SerializedName("persentase") val persentase: Double,
+    @field:SerializedName("target") val target: Double,
 
     @field:SerializedName("short_message") val short_message: String,
 

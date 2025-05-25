@@ -31,16 +31,16 @@ import com.example.sehatin.common.ResultResponse
 import com.example.sehatin.navigation.DetailDestinations
 import com.example.sehatin.navigation.MainDestinations
 import com.example.sehatin.view.components.CustomButton
-import com.example.sehatin.view.screen.authentication.register.personalize.Option
 import com.example.sehatin.viewmodel.PersonalizeViewModel
 
 
 @Composable
-fun UpdateWeight(
+fun UpdateHeightOnly(
     modifier: Modifier = Modifier,
-    navigateToRoute: (String) -> Unit,
-    personalizeViewModel: PersonalizeViewModel
+    navigateToRoute: (String, Boolean) -> Unit,
+    personalizeViewModel: PersonalizeViewModel,
 ) {
+
     var selectedFloatValue by remember { mutableFloatStateOf(0f) }
 
     var showCircularProgress by remember { mutableStateOf(false) }
@@ -53,9 +53,8 @@ fun UpdateWeight(
         when (selectionState) {
             is ResultResponse.Success -> {
                 showCircularProgress = false
-                navigateToRoute(DetailDestinations.UPDATE_ACTIVITY_ROUTE )
+                navigateToRoute(MainDestinations.DASHBOARD_ROUTE,true)
                 personalizeViewModel.setPersonalizeState(ResultResponse.None)
-
             }
 
             is ResultResponse.Loading -> {
@@ -63,7 +62,7 @@ fun UpdateWeight(
             }
 
             is ResultResponse.Error -> {
-                showCircularProgress = false
+          showCircularProgress = false
                 personalizeViewModel.setPersonalizeState(ResultResponse.None)
             }
 
@@ -72,9 +71,10 @@ fun UpdateWeight(
     }
 
     Box(
-        modifier = Modifier
-            .fillMaxSize()
+       modifier = Modifier
+           .fillMaxSize()
     ) {
+
         Column(
             horizontalAlignment = Alignment.CenterHorizontally,
             verticalArrangement = Arrangement.SpaceBetween,
@@ -95,17 +95,9 @@ fun UpdateWeight(
                 Column(
                     verticalArrangement = Arrangement.spacedBy(16.dp)
                 ) {
+
                     Text(
-                        text = "2/4",
-                        textAlign = TextAlign.Center,
-                        fontSize = 20.sp,
-                        fontWeight = FontWeight.SemiBold,
-                        color = MaterialTheme.colorScheme.primary,
-                        modifier = Modifier
-                            .fillMaxWidth()
-                    )
-                    Text(
-                        text = "Perbarui berat badan Anda",
+                        text = "Perbarui tinggi badan Anda",
                         textAlign = TextAlign.Center,
                         fontSize = 20.sp,
                         fontWeight = FontWeight.SemiBold,
@@ -114,7 +106,7 @@ fun UpdateWeight(
                             .fillMaxWidth()
                     )
                     Text(
-                        text = "Ini membantu kami menghitung BMI Anda dan merekomendasikan diet dan latihan yang dipersonalisasi",
+                        text = "Kami membutuhkan tinggi badan Anda untuk menghitung komposisi tubuh dan berat badan ideal Anda",
                         textAlign = TextAlign.Center,
                         fontSize = 16.sp,
                         fontWeight = FontWeight.Normal,
@@ -128,17 +120,13 @@ fun UpdateWeight(
                     verticalArrangement = Arrangement.spacedBy(18.dp),
                     modifier = Modifier
                         .padding(top = 100.dp)
+
                 ) {
 
                     CustomScrollInput(
-                        firstUnitMax = 220,
-                        secondUnitMax = 440,
-                        unitOptions = listOf(
-                            Option(0, "kg"),
-                        ),
                         onValueChanged = { value ->
                             selectedFloatValue = value
-                            personalizeViewModel.setWeight(selectedFloatValue)
+                            personalizeViewModel.setHeight(selectedFloatValue)
                             Log.e("Selected Value", selectedFloatValue.toString())
                         }
                     )
@@ -148,7 +136,7 @@ fun UpdateWeight(
             CustomButton(
                 text = "Selanjutnya",
                 onClick = {
-                    personalizeViewModel.inputWeight()
+                    personalizeViewModel.inputHeight()
                 },
                 modifier = Modifier
                     .padding(bottom = 65.dp)

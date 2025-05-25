@@ -56,6 +56,9 @@ data class Detail(
 	@field:SerializedName("height")
 	val height: String?,
 
+	@field:SerializedName("weight_target")
+	val weight_target: String?,
+
 	@field:SerializedName("bmi")
 	val bmi: String
 ) {

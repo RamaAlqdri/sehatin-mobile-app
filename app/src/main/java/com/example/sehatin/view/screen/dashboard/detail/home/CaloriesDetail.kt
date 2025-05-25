@@ -32,6 +32,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.draw.shadow
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.text.font.FontStyle
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
@@ -46,6 +47,7 @@ import com.example.sehatin.utils.convertToHoursAndMinutes
 import com.example.sehatin.view.components.CaloriesProgress
 import com.example.sehatin.view.components.CustomTopAppBar
 import com.example.sehatin.viewmodel.DashboardViewModel
+import com.valentinilk.shimmer.shimmer
 
 import network.chaintech.kmp_date_time_picker.utils.now
 import java.time.LocalDate
@@ -83,9 +85,11 @@ private fun CaloriesDetail(
     val isRefreshing by dashboardViewModel.isRefreshing.collectAsStateWithLifecycle()
 
 
+    val caloriesDailyState by dashboardViewModel.caloriesDailyState.collectAsStateWithLifecycle(
+        initialValue = ResultResponse.None
+    )
 
-    val caloriesDailyState by dashboardViewModel.caloriesDailyState.collectAsStateWithLifecycle(initialValue = ResultResponse.None)
-
+    val isLoading = caloriesDailyState is ResultResponse.Loading
 
     val caloriesDayData by dashboardViewModel.caloriesDaily.collectAsStateWithLifecycle(initialValue = null)
 
@@ -173,7 +177,7 @@ private fun CaloriesDetail(
                             )
                         }
 
-                        item{
+                        item {
                             Spacer(modifier = Modifier.height(16.dp))
                             CaloriesConsumptionHistory(
                                 dashboardViewModel = dashboardViewModel
@@ -194,23 +198,31 @@ fun CaloriesConsumptionHistory(
     dashboardViewModel: DashboardViewModel
 ) {
 
-    val caloriesHistoryState by dashboardViewModel.caloriesHistoryState.collectAsStateWithLifecycle(initialValue = ResultResponse.None)
-    val caloriesHistoryData by dashboardViewModel.caloriesHistory.collectAsStateWithLifecycle(initialValue = null)
+    val caloriesHistoryState by dashboardViewModel.caloriesHistoryState.collectAsStateWithLifecycle(
+        initialValue = ResultResponse.None
+    )
+    val isLoading = caloriesHistoryState is ResultResponse.Loading
+    val caloriesHistoryData by dashboardViewModel.caloriesHistory.collectAsStateWithLifecycle(
+        initialValue = null
+    )
 
     LaunchedEffect(caloriesHistoryState) {
         when (caloriesHistoryState) {
             is ResultResponse.Loading -> {
                 // tampilkan progress bar loading
             }
+
             is ResultResponse.Error -> {
                 // tampilkan error
 
                 Log.e("RESULT", "Error: ${(caloriesHistoryState as ResultResponse.Error).error}")
             }
+
             is ResultResponse.Success -> {
                 // tampilkan data jika sukses
                 Log.d("RESULT", "Success: ${(caloriesHistoryState as ResultResponse.Success).data}")
             }
+
             else -> {
                 // status default
             }
@@ -236,22 +248,69 @@ fun CaloriesConsumptionHistory(
 //        FakeData.CaloriesHistory.forEach { item ->
 //            CaloriesConsumptionRow(item)
 //        }
-
-        caloriesHistoryData?.data?.forEach { caloriesHistoryItem ->
-            CaloriesConsumptionRow(
-                item = CaloriesConsumptionItem(
-                    time = convertToHoursAndMinutes(caloriesHistoryItem.createdAt) ,
-                    amount = "${caloriesHistoryItem.calories} kcaL"
+        if (isLoading) {
+            // tampilkan progress bar loading
+            repeat(5) {
+                Row(
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .padding(bottom = 9.dp),
+                    verticalAlignment = Alignment.CenterVertically
+                ) {
+                    Box(
+                        modifier = Modifier
+                            .shimmer()
+                            .fillMaxWidth()
+                            .height(50.dp)
+                            .background(
+                                Color(0xFF3E7136).copy(alpha = 0.4f),
+                                shape = RoundedCornerShape(8.dp)
+                            )
+                            .padding(12.dp),
+                        contentAlignment = Alignment.Center
+                    ){}
+                }
+            }
+        } else {
+            // tampilkan data jika sukses
+            caloriesHistoryData?.data?.forEach { caloriesHistoryItem ->
+                CaloriesConsumptionRow(
+                    item = CaloriesConsumptionItem(
+                        time = convertToHoursAndMinutes(caloriesHistoryItem.createdAt),
+                        amount = "${caloriesHistoryItem.calories} kcaL"
+                    )
                 )
-            )
+            }
+            if(caloriesHistoryData?.data?.isEmpty() == true) {
+                Box(
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .height(100.dp)
+                        .padding(bottom = 9.dp),
+                    contentAlignment = Alignment.Center
+                ){
+
+                    Text(
+                        text = "Tidak ada data kalori",
+                        fontSize = 14.sp,
+                        fontStyle = FontStyle.Italic,
+                        fontWeight = FontWeight.Bold,
+                        color = Color.Gray,
+                        modifier = Modifier.padding(bottom = 8.dp)
+                    )
+                }
+            }
+
+
         }
+
 
     }
 }
 
 @Composable
 fun CaloriesConsumptionRow(
-    item : CaloriesConsumptionItem
+    item: CaloriesConsumptionItem
 ) {
     Row(
         modifier = Modifier

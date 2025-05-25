@@ -1,8 +1,11 @@
 package com.example.sehatin.utils
 
 import kotlinx.datetime.LocalDateTime
+import kotlinx.datetime.format
 import network.chaintech.kmp_date_time_picker.utils.now
 import java.text.SimpleDateFormat
+import java.time.Instant
+import java.time.ZoneId
 import java.time.ZoneOffset
 import java.time.ZonedDateTime
 import java.time.format.DateTimeFormatter
@@ -12,6 +15,25 @@ fun formatDateToISO8601(date: Date): String {
     val dateFormat = SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss.SSS'Z'")
     dateFormat.timeZone = TimeZone.getTimeZone("UTC")
     return dateFormat.format(date)
+}
+
+fun formatDatesToISO8601(date: Date): String {
+    val dateFormat = SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss.SSSXXX")
+    dateFormat.timeZone = TimeZone.getTimeZone("Asia/Makassar")
+    return dateFormat.format(date)
+}
+
+fun getCurrentTimeInMakassarISO8601(): String {
+    val zoneId = ZoneId.of("Asia/Makassar")
+    val zdt = ZonedDateTime.now(zoneId)
+    println("DEBUG ZONE: ${zdt.zone}")           // Harus: Asia/Makassar
+    println("DEBUG OFFSET: ${zdt.offset}")       // Harus: +08:00
+    return zdt.format(DateTimeFormatter.ISO_OFFSET_DATE_TIME)
+}
+fun getUtcTimeAdjustedToPlus8(): String {
+    val utcNow = Instant.now()
+    val zdt = utcNow.atZone(ZoneOffset.ofHours(8))
+    return zdt.format(DateTimeFormatter.ISO_OFFSET_DATE_TIME)
 }
 
 fun parseDate(dateString: String): Date? {
@@ -34,6 +56,23 @@ fun convertToHoursAndMinutes(utcTimestamp: String?): String {
         outputFormat.format(date) // Format to hours and minutes
     } catch (e: Exception) {
         "-" // Return fallback string if parsing fails
+    }
+}
+fun convertToHoursAndMinutesWater(utcTimestamp: String?): String {
+    if (utcTimestamp.isNullOrBlank()) return "-"
+
+    return try {
+        val inputFormat = SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss.SSS'Z'", Locale.US)
+        inputFormat.timeZone = TimeZone.getTimeZone("UTC") // Tetap di UTC
+
+        val date = inputFormat.parse(utcTimestamp) ?: return "-"
+
+        val outputFormat = SimpleDateFormat("HH:mm", Locale.US)
+        outputFormat.timeZone = TimeZone.getTimeZone("UTC") // Output juga tetap di UTC
+
+        outputFormat.format(date)
+    } catch (e: Exception) {
+        "-"
     }
 }
 

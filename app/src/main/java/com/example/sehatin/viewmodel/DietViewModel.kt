@@ -27,6 +27,7 @@ import androidx.compose.runtime.remember
 import com.example.sehatin.data.model.response.DietResponse.CreateFoodHistoryResponse
 import com.example.sehatin.data.model.response.DietResponse.FetchFoodHistoryResponse
 import com.example.sehatin.data.model.response.DietResponse.FetchManyFoodHistoryResponse
+import java.time.Instant
 import java.time.LocalDate
 import java.time.ZoneId
 import java.time.format.DateTimeFormatter
@@ -121,6 +122,12 @@ class DietViewModel(
     private val _createWaterState =
         MutableStateFlow<ResultResponse<CreateWaterHistoryResponse>>(ResultResponse.Loading)
     val createWaterState: StateFlow<ResultResponse<CreateWaterHistoryResponse>> = _createWaterState
+    private val _deleteLatestWaterState =
+        MutableStateFlow<ResultResponse<CreateWaterHistoryResponse>>(ResultResponse.Loading)
+    val deleteLatestWaterState: StateFlow<ResultResponse<CreateWaterHistoryResponse>> = _deleteLatestWaterState
+    private val _deleteWaterbyIdState =
+        MutableStateFlow<ResultResponse<CreateWaterHistoryResponse>>(ResultResponse.Loading)
+    val deleteWaterbyIdState: StateFlow<ResultResponse<CreateWaterHistoryResponse>> = _deleteWaterbyIdState
 
     private val _completedScheduleState =
         MutableStateFlow<ResultResponse<DietResponse.UpdateScheduleResponse>>(ResultResponse.None)
@@ -275,14 +282,35 @@ class DietViewModel(
         }
     }
 
+    fun deleteLatestWaterHistory() {
+        viewModelScope.launch {
+            dietRepository.deleteLatestWaterHistory().collect {
+                _deleteLatestWaterState.value = it
+            }
+        }
+    }
+    fun deleteWaterByIdHistory(id: String) {
+        viewModelScope.launch {
+            dietRepository.deleteWaterByIdHistory(id).collect {
+                _deleteWaterbyIdState.value = it
+            }
+        }
+    }
+
     fun createFoodHistory(
         food_id: String,
         serving_amount: Double
     ) {
-        val today = LocalDate.now()
-        val zoneId = ZoneId.of("UTC+8")
-        val zonedDateTime = today.atTime(12, 0).atZone(zoneId)
-        val instant = zonedDateTime.toInstant()
+//        val today = LocalDate.now()
+//        val zoneId = ZoneId.of("UTC+8")
+//        val zonedDateTime = today.atTime(12, 0).atZone(zoneId)
+//        val instant = zonedDateTime.toInstant()
+//        val date = Date.from(instant)
+
+
+        val localDateTime = LocalDateTime.now()
+        val zoneId = ZoneId.of("Asia/Makassar") // konsisten sejak awal
+        val instant = localDateTime.atZone(zoneId).toInstant()
         val date = Date.from(instant)
 
 
@@ -297,10 +325,10 @@ class DietViewModel(
     fun deleteFoodHistory(
         food_id: String,
     ) {
-        val today = LocalDate.now()
-        val zoneId = ZoneId.of("UTC+8")
-        val zonedDateTime = today.atTime(12, 0).atZone(zoneId)
-        val instant = zonedDateTime.toInstant()
+
+        val localDateTime = LocalDateTime.now()
+        val zoneId = ZoneId.of("Asia/Makassar") // konsisten sejak awal
+        val instant = localDateTime.atZone(zoneId).toInstant()
         val date = Date.from(instant)
 
 
@@ -318,10 +346,15 @@ class DietViewModel(
     fun getOneFoodHistory(foodId: String) {
         viewModelScope.launch {
             try {
-                val today = LocalDate.now()
-                val zoneId = ZoneId.of("UTC+8")
-                val zonedDateTime = today.atTime(12, 0).atZone(zoneId)
-                val instant = zonedDateTime.toInstant()
+//                val today = LocalDate.now()
+//                val zoneId = ZoneId.of("UTC+8")
+//                val zonedDateTime = today.atTime(12, 0).atZone(zoneId)
+//                val instant = zonedDateTime.toInstant()
+//                val date = Date.from(instant)
+
+                val localDateTime = LocalDateTime.now()
+                val zoneId = ZoneId.of("Asia/Makassar") // konsisten sejak awal
+                val instant = localDateTime.atZone(zoneId).toInstant()
                 val date = Date.from(instant)
 
 
@@ -353,10 +386,15 @@ class DietViewModel(
 //                val formattedDate = currentDate.atZone(zoneId).format(formatter)
 //                val date = Date.from(currentDate.atZone(zoneId).toInstant())
 
-                val today = LocalDate.now()
-                val zoneId = ZoneId.of("UTC+8")
-                val zonedDateTime = today.atTime(12, 0).atZone(zoneId)
-                val instant = zonedDateTime.toInstant()
+//                val today = LocalDate.now()
+//                val zoneId = ZoneId.of("UTC+8")
+//                val zonedDateTime = today.atTime(12, 0).atZone(zoneId)
+//                val instant = zonedDateTime.toInstant()
+//                val date = Date.from(instant)
+
+                val localDateTime = LocalDateTime.now()
+                val zoneId = ZoneId.of("Asia/Makassar") // konsisten sejak awal
+                val instant = localDateTime.atZone(zoneId).toInstant()
                 val date = Date.from(instant)
 
                 val currentTime = System.currentTimeMillis()
@@ -396,10 +434,16 @@ class DietViewModel(
     private fun getLunchFoodHistory(forceRefresh: Boolean = false) {
         viewModelScope.launch {
             try {
-                val today = LocalDate.now()
-                val zoneId = ZoneId.of("UTC+8")
-                val zonedDateTime = today.atTime(12, 0).atZone(zoneId)
-                val instant = zonedDateTime.toInstant()
+//                val today = LocalDate.now()
+//                val zoneId = ZoneId.of("UTC+8")
+//                val zonedDateTime = today.atTime(12, 0).atZone(zoneId)
+//                val instant = zonedDateTime.toInstant()
+//                val date = Date.from(instant)
+
+
+                val localDateTime = LocalDateTime.now()
+                val zoneId = ZoneId.of("Asia/Makassar") // konsisten sejak awal
+                val instant = localDateTime.atZone(zoneId).toInstant()
                 val date = Date.from(instant)
 
 
@@ -440,10 +484,16 @@ class DietViewModel(
     private fun getDinnerFoodHistory(forceRefresh: Boolean = false) {
         viewModelScope.launch {
             try {
-                val today = LocalDate.now()
-                val zoneId = ZoneId.of("UTC+8")
-                val zonedDateTime = today.atTime(12, 0).atZone(zoneId)
-                val instant = zonedDateTime.toInstant()
+//                val today = LocalDate.now()
+//                val zoneId = ZoneId.of("UTC+8")
+//                val zonedDateTime = today.atTime(12, 0).atZone(zoneId)
+//                val instant = zonedDateTime.toInstant()
+//                val date = Date.from(instant)
+
+
+                val localDateTime = LocalDateTime.now()
+                val zoneId = ZoneId.of("Asia/Makassar") // konsisten sejak awal
+                val instant = localDateTime.atZone(zoneId).toInstant()
                 val date = Date.from(instant)
 
                 val currentTime = System.currentTimeMillis()
@@ -483,10 +533,16 @@ class DietViewModel(
     private fun getOtherFoodHistory(forceRefresh: Boolean = false) {
         viewModelScope.launch {
             try {
-                val today = LocalDate.now()
-                val zoneId = ZoneId.of("UTC+8")
-                val zonedDateTime = today.atTime(12, 0).atZone(zoneId)
-                val instant = zonedDateTime.toInstant()
+//                val today = LocalDate.now()
+//                val zoneId = ZoneId.of("UTC+8")
+//                val zonedDateTime = today.atTime(12, 0).atZone(zoneId)
+//                val instant = zonedDateTime.toInstant()
+//                val date = Date.from(instant)
+
+
+                val localDateTime = LocalDateTime.now()
+                val zoneId = ZoneId.of("Asia/Makassar") // konsisten sejak awal
+                val instant = localDateTime.atZone(zoneId).toInstant()
                 val date = Date.from(instant)
 
                 val currentTime = System.currentTimeMillis()
@@ -525,6 +581,12 @@ class DietViewModel(
 
     fun resetCreateWaterState() {
         _createWaterState.value = ResultResponse.None
+    }
+    fun resetDeleteLatestWaterState() {
+        _deleteLatestWaterState.value = ResultResponse.None
+    }
+    fun resetDeleteWaterByIdState() {
+        _deleteWaterbyIdState.value = ResultResponse.None
     }
 
     fun resetUpdateFoodScheduleState() {
@@ -631,6 +693,8 @@ class DietViewModel(
                 val zonedDateTime = today.atTime(12, 0).atZone(zoneId)
                 val instant = zonedDateTime.toInstant()
                 val date = Date.from(instant)
+
+                Log.e("getWaterADay", "date: $date")
 
                 val currentTime = System.currentTimeMillis()
                 val shouldRefresh = _waterADayState.value is ResultResponse.None ||
@@ -761,10 +825,23 @@ class DietViewModel(
     private fun getScheduleClosest(forceRefresh: Boolean = false) {
         viewModelScope.launch {
             try {
-                val today = LocalDate.now()
-                val zoneId = ZoneId.of("UTC+8")
-                val zonedDateTime = today.atTime(12, 0).atZone(zoneId)
-                val instant = zonedDateTime.toInstant()
+//                val today = LocalDate.now()
+//                val zoneId = ZoneId.of("UTC+8")
+//                val zonedDateTime = today.atTime(12, 0).atZone(zoneId)
+//                val instant = zonedDateTime.toInstant()
+////                val instant = today
+//                val date = Date.from(instant)
+//                val date = Date.from(today)
+
+//                val today = LocalDate.now()
+//                val localDate = today.atTime(12, 0)
+////                val localDate = today.atStartOfDay()
+//                val instant = localDate.atZone(zoneId).toInstant()
+//                val date = Date.from(instant)
+
+                val localDateTime = LocalDateTime.now()
+                val zoneId = ZoneId.of("Asia/Makassar") // konsisten sejak awal
+                val instant = localDateTime.atZone(zoneId).toInstant()
                 val date = Date.from(instant)
 
                 val currentTime = System.currentTimeMillis()

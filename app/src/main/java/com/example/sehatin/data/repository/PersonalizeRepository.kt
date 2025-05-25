@@ -6,6 +6,7 @@ import com.example.sehatin.data.model.response.ActivityRequest
 import com.example.sehatin.data.model.response.BirthdayRequest
 import com.example.sehatin.data.model.response.Detail
 import com.example.sehatin.data.model.response.GenderRequest
+import com.example.sehatin.data.model.response.GetUserResponse
 import com.example.sehatin.data.model.response.GoalRequest
 import com.example.sehatin.data.model.response.HeightRequest
 import com.example.sehatin.data.model.response.NameRequest
@@ -142,6 +143,23 @@ class PersonalizeRepository private constructor(
 
         try {
             val response = personalizeService.inputGoal(GoalRequest(goal))
+            if (response.isSuccessful) {
+                response.body()?.let {
+                    emit(ResultResponse.Success(it))
+                } ?: emit(ResultResponse.Error("Failed to generate OTP, response body empty"))
+            } else {
+                emit(ResultResponse.Error("Error: ${response.errorBody()?.string() ?: "Unknown error"}"))
+            }
+        } catch (e: Exception) {
+            emit(ResultResponse.Error(e.localizedMessage ?: "Network error"))
+        }
+    }.flowOn(Dispatchers.IO)
+
+    fun getProfile(): Flow<ResultResponse<GetUserResponse>> = flow {
+        emit(ResultResponse.Loading)
+
+        try {
+            val response = personalizeService.getProfile()
             if (response.isSuccessful) {
                 response.body()?.let {
                     emit(ResultResponse.Success(it))

@@ -37,15 +37,24 @@ import com.example.compose.onPrimaryLight
 import com.example.compose.primaryDark
 import com.example.compose.primaryLight
 import android.util.Log
+import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.material3.Icon
+import androidx.compose.ui.res.painterResource
+import com.example.sehatin.R
+import com.valentinilk.shimmer.shimmer
+
 @Composable
 fun CircularProgressBar(
     percentage: Float, // Nilai progress dalam bentuk desimal (0f - 1f)
+    weightTarget: Float,
     modifier: Modifier = Modifier,
     size: Dp = 100.dp, // Ukuran lingkaran
     strokeWidth: Dp = 12.dp, // Ketebalan lingkaran
     backgroundColor: Color = Color.LightGray, // Warna background progress
     progressColor: Color = Color.White, // Warna progress
-    textColor: Color = Color.White // Warna teks
+    textColor: Color = Color.White // Warna teks,
+
 ) {
     Log.d("CircularProgressBar", "Percentage: $percentage")
     Box(
@@ -73,7 +82,7 @@ fun CircularProgressBar(
             drawArc(
                 color = progressColor,
                 startAngle = -90f,
-                sweepAngle = 360f * (percentage/100),
+                sweepAngle = 360f * (percentage / 100),
                 useCenter = false,
                 style = Stroke(width = strokeWidth.toPx(), cap = StrokeCap.Round),
                 size = Size(circleSize, circleSize),
@@ -85,12 +94,38 @@ fun CircularProgressBar(
         }
 
         // Teks di tengah progress bar
-        Text(
-            text = "${(percentage).toInt()}%",
-            style = MaterialTheme.typography.bodyLarge.copy(
-                color = textColor,
-                fontWeight = FontWeight.Bold
+        Column(
+            horizontalAlignment = Alignment.CenterHorizontally
+        ) {
+            Icon(
+                painter = painterResource(id = R.drawable.flag_target),
+                contentDescription = null,
+                modifier = Modifier
+                    .size(16.dp)
+//                    .padding(bottom = 2.dp),
+                , tint = textColor
             )
-        )
+
+            Row(
+                verticalAlignment = Alignment.Bottom
+            ) {
+
+                    Text(
+                        text = "${weightTarget.toInt()}",
+                        fontSize = 22.sp,
+                        fontWeight = FontWeight.SemiBold,
+                        color = textColor
+                    )
+                    Spacer(modifier = Modifier.width(4.dp))
+                    Text(
+                        text = "kg",
+                        fontSize = 22.sp,
+                        fontWeight = FontWeight.Light,
+                        color = textColor
+                    )
+
+            }
+        }
+
     }
 }

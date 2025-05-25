@@ -29,6 +29,12 @@ interface DietService {
     @POST("api/schedule/water")
     suspend fun postWaterHistory(@Body request: WaterHistoryRequest): Response<CreateWaterHistoryResponse>
 
+    @DELETE("api/schedule/water")
+    suspend fun deleteLatestWaterHistory(): Response<CreateWaterHistoryResponse>
+
+    @DELETE("api/schedule/water/id")
+    suspend fun deleteWaterByIdHistory(@Query("waterId") id:String): Response<CreateWaterHistoryResponse>
+
     @GET("api/food/detail")
     suspend fun getFoodDetail(@Query("foodId") id: String): Response<FoodDetailResponse>
 

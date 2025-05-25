@@ -129,12 +129,14 @@ fun LoginScreen(
     LaunchedEffect(loginState) {
         when (loginState) {
             is ResultResponse.Success -> {
-                loginViewModel.getUser()
+                showCircularProgress = false
                 showDialog = true
                 dialogTitle = "Berhasil"
                 dialogMessage = "Login berhasil, memuat data pengguna..."
                 isDialogSuccess = true
                 isDialogError = false
+                delay(2000L)
+                loginViewModel.getUser()
             }
 
             is ResultResponse.Loading -> {

@@ -8,6 +8,7 @@ import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.imePadding
 import androidx.compose.foundation.layout.padding
 import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.MaterialTheme
@@ -36,6 +37,7 @@ import com.example.sehatin.common.ResultResponse
 import com.example.sehatin.navigation.MainDestinations
 import com.example.sehatin.view.components.CustomGenderRadioButton
 import com.example.sehatin.view.components.CustomRadioButton
+import com.example.sehatin.view.components.DynamicDialog
 import com.example.sehatin.viewmodel.LoginScreenViewModel
 import com.example.sehatin.viewmodel.PersonalizeViewModel
 
@@ -74,14 +76,30 @@ fun InputGoal(
 
     val userState by loginScreenViewModel.userState.collectAsStateWithLifecycle(initialValue = ResultResponse.None)
 
-    val personalizeState by loginScreenViewModel.isPersonalizeFilled()
-        .collectAsStateWithLifecycle(initialValue = false)
+//    val personalizeState by loginScreenViewModel.isPersonalizeFilled()
+//        .collectAsStateWithLifecycle(initialValue = false)
+
+    val personalizeState by personalizeViewModel.personalizeState.collectAsStateWithLifecycle(
+        initialValue = ResultResponse.None
+    )
+    var shouldCheckUserState by remember { mutableStateOf(false) }
+    var showDialog by remember { mutableStateOf(false) }
+    var dialogTitle by remember { mutableStateOf("") }
+    var dialogMessage by remember { mutableStateOf("") }
+    var isDialogError by remember { mutableStateOf(false) }
+    var isDialogSuccess by remember { mutableStateOf(false) }
 
     LaunchedEffect(selectionState) {
         when (selectionState) {
             is ResultResponse.Success -> {
-                showCircularProgress = true
+                showCircularProgress = false
                 loginScreenViewModel.getUser()
+                showDialog = true
+                dialogTitle = "Berhasil"
+                dialogMessage = "Pendaftaran berhasil..."
+                isDialogSuccess = true
+                isDialogError = false
+
             }
 
             is ResultResponse.Loading -> {
@@ -90,26 +108,34 @@ fun InputGoal(
 
             is ResultResponse.Error -> {
                 showCircularProgress = false
+                showDialog = true
+                dialogTitle = "Gagal"
+                dialogMessage = "Pendaftaran gagal"
+                isDialogError = true
+                isDialogSuccess = false
             }
 
             else -> {}
         }
     }
 
-    LaunchedEffect(userState) {
-        when (userState) {
+    LaunchedEffect(personalizeState) {
+        when (personalizeState) {
             is ResultResponse.Success -> {
+                loginScreenViewModel.getUser()
                 showCircularProgress = false
-                val detail = (userState as ResultResponse.Success).data.data
-                Log.e("GoalScreen", "User detail: $detail")
-                // Cek langsung pada detail yang diterima
-                if (detail.isProfileComplete()) {
-                    loginScreenViewModel.setPersonalizeCompleted()
-                    navigateToRoute(MainDestinations.DASHBOARD_ROUTE, true)
-                }
-                else {
-                    navigateToRoute(MainDestinations.INPUT_NAME_ROUTE, true)
-                }
+                shouldCheckUserState = true
+
+//                val detail = (userState as ResultResponse.Success).data.data
+//                Log.e("GoalScreen", "User detail: $detail")
+//                // Cek langsung pada detail yang diterima
+//                if (detail.isProfileComplete()) {
+//                    loginScreenViewModel.setPersonalizeCompleted()
+//                    navigateToRoute(MainDestinations.DASHBOARD_ROUTE, true)
+//                }
+//                else {
+//                    navigateToRoute(MainDestinations.INPUT_NAME_ROUTE, true)
+//                }
             }
             is ResultResponse.Loading -> {
                 showCircularProgress = true
@@ -119,6 +145,20 @@ fun InputGoal(
                 Log.e("LoginScreen", "Get user error: ${(userState as ResultResponse.Error).error}")
             }
             else -> {}
+        }
+    }
+
+    LaunchedEffect(userState, shouldCheckUserState) {
+        if (shouldCheckUserState && userState is ResultResponse.Success) {
+            val detail = (userState as ResultResponse.Success).data.data
+            Log.e("GoalScreen", "User detail updated: $detail")
+            if (detail.isProfileComplete()) {
+                loginScreenViewModel.setPersonalizeCompleted()
+                navigateToRoute(MainDestinations.DASHBOARD_ROUTE, true)
+            } else {
+                navigateToRoute(MainDestinations.INPUT_NAME_ROUTE, true)
+            }
+            shouldCheckUserState = false // reset biar tidak ter-trigger ulang
         }
     }
 
@@ -135,6 +175,7 @@ fun InputGoal(
             modifier = Modifier
 //            .background(color = Color.Black)
                 .fillMaxSize()
+                .imePadding()
         ) {
             Column(
                 verticalArrangement = Arrangement.Bottom,
@@ -210,6 +251,17 @@ fun InputGoal(
                 modifier = Modifier
                     .padding(bottom = 65.dp)
 
+            )
+        }
+        if (showDialog) {
+            DynamicDialog(
+                title = dialogTitle,
+                message = dialogMessage,
+                onDismiss = { showDialog = false },
+                isError = isDialogError,
+                isSuccess = isDialogSuccess,
+//                isWarning = isDialogWarning,
+//                dismissText = "Batal"
             )
         }
         if (showCircularProgress) {

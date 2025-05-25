@@ -123,7 +123,7 @@ fun UpdateActivity(
                             .fillMaxWidth()
                     )
                     Text(
-                        text = "Seberapa aktif Anda?",
+                        text = "Perbarui keaktifan Anda",
                         textAlign = TextAlign.Center,
                         fontSize = 20.sp,
                         fontWeight = FontWeight.SemiBold,

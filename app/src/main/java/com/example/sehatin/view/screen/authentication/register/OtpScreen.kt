@@ -21,6 +21,7 @@ import androidx.compose.foundation.layout.fillMaxHeight
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
+import androidx.compose.foundation.layout.imePadding
 import androidx.compose.foundation.layout.offset
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
@@ -65,6 +66,7 @@ import com.example.sehatin.navigation.MainDestinations
 import com.example.sehatin.view.components.BackgroundCurve
 import com.example.sehatin.view.components.CustomButton
 import com.example.sehatin.view.components.CustomTextField
+import com.example.sehatin.view.components.DynamicDialog
 import com.example.sehatin.viewmodel.OtpScreenViewModel
 import kotlinx.coroutines.delay
 
@@ -88,6 +90,7 @@ fun OtpScreen(
     Log.e("OtpScreen", "data ${otpViewModel.otpData}")
 
     val otpState by otpViewModel.verifyOtpState.collectAsStateWithLifecycle(initialValue = ResultResponse.None)
+    val reqotpState by otpViewModel.otpState.collectAsStateWithLifecycle(initialValue = ResultResponse.None)
     Log.e("OtPSTET", "otpState: $otpState")
     val decodedEmail: String = Uri.decode(email)
     otpViewModel.setEmail(decodedEmail)
@@ -100,14 +103,29 @@ fun OtpScreen(
 
     var showInvalidOtpMessage by remember { mutableStateOf(false) }
 
+    var showDialog by remember { mutableStateOf(false) }
+    var dialogTitle by remember { mutableStateOf("") }
+    var dialogMessage by remember { mutableStateOf("") }
+    var isDialogError by remember { mutableStateOf(false) }
+    var isDialogSuccess by remember { mutableStateOf(false) }
+
+
+    LaunchedEffect(Unit) {
+        otpViewModel.resetOtpState()
+        otpViewModel.resetOtpRequest()
+    }
+
+
     LaunchedEffect(otpState) {
         when (otpState) {
             is ResultResponse.Success -> {
                 showCircularProgress = false
-                Log.e(
-                    "OtpScreen",
-                    "Otp Sukses: ${(otpState as ResultResponse.Success).data}"
-                )
+                showDialog = true
+                dialogTitle = "Berhasil"
+                dialogMessage = "Verifikasi OTP berhasil..."
+                isDialogSuccess = true
+                isDialogError = false
+                delay(2000L)
                 navigateToRoute(MainDestinations.LOGIN_ROUTE, true)
             }
 
@@ -117,12 +135,44 @@ fun OtpScreen(
 
             is ResultResponse.Error -> {
                 showCircularProgress = false
-                Log.e(
-                    "RegisterScreen",
-                    "Registration error: ${(otpState as ResultResponse.Error).error}"
-                )
-
+                showDialog = true
+                dialogTitle = "Gagal"
+                dialogMessage = "Verifikasi akun gagal"
+                isDialogError = true
+                isDialogSuccess = false
                 showInvalidOtpMessage = true
+                // Display error message to the user
+                // Toast.makeText(context, otpState.message, Toast.LENGTH_SHORT).show()
+            }
+
+            else -> {}
+        }
+    }
+    LaunchedEffect(reqotpState) {
+        when (reqotpState) {
+            is ResultResponse.Success -> {
+                showCircularProgress = false
+                showDialog = true
+                dialogTitle = "Berhasil"
+                dialogMessage = "Berhasil mengirim otp..."
+                isDialogSuccess = true
+                isDialogError = false
+                otpViewModel.resetOtpRequest()
+            }
+
+            is ResultResponse.Loading -> {
+                showCircularProgress = true
+            }
+
+            is ResultResponse.Error -> {
+                showCircularProgress = false
+                showDialog = true
+                dialogTitle = "Gagal"
+                dialogMessage = "Gagal mengirim otp"
+                isDialogError = true
+                isDialogSuccess = false
+                showInvalidOtpMessage = true
+                otpViewModel.resetOtpRequest()
                 // Display error message to the user
                 // Toast.makeText(context, otpState.message, Toast.LENGTH_SHORT).show()
             }
@@ -177,6 +227,7 @@ fun OtpScreen(
             horizontalAlignment = Alignment.CenterHorizontally,
             modifier = Modifier
 //            .background(color = Color.Black)
+                .imePadding()
                 .fillMaxSize()
         ) {
             Column(
@@ -311,7 +362,7 @@ fun OtpScreen(
                             color = MaterialTheme.colorScheme.onBackground
                         )
                         Text(
-                            text = if (countdown > 0) "$countdown" else "Resend",
+                            text = if (countdown > 0) "$countdown" else "Kirim Ulang",
                             fontSize = 12.sp,
                             fontWeight = FontWeight.Bold,
                             letterSpacing = (-0.15).sp,
@@ -323,7 +374,7 @@ fun OtpScreen(
                                 if (countdown == 0) {
                                     countdown = 30
                                     // Panggil fungsi request OTP ulang di sini, misalnya:
-                                    // otpViewModel.requestOtp()
+                                     otpViewModel.requestOtp()
                                 }
                             }
                         )
@@ -366,6 +417,17 @@ fun OtpScreen(
                 }
 
             }
+        }
+        if (showDialog) {
+            DynamicDialog(
+                title = dialogTitle,
+                message = dialogMessage,
+                onDismiss = { showDialog = false },
+                isError = isDialogError,
+                isSuccess = isDialogSuccess,
+//                isWarning = isDialogWarning,
+//                dismissText = "Batal"
+            )
         }
         if (showCircularProgress) {
             Box(

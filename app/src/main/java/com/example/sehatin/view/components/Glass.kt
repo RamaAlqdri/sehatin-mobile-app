@@ -22,6 +22,7 @@ import androidx.compose.ui.graphics.drawscope.DrawScope
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.compose.ui.graphics.drawscope.Fill
+import androidx.compose.ui.graphics.drawscope.clipPath
 import androidx.compose.ui.graphics.graphicsLayer
 import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.res.vectorResource
@@ -89,7 +90,7 @@ fun WaterIntake(
                     )
                     .border(1.dp, color = Color.Unspecified, shape = RoundedCornerShape(8.dp))
                     .clickable(
-                        enabled = enableButton && currentWater - selectedValue > 0,
+//                        enabled = enableButton && currentWater - selectedValue > 0,
                         onClick =
                             onMinus,
                         indication = null,
@@ -163,11 +164,100 @@ private fun drawRoundedGlassShape(drawScope: DrawScope) {
 
     val topWidth = width * 0.9f
     val bottomWidth = width * 0.73f
-    val cornerRadius = 50f
+    val cornerRadiusBottom = 50f
     val cornerRadiusTop = 10f
 
     val path = Path().apply {
+        // Top Left Arc
+        arcTo(
+            rect = Rect(
+                left = (width - topWidth) / 2,
+                top = 0f,
+                right = (width - topWidth) / 2 + 2 * cornerRadiusTop,
+                bottom = 2 * cornerRadiusTop
+            ),
+            startAngleDegrees = 180f,
+            sweepAngleDegrees = 90f,
+            forceMoveTo = true
+        )
 
+        // Top Line
+        lineTo((width + topWidth) / 2 - cornerRadiusTop, 0f)
+
+        // Top Right Arc
+        arcTo(
+            rect = Rect(
+                left = (width + topWidth) / 2 - 2 * cornerRadiusTop,
+                top = 0f,
+                right = (width + topWidth) / 2,
+                bottom = 2 * cornerRadiusTop
+            ),
+            startAngleDegrees = 270f,
+            sweepAngleDegrees = 90f,
+            forceMoveTo = false
+        )
+
+        // Right Line to bottom arc
+        lineTo((width + bottomWidth) / 2, height - cornerRadiusBottom)
+
+        // Bottom Right Arc
+        arcTo(
+            rect = Rect(
+                left = (width + bottomWidth) / 2 - 2 * cornerRadiusBottom,
+                top = height - 2 * cornerRadiusBottom,
+                right = (width + bottomWidth) / 2,
+                bottom = height
+            ),
+            startAngleDegrees = 0f,
+            sweepAngleDegrees = 90f,
+            forceMoveTo = false
+        )
+
+        // Bottom Line
+        lineTo((width - bottomWidth) / 2 + cornerRadiusBottom, height)
+
+        // Bottom Left Arc
+        arcTo(
+            rect = Rect(
+                left = (width - bottomWidth) / 2,
+                top = height - 2 * cornerRadiusBottom,
+                right = (width - bottomWidth) / 2 + 2 * cornerRadiusBottom,
+                bottom = height
+            ),
+            startAngleDegrees = 90f,
+            sweepAngleDegrees = 90f,
+            forceMoveTo = false
+        )
+
+        // Left Line to top
+        lineTo((width - topWidth) / 2, cornerRadiusTop)
+
+        close()
+    }
+
+    drawScope.drawPath(
+        path = path,
+        color = backGlass,
+        style = Fill
+    )
+}
+
+private fun drawRoundedWaterShape(drawScope: DrawScope, percentage: Int) {
+    val width = drawScope.size.width
+    val height = drawScope.size.height
+
+    val topWidth = width * 0.9f
+    val bottomWidth = width * 0.73f
+    val cornerRadius = 50f
+    val cornerRadiusTop = 10f
+
+    val cappedPercentage = percentage.coerceIn(0, 100)
+    val waterHeight = height * (cappedPercentage / 100f)
+
+    val currentTopWidth = topWidth - ((topWidth - bottomWidth) * (1 - (waterHeight / height)))
+
+    // === Path gelas, digunakan untuk clipPath ===
+    val glassPath = Path().apply {
         arcTo(
             rect = Rect(
                 left = (width - topWidth) / 2,
@@ -193,7 +283,6 @@ private fun drawRoundedGlassShape(drawScope: DrawScope) {
             sweepAngleDegrees = 90f,
             forceMoveTo = false
         )
-
 
         lineTo((width + bottomWidth) / 2, height - cornerRadius)
 
@@ -228,31 +317,10 @@ private fun drawRoundedGlassShape(drawScope: DrawScope) {
         close()
     }
 
-    drawScope.drawPath(
-        path = path,
-        color = backGlass,
-        style = Fill
-    )
-}
-
-private fun drawRoundedWaterShape(drawScope: DrawScope, percentage: Int) {
-    val width = drawScope.size.width
-    val height = drawScope.size.height
-
-    val topWidth = width * 0.9f
-    val bottomWidth = width * 0.73f
-    val cappedPercentage = percentage.coerceAtMost(100) // Ensure percentage does not exceed 100%
-    val waterHeight = height * (cappedPercentage / 100f)
-
-    val currentTopWidth = topWidth - ((topWidth - bottomWidth) * (1 - (waterHeight / height)))
-    val cornerRadius = 50f
-    val cornerRadiusTop = 10f
-
-    val path = Path().apply {
-
+    // === Path air ===
+    val waterPath = Path().apply {
         moveTo((width - currentTopWidth) / 2, height - waterHeight)
         lineTo((width + currentTopWidth) / 2, height - waterHeight)
-
         lineTo((width + bottomWidth) / 2, height - cornerRadius)
 
         arcTo(
@@ -284,10 +352,12 @@ private fun drawRoundedWaterShape(drawScope: DrawScope, percentage: Int) {
         close()
     }
 
-    drawScope.drawPath(
-        path = path,
-        color = waterGlass,
-        style = Fill
-    )
+    // === Gambar air yang ter-clip dalam gelas ===
+    drawScope.clipPath(glassPath) {
+        drawPath(
+            path = waterPath,
+            color = waterGlass,
+            style = Fill
+        )
+    }
 }
-

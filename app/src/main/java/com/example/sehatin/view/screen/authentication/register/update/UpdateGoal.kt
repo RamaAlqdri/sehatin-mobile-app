@@ -129,7 +129,7 @@ fun UpdateGoal(
                             .fillMaxWidth()
                     )
                     Text(
-                        text = "Apa tujuan diet Anda?",
+                        text = "Perbarui tujuan diet Anda",
                         textAlign = TextAlign.Center,
                         fontSize = 20.sp,
                         fontWeight = FontWeight.SemiBold,

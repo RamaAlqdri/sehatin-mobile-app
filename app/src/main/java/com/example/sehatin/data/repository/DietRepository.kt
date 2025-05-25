@@ -15,10 +15,14 @@ import com.example.sehatin.data.model.response.WaterHistoryRequest
 import com.example.sehatin.data.store.DataStoreManager
 import com.example.sehatin.retrofit.api.ApiConfig
 import com.example.sehatin.utils.formatDateToISO8601
+import com.example.sehatin.utils.formatDatesToISO8601
+import com.example.sehatin.utils.getCurrentTimeInMakassarISO8601
+import com.example.sehatin.utils.getUtcTimeAdjustedToPlus8
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.flow
 import kotlinx.coroutines.flow.flowOn
+import java.text.SimpleDateFormat
 import java.util.Date
 import kotlin.concurrent.Volatile
 
@@ -27,7 +31,6 @@ class DietRepository private constructor(
 ) {
     private val dataStoreManager = DataStoreManager(context)
     private val dietService = ApiConfig.getDietService(context)
-
 
 
     fun addFoodHistory(
@@ -124,7 +127,7 @@ class DietRepository private constructor(
     ): Flow<ResultResponse<DietResponse.FetchManyFoodHistoryResponse>> = flow {
         emit(ResultResponse.Loading)
         try {
-            val response = dietService.getManyFoodHistory( meal_type, date)
+            val response = dietService.getManyFoodHistory(meal_type, date)
             if (response.isSuccessful) {
                 response.body()?.let {
                     emit(ResultResponse.Success(it))
@@ -200,6 +203,53 @@ class DietRepository private constructor(
         emit(ResultResponse.Loading)
         try {
             val response = dietService.postWaterHistory(WaterHistoryRequest(water))
+            if (response.isSuccessful) {
+                response.body()?.let {
+                    emit(ResultResponse.Success(it))
+                } ?: emit(ResultResponse.Error("Empty response body"))
+            } else {
+                emit(
+                    ResultResponse.Error(
+                        "Error: ${
+                            response.errorBody()?.string() ?: "Unknown error"
+                        }"
+                    )
+                )
+            }
+        } catch (e: Exception) {
+            emit(ResultResponse.Error(e.localizedMessage ?: "Network error"))
+        }
+    }.flowOn(Dispatchers.IO)
+
+    fun deleteLatestWaterHistory(
+    ): Flow<ResultResponse<CreateWaterHistoryResponse>> = flow {
+        emit(ResultResponse.Loading)
+        try {
+            val response = dietService.deleteLatestWaterHistory()
+            if (response.isSuccessful) {
+                response.body()?.let {
+                    emit(ResultResponse.Success(it))
+                } ?: emit(ResultResponse.Error("Empty response body"))
+            } else {
+                emit(
+                    ResultResponse.Error(
+                        "Error: ${
+                            response.errorBody()?.string() ?: "Unknown error"
+                        }"
+                    )
+                )
+            }
+        } catch (e: Exception) {
+            emit(ResultResponse.Error(e.localizedMessage ?: "Network error"))
+        }
+    }.flowOn(Dispatchers.IO)
+
+    fun deleteWaterByIdHistory(
+        id: String
+    ): Flow<ResultResponse<CreateWaterHistoryResponse>> = flow {
+        emit(ResultResponse.Loading)
+        try {
+            val response = dietService.deleteWaterByIdHistory(id)
             if (response.isSuccessful) {
                 response.body()?.let {
                     emit(ResultResponse.Success(it))
@@ -314,6 +364,7 @@ class DietRepository private constructor(
     fun getScheduleADay(date: Date): Flow<ResultResponse<ScheduleADayResponse>> = flow {
         emit(ResultResponse.Loading)
         try {
+//            val dateFormat = SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss.SSS'Z'")
             val formattedDate = formatDateToISO8601(date) // Format date to ISO 8601
             val response = dietService.getScheduleADay(formattedDate)
             if (response.isSuccessful) {
@@ -337,7 +388,7 @@ class DietRepository private constructor(
     fun getScheduleClosest(date: Date): Flow<ResultResponse<ScheduleClosestResponse>> = flow {
         emit(ResultResponse.Loading)
         try {
-            val formattedDate = formatDateToISO8601(date) // Format date to ISO 8601
+            val formattedDate = formatDatesToISO8601(date) // Format date to ISO 8601
             val response = dietService.getSchedultClosest(formattedDate)
 //            Log.e("DietRepository", "getScheduleClosest in Repository: $formattedDate")
             if (response.isSuccessful) {

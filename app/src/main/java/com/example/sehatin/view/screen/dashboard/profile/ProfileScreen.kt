@@ -118,7 +118,8 @@ private fun ProfileScreen(
                         id = "",
                         email = "",
                         height = "",
-                        bmi = ""
+                        bmi = "",
+                        weight_target = "",
                     ),
                 )
                 Spacer(modifier = Modifier.height(20.dp))
@@ -223,7 +224,7 @@ private fun BodySection(
                         .clip(RoundedCornerShape(10.dp))
 //                        .background(Color(0xFFF3F3F3))
                         .padding(vertical = 15.dp, horizontal = 15.dp)
-                        .clickable { navigateToRoute(DetailDestinations.UPDATE_HEIGHT_ROUTE) },
+                        .clickable { navigateToRoute(DetailDestinations.UPDATE_WEIGHT_ONLY_ROUTE) },
                     verticalAlignment = Alignment.CenterVertically
                 ) {
                     Icon(
@@ -252,7 +253,7 @@ private fun BodySection(
                         .clip(RoundedCornerShape(10.dp))
 //                        .background(Color(0xFFF3F3F3))
                         .padding(vertical = 15.dp, horizontal = 15.dp)
-                        .clickable { navigateToRoute(DetailDestinations.UPDATE_HEIGHT_ROUTE) },
+                        .clickable { navigateToRoute(DetailDestinations.UPDATE_HEIGHT_ONLY_ROUTE) },
                     verticalAlignment = Alignment.CenterVertically
                 ) {
                     Icon(

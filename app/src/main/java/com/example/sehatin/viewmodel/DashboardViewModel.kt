@@ -1,6 +1,5 @@
 package com.example.sehatin.viewmodel
 
-import android.util.Log
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.example.sehatin.common.ResultResponse
@@ -10,7 +9,6 @@ import com.example.sehatin.data.model.response.CreateWaterHistoryResponse
 import com.example.sehatin.data.model.response.Detail
 import com.example.sehatin.data.model.response.DietProgressResponse
 import com.example.sehatin.data.model.response.DietResponse
-import com.example.sehatin.data.model.response.DietResponse.FetchSummaryResponse
 import com.example.sehatin.data.model.response.FoodDetailResponse
 import com.example.sehatin.data.model.response.ScheduleADayResponse
 import com.example.sehatin.data.model.response.ScheduleDataItem
@@ -23,15 +21,10 @@ import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.launch
-import java.text.SimpleDateFormat
 import java.time.LocalDate
 import java.time.LocalDateTime
 import java.time.ZoneId
-import java.time.format.DateTimeFormatter
-import java.util.Calendar
 import java.util.Date
-import java.util.Locale
-import java.util.TimeZone
 
 
 data class RadioOptionSummary(val index: Int, val type: String)
@@ -144,6 +137,14 @@ class DashboardViewModel(
     private val _createWaterState =
         MutableStateFlow<ResultResponse<CreateWaterHistoryResponse>>(ResultResponse.Loading)
     val createWaterState: StateFlow<ResultResponse<CreateWaterHistoryResponse>> = _createWaterState
+    private val _deleteLatestWaterState =
+        MutableStateFlow<ResultResponse<CreateWaterHistoryResponse>>(ResultResponse.Loading)
+    val deleteLatestWaterState: StateFlow<ResultResponse<CreateWaterHistoryResponse>> =
+        _deleteLatestWaterState
+    private val _deleteWaterbyIdState =
+        MutableStateFlow<ResultResponse<CreateWaterHistoryResponse>>(ResultResponse.Loading)
+    val deleteWaterbyIdState: StateFlow<ResultResponse<CreateWaterHistoryResponse>> =
+        _deleteWaterbyIdState
 
 
     // SEPARATOR
@@ -244,8 +245,32 @@ class DashboardViewModel(
         }
     }
 
+    fun deleteLatestWaterHistory() {
+        viewModelScope.launch {
+            dashboardRepository.deleteLatestWaterHistory().collect {
+                _deleteLatestWaterState.value = it
+            }
+        }
+    }
+
+    fun deleteWaterByIdHistory(id: String) {
+        viewModelScope.launch {
+            dashboardRepository.deleteWaterByIdHistory(id).collect {
+                _deleteWaterbyIdState.value = it
+            }
+        }
+    }
+
     fun resetCreateWaterState() {
         _createWaterState.value = ResultResponse.None
+    }
+
+    fun resetDeleteLatestWaterState() {
+        _deleteLatestWaterState.value = ResultResponse.None
+    }
+
+    fun resetDeleteWaterByIdState() {
+        _deleteWaterbyIdState.value = ResultResponse.None
     }
 
     private fun getUserDietProgress(forceRefresh: Boolean = false) {
@@ -373,6 +398,7 @@ class DashboardViewModel(
                 val zonedDateTime = today.atTime(12, 0).atZone(zoneId)
                 val instant = zonedDateTime.toInstant()
                 val date = Date.from(instant)
+
 
 //                Log.e("RESULT", "getCaloriesADay: $formattedDate")
 
@@ -584,8 +610,6 @@ class DashboardViewModel(
     }
 
 
-
-
     suspend fun getSavedSchedule(): List<ScheduleDataItem>? {
         return dashboardRepository.getSavedScheduleList()
     }
@@ -610,11 +634,11 @@ class DashboardViewModel(
         viewModelScope.launch {
             try {
 
-                val today = LocalDate.now()
-                val zoneId = ZoneId.of("UTC+8")
-                val zonedDateTime = today.atTime(12, 0).atZone(zoneId)
-                val instant = zonedDateTime.toInstant()
-                val todayDate = Date.from(instant)
+
+                val localDateTime = LocalDateTime.now()
+                val zoneId = ZoneId.of("Asia/Makassar") // konsisten sejak awal
+                val instant = localDateTime.atZone(zoneId).toInstant()
+                val date = Date.from(instant)
 
                 val currentTime = System.currentTimeMillis()
                 val shouldRefresh =
@@ -626,7 +650,7 @@ class DashboardViewModel(
 
                     dashboardRepository.getSummary(
                         selectedSummaryOption.value.type,
-                        todayDate.toString(),
+                        date.toString(),
                         selectedStartSummaryDate.value.toString(),
                         selectedEndSummaryDate.value.toString()
                     ).collect { result ->
@@ -649,159 +673,118 @@ class DashboardViewModel(
         }
     }
 
-    fun generateChartData(summary: FetchSummaryResponse): ChartData {
-        // Mengambil data foodHistory dari response
-        val foodHistory = summary.data.foodHistory
-
-        // Mengonversi createdAt ke tanggal yang dapat diproses
-        val sortedData = foodHistory
-            .mapNotNull { it.createdAt.toDate() } // Mengonversi createdAt menjadi Date
-            .distinctBy { it.toDayLabel() } // Pastikan setiap tanggal unik
-            .sorted() // Urutkan berdasarkan tanggal yang sudah diparse
-
-        // Membuat label berdasarkan tanggal (jika data kurang dari 7 hari)
-        val labels = if (sortedData.size > 7) {
-            // Jika lebih dari 7 hari, kita akan menggunakan label minggu
-            groupDataByWeek(sortedData).map { "Minggu ${it.first().toWeekNumber()}" }.distinct()
-        } else {
-            // Jika data kurang dari 7 hari, gunakan label per tanggal
-            sortedData.map { it.toDayLabel() }
-        }
-
-        // Fungsi untuk menghitung kalori berdasarkan meal type dan label tanggal
-        fun sumCalories(mealType: String, dateRange: List<Date>): Float {
-            return foodHistory.filter { it.createdAt.toDate() in dateRange && it.meal_type == mealType }
-                .sumOf { it.calories.toDouble() }
-                .toFloat()
-        }
-
-        // Menghitung kalori untuk setiap meal type berdasarkan minggu atau per tanggal
-        val breakfastData = labels.map { label ->
-            sumCalories(
-                "breakfast",
-                getDateRangeForLabel(label, sortedData)
-            )
-        }
-        val lunchData =
-            labels.map { label -> sumCalories("lunch", getDateRangeForLabel(label, sortedData)) }
-        val dinnerData =
-            labels.map { label -> sumCalories("dinner", getDateRangeForLabel(label, sortedData)) }
-        val otherData =
-            labels.map { label -> sumCalories("other", getDateRangeForLabel(label, sortedData)) }
-
-        // Mengembalikan ChartData dengan tipe data yang tepat
-        return ChartData(labels, breakfastData, lunchData, dinnerData, otherData)
-    }
-
-    // Fungsi untuk mengelompokkan data per minggu jika lebih dari 7 hari
-    fun groupDataByWeek(sortedData: List<Date>): List<List<Date>> {
-        val weeks = mutableListOf<List<Date>>()
-        var currentWeek = mutableListOf<Date>()
-
-        var currentWeekStart = sortedData.first().toWeekStart()
-
-        for (date in sortedData) {
-            if (date.isSameWeekAs(currentWeekStart)) {
-                currentWeek.add(date)
-            } else {
-                weeks.add(currentWeek)
-                currentWeek = mutableListOf(date)
-                currentWeekStart = date.toWeekStart() // Update minggu baru
-            }
-        }
-
-        // Menambahkan minggu terakhir yang belum ditambahkan
-        if (currentWeek.isNotEmpty()) {
-            weeks.add(currentWeek)
-        }
-
-        return weeks
-    }
-
-    // Fungsi untuk mendapatkan rentang tanggal berdasarkan label minggu atau tanggal
-    fun getDateRangeForLabel(label: String, sortedData: List<Date>): List<Date> {
-        return if (label.startsWith("Minggu")) {
-            // Jika label adalah minggu, ambil data untuk minggu tersebut
-            val weekNumber = label.split(" ")[1].toInt()
-            val weekStart = sortedData.first {
-                it.toWeekNumber() == weekNumber && it.toWeekStart().year == sortedData.first()
-                    .toWeekStart().year
-            }
-            val weekEnd = sortedData.last {
-                it.toWeekNumber() == weekNumber && it.toWeekStart().year == sortedData.first()
-                    .toWeekStart().year
-            }
-
-            // Menghasilkan rentang tanggal dari minggu tersebut
-            getDatesInRange(weekStart, weekEnd)
-        } else {
-            // Jika label adalah tanggal, hanya ambil data untuk tanggal tersebut
-            sortedData.filter { it.toDayLabel() == label }
-        }
-    }
-
-    // Fungsi untuk mendapatkan rentang tanggal dari mulai hingga akhir minggu
-    fun getDatesInRange(startDate: Date, endDate: Date): List<Date> {
-        val calendar = Calendar.getInstance(
-//            TimeZone.getTimeZone("GMT+8")
-        )
-        calendar.time = startDate
-        val startDayOfWeek = calendar[Calendar.DAY_OF_WEEK]
-        val datesInRange = mutableListOf<Date>()
-
-        while (calendar.time <= endDate) {
-            datesInRange.add(calendar.time)
-            calendar.add(Calendar.DAY_OF_YEAR, 1) // Lanjut ke hari berikutnya
-        }
-
-        return datesInRange
-    }
-
-    // Fungsi untuk menentukan awal minggu dari sebuah tanggal
-    fun Date.toWeekStart(): Date {
-        val calendar = Calendar.getInstance(
-//            TimeZone.getTimeZone("GMT+8")
-        ) // Menggunakan UTC+8
-        calendar.time = this
-        calendar.set(Calendar.DAY_OF_WEEK, Calendar.MONDAY) // Set ke hari Senin minggu itu
-        return calendar.time
-    }
-
-    // Fungsi untuk mengecek apakah dua tanggal berada dalam minggu yang sama
-    fun Date.isSameWeekAs(other: Date): Boolean {
-        // Pastikan tahun juga diperhitungkan saat membandingkan minggu
-        return this.toWeekStart().year == other.toWeekStart().year &&
-                this.toWeekStart().toWeekNumber() == other.toWeekStart().toWeekNumber()
-    }
-
-    // Fungsi untuk mendapatkan nomor minggu dari tanggal
-    fun Date.toWeekNumber(): Int {
-        val calendar = Calendar.getInstance(
-//            TimeZone.getTimeZone("GMT+8")
-        ) // Menggunakan UTC+8
-        calendar.time = this
-        return calendar.get(Calendar.WEEK_OF_YEAR)
-    }
-
-    // Extension function to convert the string to Date (with UTC+8 timezone)
-    fun String.toDate(): Date? {
-        val inputFormat = SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss.SSS'Z'", Locale.getDefault())
-//        inputFormat.timeZone = TimeZone.getTimeZone("GMT+8") // Set timezone to UTC+8
-
-        return try {
-            inputFormat.parse(this)
-        } catch (e: Exception) {
-            null
-        }
-    }
-
-    // Extension function to format Date into a label like "Sen 01"
-    fun Date.toDayLabel(): String {
-        val outputFormat = SimpleDateFormat("EEE dd", Locale("id")) // "Sen 01"
-        return outputFormat.format(this)
-    }
 
 
+//    fun generateChartData(summary: FetchSummaryResponse): ChartData {
+//        val foodHistory = summary.data.foodHistory
+//
+//        val dataWithDates = foodHistory.mapNotNull { entry ->
+//            entry.createdAt.toDate()?.let { date ->
+//                Triple(date, entry.meal_type, entry.calories)
+//            }
+//        }
+//
+//        val sortedData = dataWithDates.map { it.first }.distinct().sorted()
+//
+//        val labels = if (sortedData.size > 7) {
+//            groupDataByWeek(sortedData).map { week ->
+//                val weekNumber = week.first().toWeekNumber()
+//                "Minggu $weekNumber"
+//            }.distinct()
+//        } else {
+//            sortedData.map { it.toDayLabel() }.distinct()
+//        }
+//
+//        fun sumCalories(mealType: String, dateRange: List<Date>): Float {
+//            return dataWithDates
+//                .filter { (date, type, _) -> date in dateRange && type == mealType }
+//                .sumOf { it.third.toDouble() }
+//                .toFloat()
+//        }
+//
+//        val labelToRange = labels.associateWith { getDateRangeForLabel(it, sortedData) }
+//
+//        val breakfastData = labels.map { label -> sumCalories("breakfast", labelToRange[label] ?: emptyList()) }
+//        val lunchData = labels.map { label -> sumCalories("lunch", labelToRange[label] ?: emptyList()) }
+//        val dinnerData = labels.map { label -> sumCalories("dinner", labelToRange[label] ?: emptyList()) }
+//        val otherData = labels.map { label -> sumCalories("other", labelToRange[label] ?: emptyList()) }
+//
+//        return ChartData(labels, breakfastData, lunchData, dinnerData, otherData)
+//    }
+//
+//    fun groupDataByWeek(sortedData: List<Date>): List<List<Date>> {
+//        val calendar = Calendar.getInstance()
+//        val weeks = mutableListOf<List<Date>>()
+//        var currentWeek = mutableListOf<Date>()
+//        calendar.time = sortedData.first()
+//        calendar.set(Calendar.DAY_OF_WEEK, Calendar.MONDAY)
+//        var currentWeekStart = calendar.time
+//
+//        for (date in sortedData) {
+//            val weekStart = Calendar.getInstance().apply {
+//                time = date
+//                set(Calendar.DAY_OF_WEEK, Calendar.MONDAY)
+//            }.time
+//            if (weekStart == currentWeekStart) {
+//                currentWeek.add(date)
+//            } else {
+//                weeks.add(currentWeek)
+//                currentWeek = mutableListOf(date)
+//                currentWeekStart = weekStart
+//            }
+//        }
+//
+//        if (currentWeek.isNotEmpty()) {
+//            weeks.add(currentWeek)
+//        }
+//
+//        return weeks
+//    }
+//
+//    fun getDateRangeForLabel(label: String, sortedData: List<Date>): List<Date> {
+//        return if (label.startsWith("Minggu")) {
+//            val weekNumber = label.split(" ")[1].toInt()
+//            val weekData = sortedData.filter {
+//                it.toWeekNumber() == weekNumber &&
+//                        Calendar.getInstance().apply { time = it }.get(Calendar.YEAR) == Calendar.getInstance().apply { time = sortedData.first() }.get(Calendar.YEAR)
+//            }
+//            if (weekData.isNotEmpty()) getDatesInRange(weekData.first(), weekData.last()) else emptyList()
+//        } else {
+//            sortedData.filter { it.toDayLabel() == label }
+//        }
+//    }
+//
+//    fun getDatesInRange(startDate: Date, endDate: Date): List<Date> {
+//        val calendar = Calendar.getInstance()
+//        calendar.time = startDate
+//        val datesInRange = mutableListOf<Date>()
+//
+//        while (!calendar.time.after(endDate)) {
+//            datesInRange.add(calendar.time)
+//            calendar.add(Calendar.DAY_OF_YEAR, 1)
+//        }
+//        return datesInRange
+//    }
+//
+//    fun String.toDate(): Date? {
+//        return try {
+//            val inputFormat = SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss.SSS", Locale.getDefault())
+//            inputFormat.parse(this)
+//        } catch (e: Exception) {
+//            null
+//        }
+//    }
+//
+//    fun Date.toDayLabel(): String {
+//        val outputFormat = SimpleDateFormat("EEE dd", Locale("id"))
+//        return outputFormat.format(this)
+//    }
+//
+//    fun Date.toWeekNumber(): Int {
+//        val calendar = Calendar.getInstance()
+//        calendar.time = this
+//        return calendar.get(Calendar.WEEK_OF_YEAR)
+//    }
     fun refresh() {
         getUserDietProgress(forceRefresh = true)
         getWeightHistory(forceRefresh = true)
@@ -822,9 +805,9 @@ class DashboardViewModel(
 
 
 data class ChartData(
-    val labels: List<String>,
-    val breakfastData: List<Float>,
-    val lunchData: List<Float>,
-    val dinnerData: List<Float>,
-    val snackData: List<Float>
+    val labels: List<String>?,
+    val breakfastData: List<Float>?,
+    val lunchData: List<Float>?,
+    val dinnerData: List<Float>?,
+    val snackData: List<Float>?
 )

@@ -13,6 +13,7 @@ import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxHeight
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.imePadding
 import androidx.compose.foundation.layout.offset
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
@@ -49,7 +50,9 @@ import com.example.sehatin.navigation.MainDestinations
 import com.example.sehatin.view.components.BackgroundCurve
 import com.example.sehatin.view.components.CustomButton
 import com.example.sehatin.view.components.CustomTextField
+import com.example.sehatin.view.components.DynamicDialog
 import com.example.sehatin.viewmodel.RegisterScreenViewModel
+import kotlinx.coroutines.delay
 
 
 @Composable
@@ -71,15 +74,31 @@ fun RegisterScreen(
 
     var showCircularProgress by remember { mutableStateOf(false) }
 
+    var showDialog by remember { mutableStateOf(false) }
+    var dialogTitle by remember { mutableStateOf("") }
+    var dialogMessage by remember { mutableStateOf("") }
+    var isDialogError by remember { mutableStateOf(false) }
+    var isDialogSuccess by remember { mutableStateOf(false) }
+
+    LaunchedEffect(Unit){
+        registerViewModel.resetRegisterState()
+    }
+
     LaunchedEffect(registerState) {
         when (registerState) {
             is ResultResponse.Success -> {
                 showCircularProgress = false
-                Log.d(
-                    "RegisterScreen",
-                    "Registration successful: ${(registerState as ResultResponse.Success).data}"
-                )
-                Log.e("tempLog", "${registerViewModel.tempLog}")
+//                Log.d(
+//                    "RegisterScreen",
+//                    "Registration successful: ${(registerState as ResultResponse.Success).data}"
+//                )
+//                Log.e("tempLog", "${registerViewModel.tempLog}")
+                showDialog = true
+                dialogTitle = "Berhasil"
+                dialogMessage = "Pendaftaran akun berhasil..."
+                isDialogSuccess = true
+                isDialogError = false
+                delay(2000L)
                 navigateToRoute("${MainDestinations.OTP_ROUTE}?" + "email=$emailValue", true)
             }
 
@@ -89,10 +108,11 @@ fun RegisterScreen(
 
             is ResultResponse.Error -> {
                 showCircularProgress = false
-                Log.e(
-                    "RegisterScreen",
-                    "Registration error: ${(registerState as ResultResponse.Error).error}"
-                )
+                showDialog = true
+                dialogTitle = "Gagal"
+                dialogMessage = "Pendaftaran Akun gagal"
+                isDialogError = true
+                isDialogSuccess = false
             }
 
             else -> {}
@@ -112,6 +132,7 @@ fun RegisterScreen(
             modifier = Modifier
 //            .background(color = Color.Black)
                 .fillMaxSize()
+                .imePadding()
                 .clickable(
                     onClick = {
                         focusManager.clearFocus()
@@ -322,6 +343,17 @@ fun RegisterScreen(
                 }
 
             }
+        }
+        if (showDialog) {
+            DynamicDialog(
+                title = dialogTitle,
+                message = dialogMessage,
+                onDismiss = { showDialog = false },
+                isError = isDialogError,
+                isSuccess = isDialogSuccess,
+//                isWarning = isDialogWarning,
+//                dismissText = "Batal"
+            )
         }
         if (showCircularProgress) {
             Box(

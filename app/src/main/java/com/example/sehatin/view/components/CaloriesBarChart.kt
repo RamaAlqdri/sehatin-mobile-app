@@ -72,8 +72,8 @@ fun CaloriesBarChart(
                 colors = listOf(
                     Color(0xFFE8C37B), // Makan Pagi
                     Color(0xFF7FB2D9), // Makan Siang
-                    Color(0xFF7D5BA6), // Makan Malam
-                    Color(0xFFD26466)  // Snack
+                    Color(0xFFD26466), // Makan Malam
+                    Color(0xFF7D5BA6)  // Snack
                 )
             )
         }

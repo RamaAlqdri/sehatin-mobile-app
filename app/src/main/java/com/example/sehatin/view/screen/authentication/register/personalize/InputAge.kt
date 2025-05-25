@@ -8,6 +8,7 @@ import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.fillMaxHeight
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.imePadding
 import androidx.compose.foundation.layout.padding
 import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.MaterialTheme
@@ -91,6 +92,7 @@ fun InputAge(
             modifier = Modifier
 //            .background(color = Color.Black)
                 .fillMaxSize()
+                .imePadding()
         ) {
             Column(
                 verticalArrangement = Arrangement.Bottom,

@@ -17,6 +17,7 @@ import com.example.sehatin.data.model.response.WaterHistoryResponse
 import com.example.sehatin.data.model.response.WeightResponse
 import retrofit2.Response
 import retrofit2.http.Body
+import retrofit2.http.DELETE
 import retrofit2.http.GET
 import retrofit2.http.POST
 import retrofit2.http.Query
@@ -42,6 +43,12 @@ interface DashboardService {
 
     @POST("api/schedule/water")
     suspend fun postWaterHistory(@Body request: WaterHistoryRequest) : Response<CreateWaterHistoryResponse>
+
+    @DELETE("api/schedule/water")
+    suspend fun deleteLatestWaterHistory(): Response<CreateWaterHistoryResponse>
+
+    @DELETE("api/schedule/water/id")
+    suspend fun deleteWaterByIdHistory(@Query("waterId") id:String): Response<CreateWaterHistoryResponse>
 
     @GET("api/food/detail")
     suspend fun getFoodDetail(@Query("foodId") id: String): Response<FoodDetailResponse>

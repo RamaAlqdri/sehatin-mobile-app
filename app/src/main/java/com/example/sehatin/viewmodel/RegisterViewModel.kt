@@ -60,6 +60,10 @@ class RegisterScreenViewModel(
     var confirmPasswordError by mutableStateOf("")
         private set
 
+    fun resetRegisterState(){
+        _registerState.value = ResultResponse.None
+    }
+
     fun registerUser() {
         if (!isButtonEnabled) return
 
@@ -103,11 +107,11 @@ class RegisterScreenViewModel(
                             _otpState.value = result
                         }
                 } catch (e: Exception) {
-                    _otpState.value = ResultResponse.Error("Failed to generate OTP: ${e.message}")
+                    _otpState.value = ResultResponse.Error("Gagal membuat OTP: ${e.message}")
                 }
             }
         } else {
-            _otpState.value = ResultResponse.Error("Please enter a valid email address.")
+            _otpState.value = ResultResponse.Error("Tolong masukkan alamat email yang valid.")
         }
     }
 
@@ -134,13 +138,13 @@ class RegisterScreenViewModel(
     private fun validateUsername(): Boolean {
         val username = usernameValue.trim()
         return if (username.isBlank()) {
-            usernameError = "Please fill username field"
+            usernameError = "Tolong isi nama pengguna"
             false
         } else if (username.length < 5) {
-            usernameError = "Username must be at least 5 characters long"
+            usernameError = "Nama pengguna harus terdiri dari minimal 5 karakter"
             false
         } else if (username.contains(" ")) {
-            usernameError = "Username should not contain spaces"
+            usernameError = "Nama pengguna tidak boleh mengandung spasi"
             false
         } else {
             usernameError = ""
@@ -151,10 +155,10 @@ class RegisterScreenViewModel(
     private fun validateEmail(): Boolean {
         val email = emailValue.trim()
         return if (email.isBlank()) {
-            emailError = "Email is required"
+            emailError = "Email tidak boleh kosong"
             false
         } else if (!Patterns.EMAIL_ADDRESS.matcher(email).matches()) {
-            emailError = "Invalid email address"
+            emailError = "Email tidak valid"
             false
         } else {
             emailError = ""
@@ -169,22 +173,22 @@ class RegisterScreenViewModel(
 
         return when {
             password.isBlank() -> {
-                passwordError = "Please fill password field"
+                passwordError = "Tolong isi kata sandi"
                 false
             }
 
             password.length < 6 -> {
-                passwordError = "Password must be at least 6 characters long"
+                passwordError = "Kata sandi harus terdiri dari minimal 6 karakter"
                 false
             }
 
             !containsLetter -> {
-                passwordError = "Password must contain at least one letter"
+                passwordError = "Kata sandi harus mengandung setidaknya satu huruf"
                 false
             }
 
             !containsDigit -> {
-                passwordError = "Password must contain at least one digit"
+                passwordError = "Kata sandi harus mengandung setidaknya satu angka"
                 false
             }
 
@@ -197,7 +201,7 @@ class RegisterScreenViewModel(
 
     private fun validateConfirmPassword(): Boolean {
         return if (confirmPasswordValue != passwordValue) {
-            confirmPasswordError = "Passwords do not match"
+            confirmPasswordError = "Kata sandi tidak cocok"
             false
         } else {
             confirmPasswordError = ""

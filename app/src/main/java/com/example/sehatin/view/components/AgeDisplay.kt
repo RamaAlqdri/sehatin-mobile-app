@@ -32,7 +32,7 @@ fun AgeDisplay(
         contentAlignment = Alignment.Center,
         modifier = modifier
             .fillMaxWidth()
-            .height(79.dp) // Ukuran sesuai dengan contoh gambar
+            .height(100.dp) // Ukuran sesuai dengan contoh gambar
             .border(
                 width = 1.dp,
                 color = MaterialTheme.colorScheme.primary,

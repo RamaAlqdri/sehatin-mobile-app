@@ -75,6 +75,7 @@ import com.example.sehatin.data.model.response.ScheduleADayResponse
 import com.example.sehatin.data.model.response.ScheduleClosestResponse
 import com.example.sehatin.data.model.response.ScheduleDataItem
 import com.example.sehatin.navigation.DetailDestinations
+import com.example.sehatin.navigation.MainDestinations
 import com.example.sehatin.navigation.SehatInSurface
 import com.example.sehatin.utils.convertToHoursAndMinutes
 import com.example.sehatin.view.components.CalendarView
@@ -86,6 +87,10 @@ import com.example.sehatin.view.components.WaterDialog
 import com.example.sehatin.view.screen.dashboard.home.formattedCurrentDate
 import com.example.sehatin.viewmodel.DashboardViewModel
 import com.example.sehatin.viewmodel.DietViewModel
+import com.valentinilk.shimmer.shimmer
+import java.time.LocalDate
+import java.time.ZonedDateTime
+import java.time.format.DateTimeFormatter
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
@@ -93,7 +98,8 @@ fun DietScreen(
     modifier: Modifier = Modifier,
     dietViewModel: DietViewModel,
     navigateToDetail: (String) -> Unit,
-    dashboardViewModel: DashboardViewModel
+    dashboardViewModel: DashboardViewModel,
+    navigateToBottomNav: (String) -> Unit // 👈 Tambahan
 ) {
     // CAll API Here
     DietScreen(
@@ -101,7 +107,8 @@ fun DietScreen(
         id = 1,
         dietViewModel = dietViewModel,
         navigateToDetail = navigateToDetail,
-        dashboardViewModel = dashboardViewModel
+        dashboardViewModel = dashboardViewModel,
+        navigateToBottomNav = navigateToBottomNav // 👈 Tambahan
 
     )
 }
@@ -114,6 +121,7 @@ private fun DietScreen(
     dietViewModel: DietViewModel,
     navigateToDetail: (String) -> Unit,
     dashboardViewModel: DashboardViewModel,
+    navigateToBottomNav: (String) -> Unit // 👈 Tambahan
 ) {
 
 
@@ -131,8 +139,11 @@ private fun DietScreen(
     val scheduleClosest by dietViewModel.scheduleClosest.collectAsStateWithLifecycle(initialValue = null)
 
 
+    val scheduleClosestState by dietViewModel.scheduleClosestState.collectAsStateWithLifecycle()
+    val waterTodayState by dietViewModel.waterADayState.collectAsStateWithLifecycle()
     val completedScheduleState by dietViewModel.completedScheduleState.collectAsStateWithLifecycle()
     val createWaterState by dietViewModel.createWaterState.collectAsStateWithLifecycle()
+    val deleteLatestWaterState by dietViewModel.deleteLatestWaterState.collectAsStateWithLifecycle()
 
     val breakFastFoodHistory by dietViewModel.breakfastFoodHistory.collectAsStateWithLifecycle()
     val lunchFoodHistory by dietViewModel.lunchFoodHistory.collectAsStateWithLifecycle()
@@ -169,6 +180,14 @@ private fun DietScreen(
         if (createWaterState is ResultResponse.Success) {
             dietViewModel.refresh()
             dietViewModel.resetCreateWaterState()
+        }
+
+
+    }
+    LaunchedEffect(deleteLatestWaterState) {
+        if (deleteLatestWaterState is ResultResponse.Success) {
+            dietViewModel.refresh()
+            dietViewModel.resetDeleteLatestWaterState()
         }
 
 
@@ -212,7 +231,11 @@ private fun DietScreen(
                         modifier = Modifier.fillMaxSize()
                     ) {
                         item {
-                            TabSection(navigateToDetail = navigateToDetail, profile = profile)
+                            TabSection(
+                                navigateToDetail = navigateToDetail,
+                                navigateToBottomNav = navigateToBottomNav,
+                                profile = profile
+                            )
                         }
 
                         item {
@@ -224,12 +247,13 @@ private fun DietScreen(
                                 },
                                 onMinus = {
 //                                    currentWater -= selectedValue
-                                    dietViewModel.createWaterHistory(-selectedValue.toDouble())
+                                    dietViewModel.deleteLatestWaterHistory()
                                 },
                                 currentWater = waterToday?.data?.water?.toInt() ?: 0,
                                 maxWaterValue = waterToday?.data?.target?.toInt() ?: 0,
                                 selectedValue = selectedValue,
-                                navigateToDetail = navigateToDetail
+                                navigateToDetail = navigateToDetail,
+                                isLoading = waterTodayState is ResultResponse.Loading
                             )
                         }
 
@@ -240,7 +264,8 @@ private fun DietScreen(
                             UpcomingScheduleSection(
                                 data = scheduleClosest,
                                 navigateToDetail = navigateToDetail,
-                                dietViewModel = dietViewModel
+                                dietViewModel = dietViewModel,
+                                isLoading = scheduleClosestState is ResultResponse.Loading
                             )
                         }
 
@@ -254,7 +279,11 @@ private fun DietScreen(
                                 iconColor = Color(0xFFE8BC1F),
                                 onAddItemClick = {
                                     // Handle Add Item functionality here
-                                    dietViewModel.setSelectedFoodOption(dietViewModel.foodCategoryOptions.get(0))
+                                    dietViewModel.setSelectedFoodOption(
+                                        dietViewModel.foodCategoryOptions.get(
+                                            0
+                                        )
+                                    )
                                     navigateToDetail(DetailDestinations.FOOD_LIST_DETAIL_ROUTE)
                                 },
                                 navigateToDetail = navigateToDetail,
@@ -272,7 +301,11 @@ private fun DietScreen(
                                 iconColor = Color(0xFF63A8CF),
                                 onAddItemClick = {
                                     // Handle Add Item functionality here
-                                    dietViewModel.setSelectedFoodOption(dietViewModel.foodCategoryOptions.get(1))
+                                    dietViewModel.setSelectedFoodOption(
+                                        dietViewModel.foodCategoryOptions.get(
+                                            1
+                                        )
+                                    )
                                     navigateToDetail(DetailDestinations.FOOD_LIST_DETAIL_ROUTE)
                                 },
                                 navigateToDetail = navigateToDetail,
@@ -290,7 +323,11 @@ private fun DietScreen(
                                 iconColor = Color(0xFFE86F1F),
                                 onAddItemClick = {
                                     // Handle Add Item functionality here
-                                    dietViewModel.setSelectedFoodOption(dietViewModel.foodCategoryOptions.get(2))
+                                    dietViewModel.setSelectedFoodOption(
+                                        dietViewModel.foodCategoryOptions.get(
+                                            2
+                                        )
+                                    )
                                     navigateToDetail(DetailDestinations.FOOD_LIST_DETAIL_ROUTE)
                                 },
                                 navigateToDetail = navigateToDetail,
@@ -308,7 +345,11 @@ private fun DietScreen(
                                 iconColor = Color(0xFF7C1C89),
                                 onAddItemClick = {
                                     // Handle Add Item functionality here
-                                    dietViewModel.setSelectedFoodOption(dietViewModel.foodCategoryOptions.get(3))
+                                    dietViewModel.setSelectedFoodOption(
+                                        dietViewModel.foodCategoryOptions.get(
+                                            3
+                                        )
+                                    )
                                     navigateToDetail(DetailDestinations.FOOD_LIST_DETAIL_ROUTE)
                                 },
                                 navigateToDetail = navigateToDetail,
@@ -333,7 +374,8 @@ private fun DietScreen(
 private fun TabSection(
     profile: Detail? = null,
     modifier: Modifier = Modifier,
-    navigateToDetail: (String) -> Unit
+    navigateToDetail: (String) -> Unit,
+    navigateToBottomNav: (String) -> Unit // 👈 Tambahan
 ) {
     Row(
         horizontalArrangement = Arrangement.SpaceBetween,
@@ -344,54 +386,98 @@ private fun TabSection(
             .padding(horizontal = 21.dp)
 
     ) {
-        Row(
+        if (profile != null) {
+            Row(
+                modifier = Modifier.clickable {
+                    navigateToBottomNav(MainDestinations.PROFILE_ROUTE)
+                },
 
-            verticalAlignment = Alignment.CenterVertically
-        ) {
-            val genderIcon = when (profile?.gender.toString().lowercase()) {
-                "male" -> R.drawable.ic_male
-                "female" -> R.drawable.ic_female
-                else -> R.drawable.ic_male // default/fallback
-            }
-            Box(
-                modifier = Modifier
-                    .clip(CircleShape)
-                    .background(
-                        color = MaterialTheme.colorScheme.primary.copy(alpha = 0.2f),
-                    ), // Warna latar belakang lingkaran
-                contentAlignment = Alignment.Center
+                verticalAlignment = Alignment.CenterVertically
             ) {
-                Image(
-                    painter = painterResource(id = genderIcon),
-                    contentDescription = null,
-
-                    contentScale = ContentScale.Crop,
+                val genderIcon = when (profile?.gender.toString().lowercase()) {
+                    "male" -> R.drawable.ic_male
+                    "female" -> R.drawable.ic_female
+                    else -> R.drawable.ic_male // default/fallback
+                }
+                Box(
                     modifier = Modifier
-                        .size(50.dp)
-                        .clip(RoundedCornerShape(50.dp))
-                        .offset(y = 5.dp)
-                )
-            }
-            Spacer(modifier = Modifier.width(15.dp))
-            Column(
-                verticalArrangement = Arrangement.spacedBy(0.1.dp)
-            ) {
+                        .clip(CircleShape)
+                        .background(
+                            color = MaterialTheme.colorScheme.primary.copy(alpha = 0.2f),
+                        ), // Warna latar belakang lingkaran
+                    contentAlignment = Alignment.Center
+                ) {
+                    Image(
+                        painter = painterResource(id = genderIcon),
+                        contentDescription = null,
 
-                Text(
-                    text = "Halo, ${profile?.name}",
-                    fontWeight = FontWeight.SemiBold,
-                    fontSize = 16.sp,
-                    color = MaterialTheme.colorScheme.onBackground,
-                )
-                Text(
-                    text = "${formattedCurrentDate()}",
-                    fontWeight = FontWeight.SemiBold,
-                    fontSize = 12.sp,
-                    color = MaterialTheme.colorScheme.onBackground.copy(
-                        alpha = 0.5f
+                        contentScale = ContentScale.Crop,
+                        modifier = Modifier
+                            .size(50.dp)
+                            .clip(RoundedCornerShape(50.dp))
+                            .offset(y = 5.dp)
                     )
-                )
+                }
+                Spacer(modifier = Modifier.width(15.dp))
+                Column(
+                    verticalArrangement = Arrangement.spacedBy(0.1.dp)
+                ) {
+
+                    Text(
+                        text = "Halo, ${profile?.name}",
+                        fontWeight = FontWeight.SemiBold,
+                        fontSize = 16.sp,
+                        color = MaterialTheme.colorScheme.onBackground,
+                    )
+                    Text(
+                        text = "${formattedCurrentDate()}",
+                        fontWeight = FontWeight.SemiBold,
+                        fontSize = 12.sp,
+                        color = MaterialTheme.colorScheme.onBackground.copy(
+                            alpha = 0.5f
+                        )
+                    )
+                }
             }
+        } else {
+            Row(
+                verticalAlignment = Alignment.CenterVertically,
+                modifier = Modifier.shimmer()
+            ) {
+                Box(
+                    modifier = Modifier
+                        .clip(CircleShape)
+                        .height(50.dp)
+                        .width(50.dp)
+                        .background(
+                            Color(0xFF3E7136).copy(alpha = 0.4f),
+                            shape = RoundedCornerShape(8.dp)
+                        )
+                )
+                Spacer(modifier = Modifier.width(15.dp))
+                Column {
+                    Box(
+                        modifier = Modifier
+                            .height(20.dp)
+                            .width(100.dp)
+                            .background(
+                                Color(0xFF3E7136).copy(alpha = 0.4f),
+                                shape = RoundedCornerShape(8.dp)
+                            )
+                    )
+                    Spacer(modifier = Modifier.height(5.dp))
+                    Box(
+                        modifier = Modifier
+                            .height(20.dp)
+                            .width(80.dp)
+                            .background(
+                                Color(0xFF3E7136).copy(alpha = 0.4f),
+                                shape = RoundedCornerShape(8.dp)
+                            )
+                    )
+                }
+            }
+
         }
         Row(
 
@@ -465,7 +551,8 @@ private fun WaterDropSection(
     currentWater: Int,
     maxWaterValue: Int,
     selectedValue: Int,
-    navigateToDetail: (String) -> Unit
+    navigateToDetail: (String) -> Unit,
+    isLoading: Boolean = false
 ) {
 
     val waterValue = buildAnnotatedString {
@@ -508,7 +595,7 @@ private fun WaterDropSection(
                     )
                     .border(1.dp, color = Color.Unspecified, shape = RoundedCornerShape(8.dp))
                     .clickable(
-                        enabled = currentWater - selectedValue > 0,
+//                        enabled = currentWater - selectedValue > 0,
                         onClick = onMinus,
                         indication = null,
                         interactionSource = remember { MutableInteractionSource() }),
@@ -558,10 +645,24 @@ private fun WaterDropSection(
 
         Spacer(modifier = Modifier.height(16.dp))
 
-        Text(
-            text = waterValue, fontSize = 18.sp,
-            color = Color(0xFF63A8CF)
-        )
+        if (isLoading) {
+            Box(
+                modifier = Modifier
+                    .height(20.dp)
+                    .width(150.dp)
+                    .background(
+                        Color(0xFF63A8CF).copy(alpha = 0.1f),
+                        shape = RoundedCornerShape(8.dp)
+                    )
+            )
+
+        } else {
+            Text(
+                text = waterValue, fontSize = 18.sp,
+                color = Color(0xFF63A8CF)
+            )
+
+        }
     }
 }
 
@@ -570,7 +671,8 @@ private fun UpcomingScheduleSection(
     modifier: Modifier = Modifier,
     data: ScheduleClosestResponse? = null,
     navigateToDetail: (String) -> Unit,
-    dietViewModel: DietViewModel
+    dietViewModel: DietViewModel,
+    isLoading: Boolean = false
 ) {
     Log.e(
         "TAG", "UpcomingScheduleSection: ${data}"
@@ -593,6 +695,17 @@ private fun UpcomingScheduleSection(
 
         Spacer(modifier = Modifier.height(16.dp))
 
+        if(isLoading){
+            Box(
+                modifier = Modifier
+                    .height(80.dp)
+                    .fillMaxWidth()
+                    .background(
+                        Color(0xFF3E7136).copy(alpha = 0.1f),
+                        shape = RoundedCornerShape(8.dp)
+                    )
+            )
+        }else{
         FoodItemCard(
             imageUrl = data?.data?.food?.image ?: "",
             title = data?.data?.food?.name ?: "",
@@ -612,19 +725,36 @@ private fun UpcomingScheduleSection(
                 navigateToDetail(DetailDestinations.foodDetailRouteWithId(foodId))
             },
 //            backgroundColor = ter
-        )
+        )}
 
         Spacer(modifier = Modifier.height(16.dp))
+        val formatter = DateTimeFormatter.ISO_OFFSET_DATE_TIME
 
-        if (data?.data?.isCompleted == false) {
+        val scheduleDate = data?.data?.scheduledAt?.let {
+            ZonedDateTime.parse(it, formatter).toLocalDate()
+        }
+
+        val isSameDay = scheduleDate == LocalDate.now()
+
+        if (data?.data?.isCompleted == false && isSameDay) {
             ActionButtons(
                 onEatClick = { dietViewModel.setCompletedSchedule() },
                 onChangeMenuClick = {
                     val scheduleId = data?.data?.id.toString()
                     navigateToDetail(DetailDestinations.foodRecomendationRouteWithId(scheduleId))
-
-                })
+                }
+            )
         }
+
+//        if (data?.data?.isCompleted == false) {
+//            ActionButtons(
+//                onEatClick = { dietViewModel.setCompletedSchedule() },
+//                onChangeMenuClick = {
+//                    val scheduleId = data?.data?.id.toString()
+//                    navigateToDetail(DetailDestinations.foodRecomendationRouteWithId(scheduleId))
+//
+//                })
+//        }
 
     }
 
@@ -646,7 +776,12 @@ fun ActionButtons(
                 .weight(1f)
                 .height(48.dp)
         ) {
-            Text(text = "Makan", fontSize = 16.sp, color = Color.White, fontWeight = FontWeight.SemiBold)
+            Text(
+                text = "Makan",
+                fontSize = 16.sp,
+                color = Color.White,
+                fontWeight = FontWeight.SemiBold
+            )
         }
 
         Spacer(modifier = Modifier.width(16.dp))
@@ -659,7 +794,12 @@ fun ActionButtons(
                 .weight(1f)
                 .height(48.dp)
         ) {
-            Text(text = "Ganti Menu", fontSize = 16.sp, color = MaterialTheme.colorScheme.primary, fontWeight = FontWeight.SemiBold)
+            Text(
+                text = "Ganti Menu",
+                fontSize = 16.sp,
+                color = MaterialTheme.colorScheme.primary,
+                fontWeight = FontWeight.SemiBold
+            )
         }
     }
 }

@@ -75,7 +75,9 @@ import com.example.sehatin.view.screen.authentication.register.personalize.Input
 import com.example.sehatin.view.screen.authentication.register.update.UpdateActivity
 import com.example.sehatin.view.screen.authentication.register.update.UpdateGoal
 import com.example.sehatin.view.screen.authentication.register.update.UpdateHeight
+import com.example.sehatin.view.screen.authentication.register.update.UpdateHeightOnly
 import com.example.sehatin.view.screen.authentication.register.update.UpdateWeight
+import com.example.sehatin.view.screen.authentication.register.update.UpdateWeightOnly
 import com.example.sehatin.viewmodel.PersonalizeViewModel
 import com.example.sehatin.view.screen.dashboard.detail.diet.DietScheduleDetail
 import com.example.sehatin.view.screen.dashboard.detail.diet.FoodDetail
@@ -297,6 +299,24 @@ fun SehatInApp() {
                             navigateToRoute = { route ->
                                 sehatInNavController.navigateToNonBottomBarRoute(route)
                             }
+                        )
+                    }
+
+                    composableWithCompositionLocal(
+                        route = DetailDestinations.UPDATE_HEIGHT_ONLY_ROUTE
+                    ) { backStackEntry ->
+                        UpdateHeightOnly(
+                            personalizeViewModel = personalizeViewModel,
+                            navigateToRoute = sehatInNavController::navigateToNonBottomBarRoute,
+                        )
+                    }
+
+                    composableWithCompositionLocal(
+                        route = DetailDestinations.UPDATE_WEIGHT_ONLY_ROUTE
+                    ) { backStackEntry ->
+                        UpdateWeightOnly(
+                            personalizeViewModel = personalizeViewModel,
+                            navigateToRoute = sehatInNavController::navigateToNonBottomBarRoute,
                         )
                     }
                     composableWithCompositionLocal(
@@ -602,7 +622,7 @@ fun MainContainer(
                 modifier = Modifier
                     .padding(padding)
                     .consumeWindowInsets(padding),
-//                navigateToRoute = nestedNavController::navigateToNonBottomBarRoute,
+                navigateToBottomNav = nestedNavController::navigateToBottomBarRoute,
                 navigateToRootRoute = sehatInNavController::navigateToNonBottomBarRoute, // 👈 ini penting!
                 navigateToMain = sehatInNavController::navigateWithClear
             )

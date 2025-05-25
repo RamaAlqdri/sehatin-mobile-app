@@ -2,6 +2,7 @@ package com.example.sehatin.data.repository
 
 import android.R
 import android.content.Context
+import android.util.Log
 import androidx.work.OneTimeWorkRequestBuilder
 import androidx.work.WorkManager
 import androidx.work.workDataOf
@@ -30,9 +31,12 @@ import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.flow
 import kotlinx.coroutines.flow.flowOn
+import java.text.SimpleDateFormat
 import java.time.OffsetDateTime
 import java.time.format.DateTimeFormatter
 import java.util.Date
+import java.util.Locale
+import java.util.TimeZone
 import java.util.concurrent.TimeUnit
 
 class DashboardRepository private constructor(
@@ -72,6 +76,54 @@ class DashboardRepository private constructor(
             emit(ResultResponse.Error(e.localizedMessage ?: "Network error"))
         }
     }.flowOn(Dispatchers.IO)
+
+    fun deleteLatestWaterHistory(
+    ): Flow<ResultResponse<CreateWaterHistoryResponse>> = flow {
+        emit(ResultResponse.Loading)
+        try {
+            val response = dashboardService.deleteLatestWaterHistory()
+            if (response.isSuccessful) {
+                response.body()?.let {
+                    emit(ResultResponse.Success(it))
+                } ?: emit(ResultResponse.Error("Empty response body"))
+            } else {
+                emit(
+                    ResultResponse.Error(
+                        "Error: ${
+                            response.errorBody()?.string() ?: "Unknown error"
+                        }"
+                    )
+                )
+            }
+        } catch (e: Exception) {
+            emit(ResultResponse.Error(e.localizedMessage ?: "Network error"))
+        }
+    }.flowOn(Dispatchers.IO)
+
+    fun deleteWaterByIdHistory(
+        id: String
+    ): Flow<ResultResponse<CreateWaterHistoryResponse>> = flow {
+        emit(ResultResponse.Loading)
+        try {
+            val response = dashboardService.deleteWaterByIdHistory(id)
+            if (response.isSuccessful) {
+                response.body()?.let {
+                    emit(ResultResponse.Success(it))
+                } ?: emit(ResultResponse.Error("Empty response body"))
+            } else {
+                emit(
+                    ResultResponse.Error(
+                        "Error: ${
+                            response.errorBody()?.string() ?: "Unknown error"
+                        }"
+                    )
+                )
+            }
+        } catch (e: Exception) {
+            emit(ResultResponse.Error(e.localizedMessage ?: "Network error"))
+        }
+    }.flowOn(Dispatchers.IO)
+
 
     fun getUserDietProgress(): Flow<ResultResponse<DietProgressResponse>> = flow {
         emit(ResultResponse.Loading)
@@ -304,7 +356,9 @@ class DashboardRepository private constructor(
     // Fungsi untuk menjadwalkan notifikasi
     private fun scheduleMealReminder(context: Context, item: ScheduleDataItem) {
         val timeInMillis = parseIso8601ToMillis(item.scheduledAt) ?: return
+
         val delay = timeInMillis - System.currentTimeMillis()
+        Log.e("TAG", "scheduleMealReminder: ${item.scheduledAt} - $delay")
         if (delay <= 0) return // Lewat waktu, skip
 
         // Siapkan data untuk dikirim ke Worker
@@ -333,6 +387,15 @@ class DashboardRepository private constructor(
             null
         }
     }
+//    private fun parseIso8601ToMillis(isoDate: String): Long? {
+//        return try {
+//            val formatter = SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss", Locale.getDefault())
+//            formatter.timeZone = TimeZone.getTimeZone("Asia/Makassar") // UTC+8
+//            formatter.parse(isoDate)?.time
+//        } catch (e: Exception) {
+//            null
+//        }
+//    }
 
     companion object {
         @Volatile

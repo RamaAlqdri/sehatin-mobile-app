@@ -56,7 +56,7 @@ fun CustomDatePicker(
     ) {
         Box(
             modifier = Modifier
-                .height(40.dp)
+                .height(55.dp)
                 .fillMaxWidth()
                 .border(
                     width = borderWidth,

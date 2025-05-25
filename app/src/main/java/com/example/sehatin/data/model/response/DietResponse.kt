@@ -55,6 +55,7 @@ class DietResponse {
         @field:SerializedName("totalTargetCalories") val totalTargetCalories: Double,
         @field:SerializedName("averageCalories") val averageCalories: Double,
         @field:SerializedName("caloriesPerMealType") val caloriesPerMealType: MealTypeItem,
+        @field:SerializedName("groupedCalories") val groupedCalories: Map<String, MealTypeItem>,
         @field:SerializedName("foodHistory") val foodHistory: List<FoodHistoryItem>,
 
     )

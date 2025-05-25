@@ -7,25 +7,19 @@ import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.statusBarsPadding
 import androidx.compose.material3.ExperimentalMaterial3Api
-import androidx.compose.material3.MaterialTheme
-import androidx.compose.material3.pulltorefresh.PullToRefreshBox
-import androidx.compose.material3.pulltorefresh.PullToRefreshDefaults.Indicator
 import androidx.compose.material3.pulltorefresh.rememberPullToRefreshState
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.foundation.layout.Spacer
-import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.shape.RoundedCornerShape
-import androidx.compose.material3.Text
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.draw.shadow
 import androidx.compose.ui.graphics.Color
-import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.example.compose.back
@@ -38,10 +32,8 @@ import com.example.sehatin.view.components.FoodHistory
 import com.example.sehatin.view.components.KaloriSummary
 import com.example.sehatin.view.components.MealLegend
 import com.example.sehatin.view.components.MealLegendItem
+import com.example.sehatin.viewmodel.ChartData
 import com.example.sehatin.viewmodel.DashboardViewModel
-import java.text.SimpleDateFormat
-import java.util.Locale
-import java.util.TimeZone
 
 @Composable
 fun Statistic(
@@ -178,10 +170,29 @@ private fun StatisticDetail(
                                     )
 
                                     // Generate the chart data
-                                    val chartData = dashboardViewModel.generateChartData(it)
+//                                    val chartData = dashboardViewModel.generateChartData(it)
 
-                                    Log.e("ChartData", "Chart Data: $chartData")
+//                                    Log.e("ChartData", "Chart Data: $chartData")
 
+                                    val groupedCalories = summaryData?.data?.groupedCalories
+
+                                    val labels = groupedCalories?.keys?.sortedWith(compareBy {
+                                        val weekMatch = Regex("minggu (\\d+)").find(it)
+                                        weekMatch?.groupValues?.get(1)?.toIntOrNull() ?: it.split(" ")[1].toIntOrNull() ?: 0
+                                    })
+
+                                    val breakfastData = labels?.map { label -> groupedCalories[label]?.breakfast?.toFloat() ?: 0f }
+                                    val lunchData = labels?.map { label -> groupedCalories[label]?.lunch?.toFloat() ?: 0f }
+                                    val dinnerData = labels?.map { label -> groupedCalories[label]?.dinner?.toFloat() ?: 0f }
+                                    val snackData = labels?.map { label -> groupedCalories[label]?.other?.toFloat() ?: 0f }
+
+                                    val chartData = ChartData(
+                                        labels = labels,
+                                        breakfastData = breakfastData,
+                                        lunchData = lunchData,
+                                        dinnerData = dinnerData,
+                                        snackData = snackData
+                                    )
                                     // --- Chart Bar (Kalori per hari)
                                     CaloriesBarChart(
                                         labels = chartData.labels,
@@ -210,12 +221,13 @@ private fun StatisticDetail(
                                             ),
                                             MealLegendItem(
                                                 "Makan Malam",
-                                                Color(0xFF7D5BA6),
+                                                Color(0xFFD26466),
                                                 it.data.caloriesPerMealType.dinner.toInt()
                                             ),
                                             MealLegendItem(
                                                 "Camilan/Lainnya",
-                                                Color(0xFFD26466),
+                                                Color(0xFF7D5BA6),
+
                                                 it.data.caloriesPerMealType.other.toInt()
                                             )
                                         ),

@@ -2,7 +2,9 @@ package com.example.sehatin.view.screen.dashboard.detail.home
 
 import android.util.Log
 import androidx.compose.foundation.background
+import androidx.compose.foundation.border
 import androidx.compose.foundation.clickable
+import androidx.compose.foundation.interaction.MutableInteractionSource
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
@@ -17,7 +19,10 @@ import androidx.compose.foundation.layout.statusBarsPadding
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.Delete
 import androidx.compose.material3.ExperimentalMaterial3Api
+import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.material3.pulltorefresh.PullToRefreshBox
@@ -35,21 +40,30 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.draw.shadow
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.graphics.graphicsLayer
+import androidx.compose.ui.graphics.vector.ImageVector
+import androidx.compose.ui.res.vectorResource
+import androidx.compose.ui.text.font.FontStyle
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.example.compose.back
+import com.example.compose.backGlass
 import com.example.compose.ter
+import com.example.compose.waterGlass
+import com.example.sehatin.R
 import com.example.sehatin.common.CaloriesConsumptionItem
 import com.example.sehatin.common.FakeData
 import com.example.sehatin.common.ResultResponse
 import com.example.sehatin.common.WaterConsumptionItem
 import com.example.sehatin.navigation.SehatInSurface
 import com.example.sehatin.utils.convertToHoursAndMinutes
+import com.example.sehatin.utils.convertToHoursAndMinutesWater
 import com.example.sehatin.view.components.CustomTopAppBar
 import com.example.sehatin.view.components.WaterIntake
 import com.example.sehatin.viewmodel.DashboardViewModel
+import com.valentinilk.shimmer.shimmer
 import java.time.LocalDate
 import java.time.ZoneId
 import java.time.format.DateTimeFormatter
@@ -88,12 +102,16 @@ private fun WaterDetail(
     )
     val isRefreshing by dashboardViewModel.isRefreshing.collectAsStateWithLifecycle()
 
-    val waterDailyState by dashboardViewModel.waterDailyState.collectAsStateWithLifecycle(initialValue = ResultResponse.None)
+    val waterDailyState by dashboardViewModel.waterDailyState.collectAsStateWithLifecycle(
+        initialValue = ResultResponse.None
+    )
 
 
     val waterDayData by dashboardViewModel.waterDaily.collectAsStateWithLifecycle(initialValue = null)
 
     val createWaterState by dashboardViewModel.createWaterState.collectAsStateWithLifecycle()
+    val deleteLatestWaterState by dashboardViewModel.deleteLatestWaterState.collectAsStateWithLifecycle()
+    val deleteWaterbyIdState by dashboardViewModel.deleteWaterbyIdState.collectAsStateWithLifecycle()
 
     val selectedDate by dashboardViewModel.selectedDate.collectAsStateWithLifecycle()
     val isTodaySelected = selectedDate.toInstant()
@@ -110,6 +128,22 @@ private fun WaterDetail(
             dashboardViewModel.refresh()
             dashboardViewModel.resetCreateWaterState()
         }
+    }
+    LaunchedEffect(deleteLatestWaterState) {
+        if (deleteLatestWaterState is ResultResponse.Success) {
+            dashboardViewModel.refresh()
+            dashboardViewModel.resetDeleteLatestWaterState()
+        }
+
+
+    }
+    LaunchedEffect(deleteWaterbyIdState) {
+        if (deleteWaterbyIdState is ResultResponse.Success) {
+            dashboardViewModel.refresh()
+            dashboardViewModel.resetDeleteWaterByIdState()
+        }
+
+
     }
 
 
@@ -181,7 +215,7 @@ private fun WaterDetail(
                                     dashboardViewModel.createWaterHistory(selectedValue.toDouble())
                                 },
                                 onMinus = {
-                                    dashboardViewModel.createWaterHistory(-selectedValue.toDouble())
+                                    dashboardViewModel.deleteLatestWaterHistory()
                                 },
                                 onSelectedChange = {
                                     selectedValue = it
@@ -248,14 +282,16 @@ fun CalendarSection(
                 DateItem(
                     date = date,
                     isSelected = date == selectedLocalDate,
-                    onClick = { val zoneId = ZoneId.of("UTC+8")
+                    onClick = {
+                        val zoneId = ZoneId.of("UTC+8")
                         val zonedDateTime = date.atTime(12, 0).atZone(zoneId) // <- set jam 12 siang
                         val instant = zonedDateTime.toInstant()
                         Log.e(
                             "DateItem",
                             "date: $date, selectedDate: $selectedLocalDate"
                         )
-                        onDateSelected(Date.from(instant)) }
+                        onDateSelected(Date.from(instant))
+                    }
                 )
             }
         }
@@ -268,7 +304,10 @@ fun WaterConsumptionHistory(
     modifier: Modifier = Modifier,
     dashboardViewModel: DashboardViewModel
 ) {
-    val waterHistoryState by dashboardViewModel.waterHistoryState.collectAsStateWithLifecycle(initialValue = ResultResponse.None)
+    val waterHistoryState by dashboardViewModel.waterHistoryState.collectAsStateWithLifecycle(
+        initialValue = ResultResponse.None
+    )
+    val isLoading = waterHistoryState is ResultResponse.Loading
     val waterHistoryData by dashboardViewModel.waterHistory.collectAsStateWithLifecycle(initialValue = null)
 
     LaunchedEffect(waterHistoryState) {
@@ -276,15 +315,18 @@ fun WaterConsumptionHistory(
             is ResultResponse.Loading -> {
                 // tampilkan progress bar loading
             }
+
             is ResultResponse.Error -> {
                 // tampilkan error
 
                 Log.e("RESULT", "Error: ${(waterHistoryState as ResultResponse.Error).error}")
             }
+
             is ResultResponse.Success -> {
                 // tampilkan data jika sukses
                 Log.d("RESULT", "Success: ${(waterHistoryState as ResultResponse.Success).data}")
             }
+
             else -> {
                 // status default
             }
@@ -310,20 +352,70 @@ fun WaterConsumptionHistory(
 //        FakeData.WaterHistory.forEach { item ->
 //            WaterConsumptionRow(item)
 //        }
-        waterHistoryData?.data?.forEach { waterHistoryItem ->
-            WaterConsumptionRow(
-                item = WaterConsumptionItem(
-                    time = convertToHoursAndMinutes(waterHistoryItem.createdAt) ,
-                    amount = "${waterHistoryItem.water}"
+        if (isLoading) {
+            // tampilkan progress bar loading
+            repeat(5) {
+                Row(
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .padding(bottom = 9.dp),
+                    verticalAlignment = Alignment.CenterVertically
+                ) {
+                    Box(
+                        modifier = Modifier
+                            .shimmer()
+                            .fillMaxWidth()
+                            .height(50.dp)
+                            .background(
+                                Color(0xFF3E7136).copy(alpha = 0.4f),
+                                shape = RoundedCornerShape(8.dp)
+                            )
+                            .padding(12.dp),
+                        contentAlignment = Alignment.Center
+                    ) {}
+                }
+            }
+        } else {
+            waterHistoryData?.data?.forEach { waterHistoryItem ->
+                WaterConsumptionRow(
+                    item = WaterConsumptionItem(
+                        id = waterHistoryItem.id,
+                        time = convertToHoursAndMinutesWater(waterHistoryItem.createdAt),
+                        amount = "${waterHistoryItem.water}"
+                    ),
+                    onDelete = {
+                        dashboardViewModel.deleteWaterByIdHistory(waterHistoryItem.id)
+                    }
                 )
-            )
+            }
+            if (waterHistoryData?.data?.isEmpty() == true) {
+                Box(
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .height(100.dp)
+                        .padding(bottom = 9.dp),
+                    contentAlignment = Alignment.Center
+                ) {
+
+                    Text(
+                        text = "Tidak ada data Air",
+                        fontSize = 14.sp,
+                        fontStyle = FontStyle.Italic,
+                        fontWeight = FontWeight.Bold,
+                        color = Color.Gray,
+                        modifier = Modifier.padding(bottom = 8.dp)
+                    )
+                }
+            }
+
         }
     }
 }
 
 @Composable
 fun WaterConsumptionRow(
-    item: WaterConsumptionItem
+    item: WaterConsumptionItem,
+    onDelete: () -> Unit
 ) {
     Row(
         modifier = Modifier
@@ -352,7 +444,8 @@ fun WaterConsumptionRow(
 
         Box(
             modifier = Modifier
-                .fillMaxWidth()
+//                .width(150.dp)
+                .weight(1f)
                 .height(50.dp)
                 .background(Color(0xFFF3F3F3), RoundedCornerShape(10.dp))
                 .padding(14.dp),
@@ -364,6 +457,32 @@ fun WaterConsumptionRow(
                 fontSize = 14.sp,
                 fontWeight = FontWeight.Bold,
                 color = MaterialTheme.colorScheme.primary
+            )
+        }
+        Spacer(modifier = Modifier.width(10.dp))
+        Box(
+            modifier = Modifier
+                .size(50.dp)
+                .background(
+                    MaterialTheme.colorScheme.errorContainer,
+                    shape = RoundedCornerShape(8.dp)
+                )
+                .border(1.dp, color = Color.Unspecified, shape = RoundedCornerShape(8.dp))
+                .clickable(
+                    onClick =
+                        onDelete,
+                    indication = null,
+                    interactionSource = remember { MutableInteractionSource() }
+                ),
+            contentAlignment = Alignment.Center
+        ) {
+            Icon(
+                imageVector = Icons.Default.Delete,
+                contentDescription = null,
+                tint = MaterialTheme.colorScheme.error,
+                modifier = Modifier
+                    .size(24.dp)
+//                    .graphicsLayer(rotationZ = 180f)
             )
         }
     }

@@ -93,7 +93,8 @@ fun NavGraphBuilder.addHomeGraph(
     onSnackSelected: (Long, String, NavBackStackEntry) -> Unit,
     modifier: Modifier = Modifier,
     navigateToMain: (String,Boolean)-> Unit,
-    navigateToRootRoute: (String) -> Unit // <--- Tambahkan ini
+    navigateToRootRoute: (String) -> Unit, // <--- Tambahkan ini
+    navigateToBottomNav: (String) -> Unit // <--- Tambahkan ini
 ) {
     composable(HomeSections.Dashboard.route) { from ->
 //        HomeScreen(
@@ -110,7 +111,10 @@ fun NavGraphBuilder.addHomeGraph(
             modifier = modifier,
             navigateToDetail = { route -> // 👈 Tambahkan ini
                 navigateToRootRoute(route) // 👈 Ini akan mengarah ke root NavController
-            }
+            },
+            navigateToBottomNav = { route -> // 👈 Tambahkan ini
+                navigateToBottomNav(route) // 👈 Ini akan mengarah ke root NavController
+            },
         )
     }
     composable(HomeSections.Consultation.route) { from ->
@@ -125,6 +129,9 @@ fun NavGraphBuilder.addHomeGraph(
             dietViewModel = dietViewModel,
             navigateToDetail = { route -> // 👈 Tambahkan ini}
                 navigateToRootRoute(route) // 👈 Ini akan mengarah ke root NavController
+            },
+            navigateToBottomNav = { route -> // 👈 Tambahkan ini
+                navigateToBottomNav(route) // 👈 Ini akan mengarah ke root NavController
             },
         )
     }

@@ -15,6 +15,7 @@ data class Meal(
 )
 
 data class WaterConsumptionItem(
+    val id: String,
     val time: String,
     val amount: String
 )
@@ -84,11 +85,7 @@ object FakeData {
         ),
     )
 
-    val WaterHistory = listOf(
-        WaterConsumptionItem("08.30", "250"),
-        WaterConsumptionItem("12.30", "250"),
-        WaterConsumptionItem("15.30", "250")
-    )
+
 
     val CaloriesHistory = listOf(
         CaloriesConsumptionItem("08.30", "250"),

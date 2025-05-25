@@ -1,5 +1,6 @@
 package com.example.sehatin.viewmodel
 
+import android.util.Log
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableFloatStateOf
 import androidx.compose.runtime.mutableStateOf
@@ -8,15 +9,24 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.example.sehatin.common.ResultResponse
 import com.example.sehatin.data.model.response.Detail
+import com.example.sehatin.data.model.response.GetUserResponse
 import com.example.sehatin.data.model.response.PersonalizeResponse
 import com.example.sehatin.data.repository.PersonalizeRepository
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
+import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.launch
 
 class PersonalizeViewModel(
     private val personalizeRepository: PersonalizeRepository
 ) : ViewModel() {
+
+    private val _userProfileState =
+        MutableStateFlow<ResultResponse<GetUserResponse>>(ResultResponse.None)
+    val userProfileState: StateFlow<ResultResponse<GetUserResponse>> = _userProfileState
+    private val _userDetailData =
+        MutableStateFlow<GetUserResponse?>(null)
+    val userDetailData= _userDetailData.asStateFlow()
 
     private val _personalizeState =
         MutableStateFlow<ResultResponse<PersonalizeResponse>>(ResultResponse.None)
@@ -77,6 +87,30 @@ class PersonalizeViewModel(
 
     suspend fun getUserDetail(): Detail? {
         return personalizeRepository.getUserDetail()
+    }
+
+    fun getUserProfile() {
+        viewModelScope.launch {
+            try {
+                _userProfileState.value = ResultResponse.Loading
+
+                personalizeRepository.getProfile().collect {result ->
+                    _userProfileState.value = result
+                    Log.e(
+                        "User Profile",
+                        result.toString()
+                    )
+                    if (result !is ResultResponse.Loading){
+                        if(result is ResultResponse.Success){
+                            _userDetailData.value = result.data
+                        }
+                    }
+                }
+            } catch  (e:Exception){
+                _userProfileState.value =ResultResponse.Error(e.localizedMessage ?: "Network error")
+            }
+        }
+
     }
 
     fun inputName() {

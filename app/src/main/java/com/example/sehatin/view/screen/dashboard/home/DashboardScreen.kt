@@ -58,6 +58,7 @@ import com.example.sehatin.data.model.response.DietProgressResponse
 import com.example.sehatin.data.model.response.ScheduleADayResponse
 import com.example.sehatin.data.model.response.ScheduleDataItem
 import com.example.sehatin.navigation.DetailDestinations
+import com.example.sehatin.navigation.MainDestinations
 import com.example.sehatin.navigation.SehatInSurface
 import com.example.sehatin.utils.convertToHoursAndMinutes
 import com.example.sehatin.view.components.CircularProgressBar
@@ -65,6 +66,7 @@ import com.example.sehatin.view.components.MealCard
 import com.example.sehatin.view.components.WeeklyWeightChartFromInput
 import com.example.sehatin.view.components.WeeklyWeightInput
 import com.example.sehatin.viewmodel.DashboardViewModel
+import com.valentinilk.shimmer.shimmer
 import java.time.LocalDate
 import java.time.format.DateTimeFormatter
 import java.util.Calendar
@@ -76,7 +78,8 @@ fun DashboardScreen(
     modifier: Modifier = Modifier,
     onSnackClick: (Long, String) -> Unit,
     dashboardViewModel: DashboardViewModel,
-    navigateToDetail: (String) -> Unit // 👈 Tambahan
+    navigateToDetail: (String) -> Unit, // 👈 Tambahan
+    navigateToBottomNav: (String) -> Unit // 👈 Tambahan
 ) {
     val vectorImages = listOf(
         R.drawable.ic_male,
@@ -94,23 +97,33 @@ fun DashboardScreen(
     var workSchedule by remember { mutableStateOf<List<ScheduleDataItem>?>(null) }
 
     val isRefreshing by dashboardViewModel.isRefreshing.collectAsStateWithLifecycle()
-    val weightHistoryState by dashboardViewModel.weightHistoryState.collectAsStateWithLifecycle()
+    val weightHistoryState by dashboardViewModel.weightHistoryState.collectAsStateWithLifecycle(
+        initialValue = ResultResponse.None
+    )
+    val isWeightHistoryLoading = weightHistoryState is ResultResponse.Loading
+
     val dietProgressState by dashboardViewModel.dietProgressState.collectAsStateWithLifecycle(
         initialValue = ResultResponse.None
     )
+    val isProgressLoading = dietProgressState is ResultResponse.Loading
     val waterADayState by dashboardViewModel.waterADayState.collectAsStateWithLifecycle(
         initialValue = ResultResponse.None
     )
+    val isWaterADayLoading = waterADayState is ResultResponse.Loading
     val caloriesADayState by dashboardViewModel.caloriesADayState.collectAsStateWithLifecycle(
         initialValue = ResultResponse.None
     )
+    val isCaloriesADayLoading = caloriesADayState is ResultResponse.Loading
 
     val scheduleADayState by dashboardViewModel.scheduleADayState.collectAsStateWithLifecycle(
         initialValue = ResultResponse.None
     )
+    val isScheduleADayLoading = scheduleADayState is ResultResponse.Loading
 
     val dietProgressData by dashboardViewModel.dietProgress.collectAsStateWithLifecycle(initialValue = null)
+
     val caloriesADay by dashboardViewModel.caloriesADay.collectAsStateWithLifecycle(initialValue = null)
+
     val waterADay by dashboardViewModel.waterADay.collectAsStateWithLifecycle(initialValue = null)
     val scheduleADay by dashboardViewModel.scheduleADay.collectAsStateWithLifecycle(initialValue = null)
     val weightHistory by dashboardViewModel.weightHistory.collectAsStateWithLifecycle(initialValue = null)
@@ -201,8 +214,6 @@ fun DashboardScreen(
 //    }
 
 
-
-
     PullToRefreshBox(
         isRefreshing = isRefreshing,
         onRefresh = {
@@ -246,55 +257,103 @@ fun DashboardScreen(
 
                             ) {
 
-                                Row(
+                                if (profile != null) {
 
-                                    verticalAlignment = Alignment.CenterVertically
-                                ) {
-                                    val genderIcon = when (profile?.gender.toString().lowercase()) {
-                                        "male" -> R.drawable.ic_male
-                                        "female" -> R.drawable.ic_female
-                                        else -> R.drawable.ic_male // default/fallback
-                                    }
-                                    Box(
-                                        modifier = Modifier
-                                            .clip(CircleShape)
-                                            .background(
-                                                color = MaterialTheme.colorScheme.primary.copy(alpha = 0.2f),
-                                            ), // Warna latar belakang lingkaran
-                                        contentAlignment = Alignment.Center
-                                    ) {
-                                        Image(
-                                            painter = painterResource(id = genderIcon),
-                                            contentDescription = null,
+                                    Row(
+                                        modifier = Modifier.clickable {
+                                            navigateToBottomNav(MainDestinations.PROFILE_ROUTE)
+                                        },
+                                        verticalAlignment = Alignment.CenterVertically,
 
-                                            contentScale = ContentScale.Crop,
+                                        ) {
+                                        val genderIcon =
+                                            when (profile?.gender.toString().lowercase()) {
+                                                "male" -> R.drawable.ic_male
+                                                "female" -> R.drawable.ic_female
+                                                else -> R.drawable.ic_male // default/fallback
+                                            }
+                                        Box(
                                             modifier = Modifier
-                                                .size(50.dp)
-                                                .clip(RoundedCornerShape(50.dp))
-                                                .offset(y = 5.dp)
-                                        )
-                                    }
-                                    Spacer(modifier = Modifier.width(15.dp))
-                                    Column(
-                                        verticalArrangement = Arrangement.spacedBy(0.1.dp)
-                                    ) {
+                                                .clip(CircleShape)
+                                                .background(
+                                                    color = MaterialTheme.colorScheme.primary.copy(
+                                                        alpha = 0.2f
+                                                    ),
+                                                ), // Warna latar belakang lingkaran
+                                            contentAlignment = Alignment.Center
+                                        ) {
+                                            Image(
+                                                painter = painterResource(id = genderIcon),
+                                                contentDescription = null,
 
-                                        Text(
-                                            text = "Halo, ${profile?.name}",
-                                            fontWeight = FontWeight.SemiBold,
-                                            fontSize = 16.sp,
-                                            color = MaterialTheme.colorScheme.onBackground,
-                                        )
-                                        Text(
-                                            text = "${formattedCurrentDate()}",
-                                            fontWeight = FontWeight.SemiBold,
-                                            fontSize = 12.sp,
-                                            color = MaterialTheme.colorScheme.onBackground.copy(
-                                                alpha = 0.5f
+                                                contentScale = ContentScale.Crop,
+                                                modifier = Modifier
+                                                    .size(50.dp)
+                                                    .clip(RoundedCornerShape(50.dp))
+                                                    .offset(y = 5.dp)
                                             )
+                                        }
+                                        Spacer(modifier = Modifier.width(15.dp))
+                                        Column(
+                                            verticalArrangement = Arrangement.spacedBy(0.1.dp)
+                                        ) {
+
+                                            Text(
+                                                text = "Halo, ${profile?.name}",
+                                                fontWeight = FontWeight.SemiBold,
+                                                fontSize = 16.sp,
+                                                color = MaterialTheme.colorScheme.onBackground,
+                                            )
+                                            Text(
+                                                text = "${formattedCurrentDate()}",
+                                                fontWeight = FontWeight.SemiBold,
+                                                fontSize = 12.sp,
+                                                color = MaterialTheme.colorScheme.onBackground.copy(
+                                                    alpha = 0.5f
+                                                )
+                                            )
+                                        }
+                                    }
+                                } else {
+                                    Row(
+                                        verticalAlignment = Alignment.CenterVertically,
+                                        modifier = Modifier.shimmer()
+                                    ) {
+                                        Box(
+                                            modifier = Modifier
+                                                .clip(CircleShape)
+                                                .height(50.dp)
+                                                .width(50.dp)
+                                                .background(
+                                                    Color(0xFF3E7136).copy(alpha = 0.4f),
+                                                    shape = RoundedCornerShape(8.dp)
+                                                )
                                         )
+                                        Spacer(modifier = Modifier.width(15.dp))
+                                        Column {
+                                            Box(
+                                                modifier = Modifier
+                                                    .height(20.dp)
+                                                    .width(100.dp)
+                                                    .background(
+                                                        Color(0xFF3E7136).copy(alpha = 0.4f),
+                                                        shape = RoundedCornerShape(8.dp)
+                                                    )
+                                            )
+                                            Spacer(modifier = Modifier.height(5.dp))
+                                            Box(
+                                                modifier = Modifier
+                                                    .height(20.dp)
+                                                    .width(80.dp)
+                                                    .background(
+                                                        Color(0xFF3E7136).copy(alpha = 0.4f),
+                                                        shape = RoundedCornerShape(8.dp)
+                                                    )
+                                            )
+                                        }
                                     }
                                 }
+
 
                                 Row(
                                     modifier = Modifier
@@ -360,40 +419,110 @@ fun DashboardScreen(
                                             verticalArrangement = Arrangement.spacedBy(-2.dp)
                                         ) {
 
-                                            Text(
-                                                text = dietProgressData?.data?.short_message ?: " ",
-                                                color = MaterialTheme.colorScheme.onPrimary,
-                                                fontWeight = FontWeight.Bold,
-                                                fontSize = 28.sp
-                                            )
-                                            Box(
-                                                modifier = Modifier.widthIn(max = 200.dp) // Set the maximum width
-                                            ) {
+                                            if (isProgressLoading) {
+
+                                                Row(
+                                                    modifier = Modifier
+                                                        .shimmer()
+                                                        .widthIn(max = 200.dp),
+//                                                        .weight(1f)
+                                                    verticalAlignment = Alignment.CenterVertically,
+                                                ) {
+                                                    Column {
+
+                                                        Box(
+                                                            modifier = Modifier
+
+                                                                .height(28.dp)
+                                                                .fillMaxWidth()
+                                                                .background(
+                                                                    Color(0xFFFFFFFF).copy(alpha = 0.4f),
+                                                                    shape = RoundedCornerShape(8.dp)
+                                                                )
+                                                        )
+                                                        Spacer(modifier = Modifier.height(10.dp))
+                                                        Box(
+                                                            modifier = Modifier
+
+                                                                .height(24.dp)
+                                                                .fillMaxWidth()
+                                                                .background(
+                                                                    Color(0xFFFFFFFF).copy(alpha = 0.4f),
+                                                                    shape = RoundedCornerShape(6.dp)
+                                                                )
+                                                        )
+
+                                                    }
+                                                }
+
+                                            } else {
+
                                                 Text(
-                                                    text = dietProgressData?.data?.desc ?: " ",
+                                                    text = dietProgressData?.data?.short_message
+                                                        ?: " ",
                                                     color = MaterialTheme.colorScheme.onPrimary,
-                                                    fontWeight = FontWeight.Normal,
-                                                    fontSize = 12.sp
+                                                    fontWeight = FontWeight.Bold,
+                                                    fontSize = 28.sp
                                                 )
+                                                Box(
+                                                    modifier = Modifier.widthIn(max = 200.dp) // Set the maximum width
+                                                ) {
+                                                    Text(
+                                                        text = dietProgressData?.data?.desc ?: " ",
+                                                        color = MaterialTheme.colorScheme.onPrimary,
+                                                        fontWeight = FontWeight.Normal,
+                                                        fontSize = 12.sp
+                                                    )
+                                                }
                                             }
                                         }
                                     }
 
-                                    Box(
-                                        modifier = Modifier
-                                            .fillMaxSize(),
+                                    if (isProgressLoading) {
+                                        Box(
+                                            modifier = Modifier
+                                                .shimmer()
+                                                .fillMaxSize()
+//                                                .background(
+//                                                    Color(0xFF3E7136).copy(alpha = 0.4f),
+//                                                    shape = RoundedCornerShape(16.dp)
+//                                                ),
+                                            ,
+                                            contentAlignment = Alignment.Center
+
+                                        ) {
+                                            Box(
+                                                modifier = Modifier
+                                                    .height(110.dp)
+                                                    .width(110.dp)
+                                                    .background(
+                                                        Color(0xFFFFFFFF).copy(alpha = 0.4f),
+                                                        shape = RoundedCornerShape(100.dp)
+                                                    )
+                                            )
+                                        }
+                                    } else {
+
+                                        Box(
+                                            modifier = Modifier
+                                                .fillMaxSize(),
 //                        .background(Color(0xFF8BC34A)), // Warna hijau sebagai background layar
-                                        contentAlignment = Alignment.Center
-                                    ) {
-                                        val persentase = dietProgressData?.data?.persentase ?: 0.99
-                                        CircularProgressBar(
-                                            percentage = persentase.toFloat(),
-                                            size = 110.dp,
-                                            strokeWidth = 16.dp,
-                                            backgroundColor = Color.White.copy(0.3f), // Warna abu-abu terang
-                                            progressColor = Color.White,
-                                            textColor = Color.White
-                                        )
+                                            contentAlignment = Alignment.Center
+                                        ) {
+                                            val persentase =
+                                                dietProgressData?.data?.persentase ?: 0.99
+                                            val weightTarget =
+                                                dietProgressData?.data?.target ?: 0.99
+                                            CircularProgressBar(
+                                                percentage = persentase.toFloat(),
+                                                weightTarget = weightTarget.toFloat(),
+                                                size = 110.dp,
+                                                strokeWidth = 16.dp,
+                                                backgroundColor = Color.White.copy(0.3f), // Warna abu-abu terang
+                                                progressColor = Color.White,
+                                                textColor = Color.White,
+                                            )
+                                        }
                                     }
 
                                 }
@@ -413,7 +542,10 @@ fun DashboardScreen(
                                 Box(
                                     modifier = Modifier
                                         .weight(1f)
-                                        .shadow(elevation = 2.dp, shape = RoundedCornerShape(16.dp))
+                                        .shadow(
+                                            elevation = 2.dp,
+                                            shape = RoundedCornerShape(16.dp)
+                                        )
                                         .background(
                                             color = Color.White,
                                             shape = RoundedCornerShape(16.dp)
@@ -444,29 +576,44 @@ fun DashboardScreen(
                                                 color = Color.Black,
                                                 text = "Kalori"
                                             )
-                                            Row {
+                                            if (isCaloriesADayLoading) {
+                                                Box(
+                                                    modifier = Modifier
+                                                        .shimmer()
+//                                                        .widthIn(max = 200.dp)
+                                                        .width(100.dp)
+//                                                        .fillMaxWidth()
+                                                        .height(22.dp)
+                                                        .background(
+                                                            Color(0xFF3E7136).copy(alpha = 0.4f),
+                                                            shape = RoundedCornerShape(8.dp)
+                                                        )
+                                                ) {}
+                                            } else {
+                                                Row {
 
-                                                Text(
-                                                    color = caloriesColor,
-                                                    fontSize = 12.sp,
-                                                    fontWeight = FontWeight.SemiBold,
-                                                    text = caloriesADay?.data?.calories.toString()
-                                                        ?: "0"
-                                                )
-                                                Text(
-                                                    color = caloriesColor.copy(alpha = 0.5f),
-                                                    fontSize = 12.sp,
-                                                    fontWeight = FontWeight.SemiBold,
-                                                    text = "/${caloriesADay?.data?.target.toString() ?: "0"}"
-                                                )
-                                                Text(
-                                                    color = MaterialTheme.colorScheme.onBackground.copy(
-                                                        alpha = 0.5f
-                                                    ),
-                                                    fontSize = 12.sp,
-                                                    fontWeight = FontWeight.SemiBold,
-                                                    text = " kcal"
-                                                )
+                                                    Text(
+                                                        color = caloriesColor,
+                                                        fontSize = 12.sp,
+                                                        fontWeight = FontWeight.SemiBold,
+                                                        text = caloriesADay?.data?.calories.toString()
+                                                            ?: "0"
+                                                    )
+                                                    Text(
+                                                        color = caloriesColor.copy(alpha = 0.5f),
+                                                        fontSize = 12.sp,
+                                                        fontWeight = FontWeight.SemiBold,
+                                                        text = "/${caloriesADay?.data?.target.toString() ?: "0"}"
+                                                    )
+                                                    Text(
+                                                        color = MaterialTheme.colorScheme.onBackground.copy(
+                                                            alpha = 0.5f
+                                                        ),
+                                                        fontSize = 12.sp,
+                                                        fontWeight = FontWeight.SemiBold,
+                                                        text = " kcal"
+                                                    )
+                                                }
                                             }
                                         }
                                         Image(
@@ -482,7 +629,10 @@ fun DashboardScreen(
                                 Box(
                                     modifier = Modifier
                                         .weight(1f)
-                                        .shadow(elevation = 2.dp, shape = RoundedCornerShape(16.dp))
+                                        .shadow(
+                                            elevation = 2.dp,
+                                            shape = RoundedCornerShape(16.dp)
+                                        )
                                         .background(
                                             color = Color.White,
                                             shape = RoundedCornerShape(16.dp)
@@ -514,28 +664,44 @@ fun DashboardScreen(
                                                 color = Color.Black,
                                                 text = "Air"
                                             )
-                                            Row {
+                                            if (isWaterADayLoading) {
+                                                Box(
+                                                    modifier = Modifier
+                                                        .shimmer()
+//                                                        .widthIn(max = 200.dp)
+                                                        .width(100.dp)
+//                                                        .fillMaxWidth()
+                                                        .height(22.dp)
+                                                        .background(
+                                                            Color(0xFF3E7136).copy(alpha = 0.4f),
+                                                            shape = RoundedCornerShape(8.dp)
+                                                        )
+                                                ) {}
+                                            } else {
+                                                Row {
 
-                                                Text(
-                                                    color = waterColor,
-                                                    fontSize = 12.sp,
-                                                    fontWeight = FontWeight.SemiBold,
-                                                    text = waterADay?.data?.water.toString() ?: "0"
-                                                )
-                                                Text(
-                                                    color = waterColor.copy(alpha = 0.5f),
-                                                    fontSize = 12.sp,
-                                                    fontWeight = FontWeight.SemiBold,
-                                                    text = "/${waterADay?.data?.target.toString() ?: "0"}"
-                                                )
-                                                Text(
-                                                    color = MaterialTheme.colorScheme.onBackground.copy(
-                                                        alpha = 0.5f
-                                                    ),
-                                                    fontSize = 12.sp,
-                                                    fontWeight = FontWeight.SemiBold,
-                                                    text = " mL"
-                                                )
+                                                    Text(
+                                                        color = waterColor,
+                                                        fontSize = 12.sp,
+                                                        fontWeight = FontWeight.SemiBold,
+                                                        text = waterADay?.data?.water.toString()
+                                                            ?: "0"
+                                                    )
+                                                    Text(
+                                                        color = waterColor.copy(alpha = 0.5f),
+                                                        fontSize = 12.sp,
+                                                        fontWeight = FontWeight.SemiBold,
+                                                        text = "/${waterADay?.data?.target.toString() ?: "0"}"
+                                                    )
+                                                    Text(
+                                                        color = MaterialTheme.colorScheme.onBackground.copy(
+                                                            alpha = 0.5f
+                                                        ),
+                                                        fontSize = 12.sp,
+                                                        fontWeight = FontWeight.SemiBold,
+                                                        text = " mL"
+                                                    )
+                                                }
                                             }
                                         }
                                         Image(
@@ -557,7 +723,10 @@ fun DashboardScreen(
                             Column(
                                 modifier = Modifier
                                     .fillMaxWidth()
-                                    .shadow(elevation = 1.5.dp, shape = RoundedCornerShape(16.dp))
+                                    .shadow(
+                                        elevation = 1.5.dp,
+                                        shape = RoundedCornerShape(16.dp)
+                                    )
                                     .clip(RoundedCornerShape(16.dp))
                                     .background(Color.White)
                                     .padding(20.dp)
@@ -577,19 +746,35 @@ fun DashboardScreen(
 
 
                                     ) {
+                                        if (isWeightHistoryLoading) {
+                                            Box(
+                                                modifier = Modifier
+                                                    .shimmer()
+//                                                        .widthIn(max = 200.dp)
+                                                    .width(100.dp)
+//                                                        .fillMaxWidth()
+                                                    .height(22.dp)
+                                                    .background(
+                                                        Color(0xFF3E7136).copy(alpha = 0.4f),
+                                                        shape = RoundedCornerShape(8.dp)
+                                                    )
+                                            ) {}
 
-                                        Text(
-                                            text = "${weightHistory?.data?.get(weightHistory?.data?.lastIndex ?: 0)?.weight.toString() ?: "0"}",
-                                            color = MaterialTheme.colorScheme.primary,
-                                            fontSize = 24.sp,
-                                            fontWeight = FontWeight.SemiBold,
-                                        )
-                                        Text(
-                                            text = " kg",
-                                            color = Color(0xFFA5A5A5),
-                                            fontSize = 24.sp,
-                                            fontWeight = FontWeight.Normal,
-                                        )
+                                        } else {
+
+                                            Text(
+                                                text = "${weightHistory?.data?.get(weightHistory?.data?.lastIndex ?: 0)?.weight.toString() ?: "0"}",
+                                                color = MaterialTheme.colorScheme.primary,
+                                                fontSize = 24.sp,
+                                                fontWeight = FontWeight.SemiBold,
+                                            )
+                                            Text(
+                                                text = " kg",
+                                                color = Color(0xFFA5A5A5),
+                                                fontSize = 24.sp,
+                                                fontWeight = FontWeight.Normal,
+                                            )
+                                        }
                                     }
 
                                 }
@@ -604,17 +789,90 @@ fun DashboardScreen(
 //                                Spacer(modifier = Modifier.height(16.dp))
 
 
-                                weightHistory?.let {
-                                    WeeklyWeightChartFromInput(it.data)
+                                if (isWeightHistoryLoading) {
+                                    Box(
+                                        modifier = Modifier
+                                            .shimmer()
+                                            .padding(top = 20.dp)
+                                            .fillMaxWidth()
+                                            .height(260.dp)
+                                            .background(
+                                                Color(0xFF3E7136).copy(alpha = 0.4f),
+                                                shape = RoundedCornerShape(16.dp)
+                                            )
+                                    )
+                                } else {
+                                    WeeklyWeightChartFromInput(weightHistory?.data)
                                 }
+
                             }
                             Spacer(modifier = Modifier.height(22.dp))
                         }
                         item {
-                            ScheduleSection(
-                                data = scheduleADay,
-                                navigateToFoodDetail = navigateToDetail // ⬅️ parameternya harus sesuai
-                            )
+                            if (isScheduleADayLoading) {
+                                Column(
+                                    modifier = Modifier
+                                        .fillMaxWidth()
+//                                        .height(260.dp)
+                                        .shadow(
+                                            elevation = 1.5.dp,
+                                            shape = RoundedCornerShape(16.dp)
+                                        )
+                                        .clip(RoundedCornerShape(16.dp))
+                                        .background(
+                                            Color(0xFFFFFFFF),
+                                            shape = RoundedCornerShape(16.dp)
+                                        )
+                                        .padding(20.dp)
+                                ) {
+                                    Text(
+                                        text = "Saran Makanan Hari Ini",
+                                        color = Color.Black,
+                                        fontSize = 14.sp,
+                                        fontWeight = FontWeight.Bold
+                                    )
+                                    Spacer(modifier = Modifier.height(8.dp))
+                                    Box(
+                                        modifier = Modifier
+                                            .shimmer()
+                                            .fillMaxWidth()
+                                            .height(80.dp)
+                                            .background(
+                                                Color(0xFF3E7136).copy(alpha = 0.4f),
+                                                shape = RoundedCornerShape(16.dp)
+                                            )
+                                    )
+                                    Spacer(modifier = Modifier.height(14.dp))
+                                    Box(
+                                        modifier = Modifier
+                                            .shimmer()
+                                            .fillMaxWidth()
+                                            .height(80.dp)
+                                            .background(
+                                                Color(0xFF3E7136).copy(alpha = 0.4f),
+                                                shape = RoundedCornerShape(16.dp)
+                                            )
+                                    )
+                                    Spacer(modifier = Modifier.height(14.dp))
+                                    Box(
+                                        modifier = Modifier
+                                            .shimmer()
+                                            .fillMaxWidth()
+                                            .height(80.dp)
+                                            .background(
+                                                Color(0xFF3E7136).copy(alpha = 0.4f),
+                                                shape = RoundedCornerShape(16.dp)
+                                            )
+                                    )
+
+
+                                }
+                            } else {
+                                ScheduleSection(
+                                    data = scheduleADay,
+                                    navigateToFoodDetail = navigateToDetail // ⬅️ parameternya harus sesuai
+                                )
+                            }
                             Spacer(modifier = Modifier.height(22.dp))
                         }
                     }

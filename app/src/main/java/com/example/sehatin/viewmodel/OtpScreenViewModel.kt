@@ -51,6 +51,14 @@ class OtpScreenViewModel(
         MutableStateFlow<ResultResponse<VerifyOtpResponse>>(ResultResponse.None)
     val verifyOtpState: StateFlow<ResultResponse<VerifyOtpResponse>> = _verifyOtpState
 
+
+    fun resetOtpState() {
+
+        _verifyOtpState.value = ResultResponse.None
+    }
+    fun resetOtpRequest() {
+        _otpState.value = ResultResponse.None
+    }
     fun verifyOtp() {
         if (otpValue.isNotBlank()) {
             viewModelScope.launch {
