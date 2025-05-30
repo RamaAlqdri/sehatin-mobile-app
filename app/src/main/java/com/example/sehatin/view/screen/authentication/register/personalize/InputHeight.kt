@@ -1,6 +1,5 @@
 package com.example.sehatin.view.screen.authentication.register.personalize
 
-import CustomScrollInput
 import android.util.Log
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
@@ -33,6 +32,7 @@ import com.example.sehatin.common.ResultResponse
 import com.example.sehatin.navigation.MainDestinations
 import com.example.sehatin.view.components.CustomButton
 import com.example.sehatin.viewmodel.PersonalizeViewModel
+import com.example.yourappname.CustomScrollInput
 
 
 @Composable
